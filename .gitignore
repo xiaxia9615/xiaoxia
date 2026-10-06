@@ -26,3 +26,7 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 .env.bak
+
+# 本地备份文件
+*.bak
+*.orig
