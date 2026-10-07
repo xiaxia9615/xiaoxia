@@ -7,6 +7,7 @@ return [
         'User',
         'Product',
         'ApiKey',
+        'Skill',
     ],
 
     'provider_pattern' => 'App\\Modules\\%s\\Providers\\%sServiceProvider',
@@ -14,6 +15,7 @@ return [
     'dependencies' => [
         'User'    => [],
         'Product' => ['User'],
-        'ApiKey'  => ['User'],
+        'ApiKey'  => ['User', 'Product'],
+        'Skill'   => ['Product'],
     ],
 ];
