@@ -5,24 +5,21 @@ declare(strict_types=1);
 namespace App\Modules\Skill\Models;
 
 use App\Models\Product;
+use Database\Factories\SkillDetailFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SkillDetail extends Model
 {
+    use HasFactory;
+
     protected $table = 'skill_details';
 
     protected $fillable = [
-        'product_id',
-        'endpoint',
-        'method',
-        'pricing_type',
-        'provider_share',
-        'platform_share',
-        'influencer_share',
-        'donation_share',
-        'free_quota',
-        'config',
+        'product_id', 'endpoint', 'method', 'pricing_type',
+        'provider_share', 'platform_share', 'influencer_share', 'donation_share',
+        'free_quota', 'config',
     ];
 
     protected function casts(): array
@@ -42,5 +39,10 @@ class SkillDetail extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    protected static function newFactory(): SkillDetailFactory
+    {
+        return SkillDetailFactory::new();
     }
 }

@@ -6,28 +6,21 @@ namespace App\Modules\ApiKey\Models;
 
 use App\Models\Product;
 use App\Models\User;
+use Database\Factories\ApiCallFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ApiCall extends Model
 {
+    use HasFactory;
+
     protected $table = 'api_calls';
 
     protected $fillable = [
-        'request_id',
-        'user_id',
-        'api_key_id',
-        'product_id',
-        'provider_id',
-        'input',
-        'output',
-        'status_code',
-        'duration_ms',
-        'cost',
-        'provider_income',
-        'platform_income',
-        'influencer_income',
-        'donation_amount',
+        'request_id', 'user_id', 'api_key_id', 'product_id', 'provider_id',
+        'input', 'output', 'status_code', 'duration_ms',
+        'cost', 'provider_income', 'platform_income', 'influencer_income', 'donation_amount',
     ];
 
     protected function casts(): array
@@ -62,5 +55,10 @@ class ApiCall extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    protected static function newFactory(): ApiCallFactory
+    {
+        return ApiCallFactory::new();
     }
 }

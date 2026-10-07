@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace App\Modules\Product\Models;
 
+use App\Models\User;
+use Database\Factories\ProductFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
+    use HasFactory;
     use SoftDeletes;
 
     protected $fillable = [
@@ -46,5 +50,10 @@ class Product extends Model
     public function scopeGoods($query)
     {
         return $query->where('type', 2);
+    }
+
+    protected static function newFactory(): ProductFactory
+    {
+        return ProductFactory::new();
     }
 }
