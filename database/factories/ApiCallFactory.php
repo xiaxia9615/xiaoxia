@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\User;
 use App\Modules\ApiKey\Models\ApiCall;
 use App\Modules\ApiKey\Models\ApiKey;
 use App\Modules\Product\Models\Product;
@@ -20,26 +21,26 @@ class ApiCallFactory extends Factory
     public function definition(): array
     {
         $cost = fake()->numberBetween(100, 10000);
-        $providerIncome   = (int) ($cost * 0.70);
-        $platformIncome   = (int) ($cost * 0.15);
-        $influencerIncome = (int) ($cost * 0.10);
-        $donationAmount   = $cost - $providerIncome - $platformIncome - $influencerIncome;
+        $p = (int) ($cost * 0.70);
+        $pl = (int) ($cost * 0.15);
+        $inf = (int) ($cost * 0.10);
+        $d = $cost - $p - $pl - $inf;
 
         return [
             'request_id'        => (string) Str::uuid(),
-            'user_id'           => \App\Models\User::factory(),
+            'user_id'           => User::factory(),
             'api_key_id'        => ApiKey::factory(),
             'product_id'        => Product::factory()->skill(),
-            'provider_id'       => \App\Models\User::factory(),
+            'provider_id'       => User::factory(),
             'input'             => ['prompt' => fake()->sentence()],
             'output'            => ['result' => fake()->paragraph()],
-            'status_code'       => fake()->randomElement([200, 200, 200, 400, 500]),
+            'status_code'       => 200,
             'duration_ms'       => fake()->numberBetween(50, 3000),
             'cost'              => $cost,
-            'provider_income'   => $providerIncome,
-            'platform_income'   => $platformIncome,
-            'influencer_income' => $influencerIncome,
-            'donation_amount'   => $donationAmount,
+            'provider_income'   => $p,
+            'platform_income'   => $pl,
+            'influencer_income' => $inf,
+            'donation_amount'   => $d,
         ];
     }
 }
