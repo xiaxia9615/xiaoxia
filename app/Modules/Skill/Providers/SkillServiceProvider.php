@@ -8,8 +8,8 @@ use Illuminate\Support\ServiceProvider;
 
 final class SkillServiceProvider extends ServiceProvider
 {
-    public function register(): void
+    public function boot(): void
     {
-        // 后续绑定 Contracts 用
+        $this->loadRoutesFrom(__DIR__ . '/../Routes/api.php');
     }
 }
