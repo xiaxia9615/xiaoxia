@@ -58,4 +58,4 @@ php artisan test tests/Architecture
 
 ## 许可
 
-私有项目
+私有项目，保留所有权利。
