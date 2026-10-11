@@ -16,7 +16,7 @@ final class SkillCallController
     {
         $input = $request->input('input', []);
         try {
-            $result = $this->service->call($id, $input);
+            $result = $this->service->call($request->user(), $id, $input);
             return response()->json(['code' => 0, 'message' => 'success', 'data' => $result]);
         } catch (\Throwable $e) {
             return response()->json(['code' => 1, 'message' => $e->getMessage()], 400);

@@ -17,7 +17,7 @@ final class SkillCallService
 {
     public function __construct(private readonly LedgerService $ledger) {}
 
-    public function call(int $productId, array $input): array
+    public function call(User $caller, int $productId, array $input): array
     {
         $product = Product::query()->where('type', 1)->find($productId);
         if (! $product) throw new RuntimeException("Skill not found: {$productId}");
@@ -25,11 +25,8 @@ final class SkillCallService
         $detail = SkillDetail::query()->where('product_id', $product->id)->first();
         if (! $detail) throw new RuntimeException("Skill detail not found: {$productId}");
 
-        $caller = User::query()->first();
-        if (! $caller) throw new RuntimeException('No user');
-
-        $apiKey = ApiKey::query()->first();
-        if (! $apiKey) throw new RuntimeException('No api key');
+        $apiKey = ApiKey::query()->where('user_id', $caller->id)->first();
+        if (! $apiKey) throw new RuntimeException('no api key for this user');
 
         $cost = (int) $product->price;
 
