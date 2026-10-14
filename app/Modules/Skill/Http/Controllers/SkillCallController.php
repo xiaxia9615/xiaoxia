@@ -15,6 +15,13 @@ final class SkillCallController
     public function __invoke(Request $request, int $id): JsonResponse
     {
         $input = $request->input('input', []);
+        if (is_string($input)) {
+            $input = ['text' => $input];
+        }
+        if (! is_array($input)) {
+            $input = [];
+        }
+
         try {
             $result = $this->service->call($request->user(), $id, $input);
             return response()->json(['code' => 0, 'message' => 'success', 'data' => $result]);

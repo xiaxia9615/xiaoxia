@@ -30,6 +30,12 @@ final class SkillCallService
 
         $cost = (int) $product->price;
 
+        // ===== 新增：余额检查 =====
+        $balance = $this->ledger->balance('user', $caller->id, 'balance');
+        if ($balance < $cost) {
+            throw new RuntimeException("余额不足：当前 {$balance} 分，需要 {$cost} 分");
+        }
+
         $provider   = (int) round($cost * $detail->provider_share / 100);
         $platform   = (int) round($cost * $detail->platform_share / 100);
         $influencer = (int) round($cost * $detail->influencer_share / 100);
@@ -61,11 +67,11 @@ final class SkillCallService
         ]);
 
         $this->ledger->record('api_call', $call->id, [
-            ['owner_type' => 'user',     'owner_id' => $caller->id,       'account_type' => 'provider',   'direction' => 'credit', 'amount' => $provider],
-            ['owner_type' => 'platform', 'owner_id' => 0,                 'account_type' => 'platform',   'direction' => 'credit', 'amount' => $platform],
-            ['owner_type' => 'platform', 'owner_id' => 0,                 'account_type' => 'influencer', 'direction' => 'credit', 'amount' => $influencer],
-            ['owner_type' => 'platform', 'owner_id' => 0,                 'account_type' => 'donation',   'direction' => 'credit', 'amount' => $donation],
-            ['owner_type' => 'user',     'owner_id' => $caller->id,       'account_type' => 'balance',    'direction' => 'debit',  'amount' => $cost],
+            ['owner_type' => 'user',     'owner_id' => $caller->id, 'account_type' => 'provider',   'direction' => 'credit', 'amount' => $provider],
+            ['owner_type' => 'platform', 'owner_id' => 0,           'account_type' => 'platform',   'direction' => 'credit', 'amount' => $platform],
+            ['owner_type' => 'platform', 'owner_id' => 0,           'account_type' => 'influencer', 'direction' => 'credit', 'amount' => $influencer],
+            ['owner_type' => 'platform', 'owner_id' => 0,           'account_type' => 'donation',   'direction' => 'credit', 'amount' => $donation],
+            ['owner_type' => 'user',     'owner_id' => $caller->id, 'account_type' => 'balance',    'direction' => 'debit',  'amount' => $cost],
         ]);
 
         return [
