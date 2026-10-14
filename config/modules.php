@@ -14,7 +14,7 @@ return [
     'provider_pattern' => 'App\\Modules\\%s\\Providers\\%sServiceProvider',
 
     'dependencies' => [
-        'User'    => [],
+        'User'    => ['Ledger'],
         'Product' => ['User'],
         'ApiKey'  => ['User', 'Product'],
         'Skill'   => ['User', 'Product', 'ApiKey', 'Ledger'],

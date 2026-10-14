@@ -11,6 +11,9 @@ use App\Modules\Ledger\Services\LedgerService;
 use App\Modules\Product\Models\Product;
 use App\Modules\Skill\Models\SkillDetail;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -59,13 +62,39 @@ final class SkillCallService
         $donation   = intdiv($cost * $detail->donation_share, 100);
         $platform  += $cost - $provider - $platform - $influencer - $donation;
 
-        $output = [
-            'skill'    => $product->name,
-            'endpoint' => $detail->endpoint,
-            'method'   => $detail->method,
-            'input'    => $input,
-            'message'  => '模拟调用成功',
-        ];
+        // 组装请求体：将用户 input 按 request_template 合并
+        $template = $detail->request_template ?? [];
+        $requestBody = array_merge($template, $input);
+
+        // 发起真实 HTTP 调用
+        $startTime = microtime(true);
+        try {
+            $http = Http::timeout(30);
+            if ($detail->api_key) {
+                $http = $http->withToken($detail->api_key);
+            }
+            $response = match (strtoupper($detail->method)) {
+                'POST'   => $http->post($detail->endpoint, $requestBody),
+                'GET'    => $http->get($detail->endpoint, $requestBody),
+                'PUT'    => $http->put($detail->endpoint, $requestBody),
+                'PATCH'  => $http->patch($detail->endpoint, $requestBody),
+                'DELETE' => $http->delete($detail->endpoint, $requestBody),
+                default  => throw new RuntimeException("不支持的 HTTP 方法: {$detail->method}"),
+            };
+            $durationMs = (int) ((microtime(true) - $startTime) * 1000);
+
+            if ($response->failed()) {
+                throw new RuntimeException(
+                    "外部 API 返回错误：HTTP {$response->status()}"
+                );
+            }
+
+            $output = $response->json() ?? ['raw' => $response->body()];
+        } catch (ConnectionException $e) {
+            throw new RuntimeException('外部 API 连接失败：' . $e->getMessage());
+        } catch (RequestException $e) {
+            throw new RuntimeException('外部 API 请求失败：' . $e->getMessage());
+        }
 
         try {
             $call = ApiCall::create([
@@ -76,8 +105,8 @@ final class SkillCallService
                 'provider_id'       => $product->user_id,
                 'input'             => $input,
                 'output'            => $output,
-                'status_code'       => 200,
-                'duration_ms'       => 42,
+                'status_code'       => $response->status(),
+                'duration_ms'       => $durationMs,
                 'cost'              => $cost,
                 'provider_income'   => $provider,
                 'platform_income'   => $platform,

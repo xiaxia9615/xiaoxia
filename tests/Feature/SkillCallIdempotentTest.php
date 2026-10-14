@@ -12,6 +12,7 @@ use App\Modules\Product\Models\Product;
 use App\Modules\Skill\Models\SkillDetail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 final class SkillCallIdempotentTest extends TestCase
@@ -88,6 +89,8 @@ final class SkillCallIdempotentTest extends TestCase
 
     public function test_same_request_id_twice_produces_one_record_and_charges_once(): void
     {
+        Http::fake(['*' => Http::response(['result' => 'ok'], 200)]);
+
         [$caller, $token] = $this->makeUserWithToken('idem1@test.com');
         $provider = $this->makeUser('pidem1@test.com');
         $skill    = $this->makeSkill(1000, $provider->id);
@@ -127,6 +130,8 @@ final class SkillCallIdempotentTest extends TestCase
 
     public function test_different_request_ids_produce_two_records_and_charge_twice(): void
     {
+        Http::fake(['*' => Http::response(['result' => 'ok'], 200)]);
+
         [$caller, $token] = $this->makeUserWithToken('idem2@test.com');
         $provider = $this->makeUser('pidem2@test.com');
         $skill    = $this->makeSkill(1000, $provider->id);
@@ -165,6 +170,8 @@ final class SkillCallIdempotentTest extends TestCase
 
     public function test_missing_request_id_generates_new_uuid_and_charges_each_time(): void
     {
+        Http::fake(['*' => Http::response(['result' => 'ok'], 200)]);
+
         [$caller, $token] = $this->makeUserWithToken('idem3@test.com');
         $provider = $this->makeUser('pidem3@test.com');
         $skill    = $this->makeSkill(1000, $provider->id);
@@ -310,6 +317,8 @@ final class SkillCallIdempotentTest extends TestCase
 
     public function test_idempotent_response_contains_complete_billing_data(): void
     {
+        Http::fake(['*' => Http::response(['result' => 'ok'], 200)]);
+
         [$caller, $token] = $this->makeUserWithToken('idem5@test.com');
         $provider = $this->makeUser('pidem5@test.com');
         $skill    = $this->makeSkill(1000, $provider->id);

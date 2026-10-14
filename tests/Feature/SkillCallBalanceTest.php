@@ -10,6 +10,7 @@ use App\Modules\Ledger\Services\LedgerService;
 use App\Modules\Product\Models\Product;
 use App\Modules\Skill\Models\SkillDetail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 final class SkillCallBalanceTest extends TestCase
@@ -78,6 +79,10 @@ final class SkillCallBalanceTest extends TestCase
 
     public function test_call_succeeds_when_balance_sufficient(): void
     {
+        Http::fake([
+            '*' => Http::response(['result' => 'ok'], 200),
+        ]);
+
         [$caller, $token] = $this->makeUserWithToken('b@test.com');
         $provider = $this->makeUser('p@test.com');
         $skill = $this->makeSkill(1000, $provider->id);

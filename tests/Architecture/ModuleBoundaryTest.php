@@ -129,7 +129,10 @@ final class ModuleBoundaryTest extends TestCase
         foreach ($it as $file) {
             /** @var SplFileInfo $file */
             if ($file->isFile() && $file->getExtension() === 'php') {
-                $files[] = str_replace(base_path() . '/', '', $file->getPathname());
+                $path = str_replace(base_path() . '/', '', $file->getPathname());
+                // Routes 文件是 Laravel 路由定义，不需要 namespace
+                if (str_contains($path, '/Routes/')) continue;
+                $files[] = $path;
             }
         }
         sort($files);

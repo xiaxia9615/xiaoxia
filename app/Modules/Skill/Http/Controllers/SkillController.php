@@ -32,11 +32,13 @@ final class SkillController
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'name'        => 'required|string|max:100',
-            'description' => 'required|string|max:500',
-            'price'       => 'required|integer|min:0|max:100000000',
-            'endpoint'    => 'required|url|max:255',
-            'method'      => 'required|in:GET,POST',
+            'name'             => 'required|string|max:100',
+            'description'      => 'required|string|max:500',
+            'price'            => 'required|integer|min:0|max:100000000',
+            'endpoint'         => 'required|url|max:255',
+            'method'           => 'required|in:GET,POST',
+            'api_key'          => 'nullable|string|max:500',
+            'request_template' => 'nullable|array',
         ]);
 
         try {
@@ -56,6 +58,8 @@ final class SkillController
                 'product_id'       => $product->id,
                 'endpoint'         => $data['endpoint'],
                 'method'           => $data['method'],
+                'api_key'          => $data['api_key'] ?? null,
+                'request_template' => $data['request_template'] ?? null,
                 'provider_share'   => 80,
                 'platform_share'   => 10,
                 'influencer_share' => 5,
