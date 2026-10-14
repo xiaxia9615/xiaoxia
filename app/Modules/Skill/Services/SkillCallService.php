@@ -10,6 +10,7 @@ use App\Modules\ApiKey\Models\ApiKey;
 use App\Modules\Ledger\Services\LedgerService;
 use App\Modules\Product\Models\Product;
 use App\Modules\Skill\Models\SkillDetail;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -66,22 +67,40 @@ final class SkillCallService
             'message'  => '模拟调用成功',
         ];
 
-        $call = ApiCall::create([
-            'request_id'        => $requestId ?: (string) Str::uuid(),
-            'user_id'           => $caller->id,
-            'api_key_id'        => $apiKey->id,
-            'product_id'        => $product->id,
-            'provider_id'       => $product->user_id,
-            'input'             => $input,
-            'output'            => $output,
-            'status_code'       => 200,
-            'duration_ms'       => 42,
-            'cost'              => $cost,
-            'provider_income'   => $provider,
-            'platform_income'   => $platform,
-            'influencer_income' => $influencer,
-            'donation_amount'   => $donation,
-        ]);
+        try {
+            $call = ApiCall::create([
+                'request_id'        => $requestId ?: (string) Str::uuid(),
+                'user_id'           => $caller->id,
+                'api_key_id'        => $apiKey->id,
+                'product_id'        => $product->id,
+                'provider_id'       => $product->user_id,
+                'input'             => $input,
+                'output'            => $output,
+                'status_code'       => 200,
+                'duration_ms'       => 42,
+                'cost'              => $cost,
+                'provider_income'   => $provider,
+                'platform_income'   => $platform,
+                'influencer_income' => $influencer,
+                'donation_amount'   => $donation,
+            ]);
+        } catch (UniqueConstraintViolationException $e) {
+            $existing = ApiCall::where('request_id', $requestId)->first();
+            if ($existing) {
+                return [
+                    'call_id' => $existing->id,
+                    'result'  => $existing->output,
+                    'billing' => [
+                        'cost'       => $existing->cost,
+                        'provider'   => $existing->provider_income,
+                        'platform'   => $existing->platform_income,
+                        'influencer' => $existing->influencer_income,
+                        'donation'   => $existing->donation_amount,
+                    ],
+                ];
+            }
+            throw $e;
+        }
 
         $this->ledger->record('api_call', $call->id, [
             ['owner_type' => 'user',     'owner_id' => $caller->id, 'account_type' => 'provider',   'direction' => 'credit', 'amount' => $provider],
