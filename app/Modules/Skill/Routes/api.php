@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('api')->prefix('api/v1/skills')->group(function (): void {
     Route::get('/',    [SkillController::class, 'index']);
+    Route::get('/calls', [SkillController::class, 'calls'])->middleware('auth:sanctum');
     Route::get('/{id}', [SkillController::class, 'show'])->whereNumber('id');
     Route::post('/',   [SkillController::class, 'store'])->middleware('auth:sanctum');
     Route::patch('/{id}/audit', [SkillController::class, 'audit'])->whereNumber('id')->middleware('auth:sanctum');

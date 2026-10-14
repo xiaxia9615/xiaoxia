@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Skill\Http\Controllers;
 
+use App\Modules\ApiKey\Models\ApiCall;
 use App\Modules\Product\Models\Product;
 use App\Modules\Skill\Models\SkillDetail;
 use Illuminate\Http\JsonResponse;
@@ -78,6 +79,16 @@ final class SkillController
                 throw new RuntimeException('内容含违规词，无法上架');
             }
         }
+    }
+
+    public function calls(Request $request): JsonResponse
+    {
+        $calls = ApiCall::where('user_id', $request->user()->id)
+            ->with('product:id,name')
+            ->orderByDesc('id')
+            ->paginate(20);
+
+        return response()->json(['code' => 0, 'data' => $calls]);
     }
 
     public function audit(Request $request, int $id): JsonResponse
