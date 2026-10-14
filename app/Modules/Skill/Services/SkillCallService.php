@@ -30,16 +30,19 @@ final class SkillCallService
 
         $cost = (int) $product->price;
 
-        // ===== 新增：余额检查 =====
         $balance = $this->ledger->balance('user', $caller->id, 'balance');
         if ($balance < $cost) {
             throw new RuntimeException("余额不足：当前 {$balance} 分，需要 {$cost} 分");
         }
 
-        $provider   = (int) round($cost * $detail->provider_share / 100);
-        $platform   = (int) round($cost * $detail->platform_share / 100);
-        $influencer = (int) round($cost * $detail->influencer_share / 100);
-        $donation   = $cost - $provider - $platform - $influencer;
+        // 按比例分账，各自整除
+        $provider   = intdiv($cost * $detail->provider_share, 100);
+        $platform   = intdiv($cost * $detail->platform_share, 100);
+        $influencer = intdiv($cost * $detail->influencer_share, 100);
+        $donation   = intdiv($cost * $detail->donation_share, 100);
+
+        // 整除余数归平台，保证四方之和 == cost
+        $platform += $cost - $provider - $platform - $influencer - $donation;
 
         $output = [
             'skill'    => $product->name,

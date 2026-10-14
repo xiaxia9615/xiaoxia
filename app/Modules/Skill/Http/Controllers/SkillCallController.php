@@ -7,6 +7,8 @@ namespace App\Modules\Skill\Http\Controllers;
 use App\Modules\Skill\Services\SkillCallService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use RuntimeException;
 
 final class SkillCallController
 {
@@ -25,8 +27,16 @@ final class SkillCallController
         try {
             $result = $this->service->call($request->user(), $id, $input);
             return response()->json(['code' => 0, 'message' => 'success', 'data' => $result]);
-        } catch (\Throwable $e) {
+        } catch (RuntimeException $e) {
+            // 业务异常：信息是给用户看的
             return response()->json(['code' => 1, 'message' => $e->getMessage()], 400);
+        } catch (\Throwable $e) {
+            // 系统异常：记日志，不泄露内部细节
+            Log::error('skill call failed', [
+                'product_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+            return response()->json(['code' => 1, 'message' => '系统繁忙，请稍后重试'], 500);
         }
     }
 }
