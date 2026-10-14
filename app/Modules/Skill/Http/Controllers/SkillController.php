@@ -79,4 +79,26 @@ final class SkillController
             }
         }
     }
+
+    public function audit(Request $request, int $id): JsonResponse
+    {
+        if (! $request->user()->is_admin) {
+            return response()->json(['code'=>1,'message'=>'无权限'], 403);
+        }
+
+        $data = $request->validate([
+            'approve' => 'required|boolean',
+            'note'    => 'nullable|string|max:255',
+        ]);
+
+        $product = Product::where('type', 1)->find($id);
+        if (! $product) return response()->json(['code'=>1,'message'=>'not found'], 404);
+
+        $product->update([
+            'status'     => $data['approve'] ? 1 : 2,
+            'audit_note' => $data['note'] ?? null,
+        ]);
+
+        return response()->json(['code'=>0,'data'=>['id'=>$product->id,'status'=>$product->status]]);
+    }
 }
