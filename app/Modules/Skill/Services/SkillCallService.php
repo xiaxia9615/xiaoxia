@@ -17,8 +17,25 @@ final class SkillCallService
 {
     public function __construct(private readonly LedgerService $ledger) {}
 
-    public function call(User $caller, int $productId, array $input): array
+    public function call(User $caller, int $productId, array $input, ?string $requestId = null): array
     {
+        if ($requestId) {
+            $existing = ApiCall::where('request_id', $requestId)->first();
+            if ($existing) {
+                return [
+                    'call_id' => $existing->id,
+                    'result'  => $existing->output,
+                    'billing' => [
+                        'cost'       => $existing->cost,
+                        'provider'   => $existing->provider_income,
+                        'platform'   => $existing->platform_income,
+                        'influencer' => $existing->influencer_income,
+                        'donation'   => $existing->donation_amount,
+                    ],
+                ];
+            }
+        }
+
         $product = Product::query()->where('type', 1)->find($productId);
         if (! $product) throw new RuntimeException("Skill not found: {$productId}");
 
@@ -35,14 +52,11 @@ final class SkillCallService
             throw new RuntimeException("余额不足：当前 {$balance} 分，需要 {$cost} 分");
         }
 
-        // 按比例分账，各自整除
         $provider   = intdiv($cost * $detail->provider_share, 100);
         $platform   = intdiv($cost * $detail->platform_share, 100);
         $influencer = intdiv($cost * $detail->influencer_share, 100);
         $donation   = intdiv($cost * $detail->donation_share, 100);
-
-        // 整除余数归平台，保证四方之和 == cost
-        $platform += $cost - $provider - $platform - $influencer - $donation;
+        $platform  += $cost - $provider - $platform - $influencer - $donation;
 
         $output = [
             'skill'    => $product->name,
@@ -53,7 +67,7 @@ final class SkillCallService
         ];
 
         $call = ApiCall::create([
-            'request_id'        => (string) Str::uuid(),
+            'request_id'        => $requestId ?: (string) Str::uuid(),
             'user_id'           => $caller->id,
             'api_key_id'        => $apiKey->id,
             'product_id'        => $product->id,

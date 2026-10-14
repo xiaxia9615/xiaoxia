@@ -24,8 +24,10 @@ final class SkillCallController
             $input = [];
         }
 
+        $requestId = $request->input('request_id');
+
         try {
-            $result = $this->service->call($request->user(), $id, $input);
+            $result = $this->service->call($request->user(), $id, $input, $requestId);
             return response()->json(['code' => 0, 'message' => 'success', 'data' => $result]);
         } catch (RuntimeException $e) {
             // 业务异常：信息是给用户看的
