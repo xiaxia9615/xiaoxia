@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Ledger\Providers;
 
+use App\Modules\Ledger\Listeners\CreateLedgerOnUserRegistered;
+use App\Modules\User\Events\UserRegistered;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 final class LedgerServiceProvider extends ServiceProvider
@@ -16,5 +19,10 @@ final class LedgerServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadRoutesFrom(__DIR__ . '/../Routes/api.php');
+
+        Event::listen(
+            UserRegistered::class,
+            CreateLedgerOnUserRegistered::class,
+        );
     }
 }
