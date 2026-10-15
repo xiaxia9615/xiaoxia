@@ -56,6 +56,20 @@ php artisan test tests/Architecture
 - docs/adr/ — 架构决策
 - docs/tech-debt.md — 技术债
 
+
 ## 许可
 
-私有项目，保留所有权利。
+Copyright (c) 2026 嗣夏平台. All rights reserved.
+
+本软件及其源代码、架构设计、文档均为嗣夏平台的专有财产，受著作权法保护。
+
+未经著作权人事先书面许可，任何个人或组织不得：
+- 复制、修改、分发本软件或其任何部分
+- 将本软件用于商业用途
+- 移除或修改本软件中的版权声明
+
+This software and its source code, architecture design, and documentation are the proprietary property of 嗣夏平台, protected by copyright law.
+
+No part of this software may be reproduced, modified, distributed, or used for commercial purposes without prior written permission from the copyright holder.
+
+详见 [LICENSE.txt](LICENSE.txt)。

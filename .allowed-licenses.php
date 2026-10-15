@@ -11,5 +11,7 @@ return (new LicenseConfigurationBuilder())
         'BSD-3-Clause',
         'Apache-2.0',
         'ISC',
+        'proprietary',
     )
+    ->addAllowedVendor('yang-satan-satan')
     ->build();
