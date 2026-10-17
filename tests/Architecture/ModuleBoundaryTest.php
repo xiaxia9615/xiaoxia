@@ -158,6 +158,72 @@ final class ModuleBoundaryTest extends TestCase
         return false;
     }
 
+    public function test_cross_module_db_access_is_whitelisted(): void
+    {
+        $whitelist = config('modules.dependencies', []);
+        $violations = [];
+        foreach ($this->moduleFiles() as $file) {
+            $current = $this->moduleOf($file);
+            if ($current === '') continue;
+            $allowed = $whitelist[$current] ?? [];
+            if (in_array('*', $allowed, true)) continue;
+            foreach ($this->dbAccessedModules($file) as $other) {
+                if ($other === $current) continue;
+                if (! in_array($other, $allowed, true)) {
+                    $violations[] = "{$file} 跨模块 DB 访问 [{$other}]，未在 dependencies[{$current}] 声明";
+                }
+            }
+        }
+        $this->assertSame([], $violations, "未声明的跨模块 DB 访问：\n" . implode("\n", $violations));
+    }
+
+    public function test_no_direct_cross_module_model_instantiation(): void
+    {
+        $whitelist = config('modules.dependencies', []);
+        $violations = [];
+        foreach ($this->moduleFiles() as $file) {
+            $current = $this->moduleOf($file);
+            if ($current === '') continue;
+            $allowed = $whitelist[$current] ?? [];
+            if (in_array('*', $allowed, true)) continue;
+            $content = file_get_contents(base_path($file));
+            // 检测直接实例化或静态调用其他模块 Model（非壳文件路径）
+            if (preg_match_all('/\\bApp\\\\Modules\\\\([A-Za-z]+)\\\\Models\\\\([A-Za-z]+)\b/', $content, $m)) {
+                foreach ($m[1] as $i => $mod) {
+                    if ($mod === $current) continue;
+                    if (! in_array($mod, $allowed, true)) {
+                        $violations[] = "{$file} 直接引用 App\\Modules\\{$mod}\\Models\\{$m[2][$i]}，未在 dependencies[{$current}] 声明";
+                    }
+                }
+            }
+        }
+        $this->assertSame([], $violations, "未声明的直接跨模块 Model 引用：\n" . implode("\n", $violations));
+    }
+
+    public function test_cross_module_table_access_is_whitelisted(): void
+    {
+        $whitelist = config('modules.dependencies', []);
+        $moduleTables = $this->moduleTableMap();
+        $violations = [];
+        foreach ($this->moduleFiles() as $file) {
+            $current = $this->moduleOf($file);
+            if ($current === '') continue;
+            $allowed = $whitelist[$current] ?? [];
+            if (in_array('*', $allowed, true)) continue;
+            $content = file_get_contents(base_path($file));
+            // 检测 DB::table()、Schema:: 等直接表名引用
+            if (preg_match_all('/(?:DB::table\(|Schema::(?:table|create|drop|rename)\()\s*[\'"](([a-z_]+))[\'"]/', $content, $m)) {
+                foreach ($m[1] as $table) {
+                    $owner = $this->tableOwner($table, $moduleTables);
+                    if ($owner !== null && $owner !== $current && ! in_array($owner, $allowed, true)) {
+                        $violations[] = "{$file} 直接访问表 [{$table}]（属于模块 [{$owner}]），未在 dependencies[{$current}] 声明";
+                    }
+                }
+            }
+        }
+        $this->assertSame([], $violations, "未声明的跨模块表访问：\n" . implode("\n", $violations));
+    }
+
     private function usedModules(string $relativePath): array
     {
         $content = file_get_contents(base_path($relativePath));
@@ -169,5 +235,68 @@ final class ModuleBoundaryTest extends TestCase
             foreach ($m[1] as $model) $modules[] = $model;
         }
         return array_values(array_unique($modules));
+    }
+
+    private function dbAccessedModules(string $relativePath): array
+    {
+        $content = file_get_contents(base_path($relativePath));
+        $modules = [];
+        // 检测 Eloquent 关系方法中的跨模块引用：belongsTo / hasMany / hasOne / belongsToMany / morphTo / morphMany 等
+        $relationPatterns = [
+            '/->(?:belongsTo|hasMany|hasOne|belongsToMany|morphTo|morphMany|morphOne|morphToMany|morphedByMany)\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)::class/',
+        ];
+        foreach ($relationPatterns as $pattern) {
+            if (preg_match_all($pattern, $content, $m)) {
+                foreach ($m[1] as $className) {
+                    $module = $this->resolveModelModule($className, $content);
+                    if ($module !== '') $modules[] = $module;
+                }
+            }
+        }
+        // 检测通过壳文件 App\Models\* 的引用
+        if (preg_match_all('/^use\s+App\\\\Models\\\\([A-Za-z]+)\b/m', $content, $m)) {
+            foreach ($m[1] as $model) $modules[] = $model;
+        }
+        return array_values(array_unique($modules));
+    }
+
+    private function resolveModelModule(string $shortName, string $fileContent): string
+    {
+        // 先检查是否通过 use 导入了 App\Modules\*\Models\*
+        if (preg_match('/^use\s+App\\\\Modules\\\\([A-Za-z]+)\\\\Models\\\\(\1)\s*;/m', $fileContent, $m)) {
+            return $m[1];
+        }
+        // 检查是否通过 use 导入了 App\Models\*（壳文件）
+        if (preg_match('/^use\s+App\\\\Models\\\\([A-Za-z]+)\s*;/m', $fileContent, $m)) {
+            return $m[1];
+        }
+        // 检查是否通过 use ... as 别名导入
+        if (preg_match('/^use\s+App\\\\Modules\\\\([A-Za-z]+)\\\\Models\\\\([A-Za-z]+)\s+as\s+(\w+)\s*;/m', $fileContent, $m)) {
+            if ($m[3] === $shortName) return $m[1];
+        }
+        if (preg_match('/^use\s+App\\\\Models\\\\([A-Za-z]+)\s+as\s+(\w+)\s*;/m', $fileContent, $m)) {
+            if ($m[2] === $shortName) return $m[1];
+        }
+        return '';
+    }
+
+    private function moduleTableMap(): array
+    {
+        $map = [];
+        foreach ($this->moduleFiles() as $file) {
+            $module = $this->moduleOf($file);
+            if ($module === '') continue;
+            if (! str_contains($file, '/Models/')) continue;
+            $content = file_get_contents(base_path($file));
+            if (preg_match('/protected\s+\$table\s*=\s*[\'"](([a-z_]+))[\'"]/', $content, $m)) {
+                $map[$m[1]] = $module;
+            }
+        }
+        return $map;
+    }
+
+    private function tableOwner(string $table, array $moduleTables): ?string
+    {
+        return $moduleTables[$table] ?? null;
     }
 }
