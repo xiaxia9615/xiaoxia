@@ -32,6 +32,25 @@ final class LedgerService
         return $transactionId;
     }
 
+    /**
+     * 查询账户流水分页（paginator toArray 结构），账户不存在返回 null
+     * @return array<string, mixed>|null
+     */
+    public function entriesByUser(int $userId, string $accountType = 'balance'): ?array
+    {
+        $accountId = DB::table('ledger_accounts')
+            ->where('owner_type', 'user')
+            ->where('owner_id', $userId)
+            ->where('account_type', $accountType)
+            ->value('id');
+        if (! $accountId) return null;
+        return DB::table('ledger_entries')
+            ->where('account_id', $accountId)
+            ->orderByDesc('id')
+            ->paginate(20)
+            ->toArray();
+    }
+
     public function balance(string $ownerType, int $ownerId, string $accountType): int
     {
         $accountId = DB::table('ledger_accounts')
