@@ -15,6 +15,7 @@ class AiProvider extends Model
     protected $fillable = [
         'name', 'display_name', 'base_url', 'api_key', 'enabled',
         'cost_per_1k_input', 'cost_per_1k_output',
+        'driver', 'model_name',
     ];
 
     protected function casts(): array

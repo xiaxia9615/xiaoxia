@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Modules\AiProvider\Clients\GlmClient;
 use App\Modules\AiProvider\Dto\ChatResult;
+use App\Modules\AiProvider\DTOs\AiResponseDTO;
 use App\Modules\AiProvider\Models\AiModel;
 use App\Modules\AiProvider\Models\AiProvider;
 use App\Modules\AiProvider\Services\ChatRouter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 use Tests\TestCase;
@@ -171,5 +174,72 @@ final class AiProviderTest extends TestCase
         $this->expectExceptionMessage('is disabled');
 
         $router->route($model);
+    }
+
+    // ─── 场景 7：GlmClient 200 返回 → 正确解析 DTO ───
+    public function test_glm_client_parses_dto_on_success(): void
+    {
+        Cache::flush();
+
+        Http::fake([
+            'open.bigmodel.cn/*' => Http::response([
+                'choices' => [
+                    ['message' => ['content' => '你好，我是 GLM-4']],
+                ],
+                'usage' => [
+                    'prompt_tokens'     => 100,
+                    'completion_tokens' => 200,
+                ],
+            ], 200),
+        ]);
+
+        $client = new GlmClient();
+        $dto    = $client->chat('你好');
+
+        $this->assertInstanceOf(AiResponseDTO::class, $dto);
+        $this->assertSame('你好，我是 GLM-4', $dto->content);
+        $this->assertSame(100, $dto->inputTokens);
+        $this->assertSame(200, $dto->outputTokens);
+        // 费用 = 100/1000*0.01 + 200/1000*0.01 = 0.003 元
+        $this->assertEqualsWithDelta(0.003, $dto->cost, 0.000001);
+
+        // 断言请求体正确：目标 URL、模型标识、消息内容
+        Http::assertSent(function ($request) {
+            return $request->url() === 'https://open.bigmodel.cn/api/paas/v4/chat/completions'
+                && $request['model'] === 'glm-4'
+                && $request['messages'][0]['content'] === '你好';
+        });
+    }
+
+    // ─── 场景 8：GlmClient 500 响应 → 抛 RuntimeException ───
+    public function test_glm_client_5xx_throws_runtime_exception(): void
+    {
+        Cache::flush();
+
+        Http::fake([
+            'open.bigmodel.cn/*' => Http::response(['error' => 'Internal error'], 500),
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('HTTP 500');
+
+        (new GlmClient())->chat('你好');
+    }
+
+    // ─── 场景 9：GlmClient 超时 → 抛 RuntimeException ───
+    public function test_glm_client_timeout_throws_runtime_exception(): void
+    {
+        Cache::flush();
+
+        Http::fake([
+            'open.bigmodel.cn/*' => function () {
+                throw new ConnectionException('cURL error 28: Connection timed out');
+            },
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('connection failed');
+
+        (new GlmClient())->chat('你好');
     }
 }

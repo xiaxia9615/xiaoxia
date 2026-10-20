@@ -6,7 +6,9 @@ use App\Models\User;
 use App\Modules\AiProvider\Models\AiProvider;
 use App\Modules\Ledger\Services\LedgerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 final class SmartRoutingGatewayTest extends TestCase
@@ -67,6 +69,20 @@ final class SmartRoutingGatewayTest extends TestCase
             'cost_per_1k_output' => 0.002,
         ]);
 
+        // 清空熔断状态，拦截真实网络请求：GLM 返回 100 输入 + 200 输出 token（费用 0.003 元）
+        Cache::flush();
+        Http::fake([
+            'open.bigmodel.cn/*' => Http::response([
+                'choices' => [
+                    ['message' => ['content' => 'GLM-5.3 模拟响应']],
+                ],
+                'usage' => [
+                    'prompt_tokens'     => 100,
+                    'completion_tokens' => 200,
+                ],
+            ], 200),
+        ]);
+
         // 充值 100 元（100000 毫），并记录调用前的真实初始余额
         $initialBalance = $this->topUp($ledger, $user->id, 100000);
         $this->assertSame(100000, $initialBalance);
@@ -120,6 +136,20 @@ final class SmartRoutingGatewayTest extends TestCase
             'cost_per_1k_output' => 0.002,
         ]);
 
+        // 清空熔断状态，拦截真实网络请求（余额校验发生在 AI 调用之后，必须拦截）
+        Cache::flush();
+        Http::fake([
+            'open.bigmodel.cn/*' => Http::response([
+                'choices' => [
+                    ['message' => ['content' => 'GLM-5.3 模拟响应']],
+                ],
+                'usage' => [
+                    'prompt_tokens'     => 100,
+                    'completion_tokens' => 200,
+                ],
+            ], 200),
+        ]);
+
         // 不充值：初始余额为 0 毫
         $initialBalance = $ledger->balance('user', $user->id, 'balance');
         $this->assertSame(0, $initialBalance);
@@ -140,5 +170,121 @@ final class SmartRoutingGatewayTest extends TestCase
         // 事务回滚：不产生扣费流水，也不产生账本分录（无脏数据）
         $this->assertSame(0, DB::table('ai_usage_deductions')->count());
         $this->assertSame(0, DB::table('ledger_entries')->where('biz_type', 'ai_usage')->count());
+    }
+
+    // ─── 场景 3：连续 3 次失败后熔断，第 4 次调用不再发请求，直接报错 ───
+    public function test_gateway_circuits_provider_after_three_consecutive_failures(): void
+    {
+        $ledger = app(LedgerService::class);
+        $user = $this->makeUser('gateway-circuit@test.com');
+        $token = $user->createToken('api')->plainTextToken;
+
+        $this->makeProvider([
+            'name'               => 'glm',
+            'display_name'       => 'GLM-5.3',
+            'cost_per_1k_input'  => 0.001,
+            'cost_per_1k_output' => 0.002,
+        ]);
+
+        $this->topUp($ledger, $user->id, 100000);
+
+        // 清空熔断状态，拦截真实网络请求：GLM 接口持续 500
+        Cache::flush();
+        Http::fake([
+            'open.bigmodel.cn/*' => Http::response(['error' => 'Internal error'], 500),
+        ]);
+
+        // 连续 3 次调用均失败（HTTP 500）
+        for ($i = 1; $i <= 3; $i++) {
+            $this->postJson('/api/v1/skills/gateway', [
+                'prompt' => '你好，请介绍一下自己',
+            ], [
+                'Authorization' => "Bearer {$token}",
+            ])->assertStatus(400)->assertJsonPath('code', 1);
+        }
+
+        // 第 4 次调用：该 Provider 已被熔断（踢出路由池），不再发请求，直接报错
+        $response = $this->postJson('/api/v1/skills/gateway', [
+            'prompt' => '你好，请介绍一下自己',
+        ], [
+            'Authorization' => "Bearer {$token}",
+        ]);
+
+        $response->assertStatus(400)
+            ->assertJsonPath('code', 1)
+            ->assertJsonPath('message', '所有 AI 服务暂不可用，请稍后再试');
+
+        // 核心断言：仅发出 3 次 HTTP 请求，第 4 次调用被熔断器拦截，未发起任何请求
+        Http::assertSentCount(3);
+    }
+
+    // ─── 场景 4：最便宜的 Provider 熔断后，自动切换到第二便宜的 Provider 并成功 ───
+    public function test_gateway_fails_over_to_second_provider_after_circuit_break(): void
+    {
+        $ledger = app(LedgerService::class);
+        $user = $this->makeUser('gateway-failover@test.com');
+        $token = $user->createToken('api')->plainTextToken;
+
+        // 成本 0.01 的高价 Provider（备用）
+        $expensive = $this->makeProvider([
+            'name'               => 'expensive-provider',
+            'display_name'       => 'Expensive Provider',
+            'cost_per_1k_input'  => 0.005,
+            'cost_per_1k_output' => 0.005,
+        ]);
+        // 成本 0.003 的低价 Provider（首选）
+        $this->makeProvider([
+            'name'               => 'glm',
+            'display_name'       => 'GLM-5.3',
+            'cost_per_1k_input'  => 0.001,
+            'cost_per_1k_output' => 0.002,
+        ]);
+
+        $this->topUp($ledger, $user->id, 100000);
+
+        // 清空熔断状态；前 3 次请求 500（打向低价 Provider），第 4 次请求 200（切换到高价 Provider 后成功）
+        Cache::flush();
+        Http::fake([
+            'open.bigmodel.cn/*' => Http::sequence()
+                ->push(['error' => 'Internal error'], 500)
+                ->push(['error' => 'Internal error'], 500)
+                ->push(['error' => 'Internal error'], 500)
+                ->push([
+                    'choices' => [
+                        ['message' => ['content' => '备用 Provider 响应']],
+                    ],
+                    'usage' => [
+                        'prompt_tokens'     => 100,
+                        'completion_tokens' => 200,
+                    ],
+                ], 200),
+        ]);
+
+        // 前 3 次调用：首选低价 Provider 连续失败
+        for ($i = 1; $i <= 3; $i++) {
+            $this->postJson('/api/v1/skills/gateway', [
+                'prompt' => '你好，请介绍一下自己',
+            ], [
+                'Authorization' => "Bearer {$token}",
+            ])->assertStatus(400)->assertJsonPath('code', 1);
+        }
+
+        // 第 4 次调用：低价 Provider 已熔断，自动切换到高价 Provider 并调用成功
+        $response = $this->postJson('/api/v1/skills/gateway', [
+            'prompt' => '你好，请介绍一下自己',
+        ], [
+            'Authorization' => "Bearer {$token}",
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('code', 0)
+            ->assertJsonPath('data.content', '备用 Provider 响应')
+            ->assertJsonPath('data.provider.id', $expensive->id)
+            ->assertJsonPath('data.provider.name', 'expensive-provider');
+
+        // 扣费流水应记在备用 Provider 名下
+        $deduction = DB::table('ai_usage_deductions')->first();
+        $this->assertNotNull($deduction);
+        $this->assertSame($expensive->id, (int) $deduction->provider_id);
     }
 }
