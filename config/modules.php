@@ -10,6 +10,7 @@ return [
         'Skill',
         'Ledger',
         'AiProvider',
+        'Team',
     ],
 
     'provider_pattern' => 'App\\Modules\\%s\\Providers\\%sServiceProvider',
@@ -21,5 +22,6 @@ return [
         'ApiKey'     => ['User', 'Product'],
         'AiProvider' => [],
         'Skill'      => ['User', 'Product', 'ApiKey', 'Ledger', 'AiProvider'],
+        'Team'       => ['User'],
     ],
 ];
