@@ -27,20 +27,20 @@ class ApiCallFactory extends Factory
         $d = $cost - $p - $pl - $inf;
 
         return [
-            'request_id'        => (string) Str::uuid(),
-            'user_id'           => User::factory(),
-            'api_key_id'        => ApiKey::factory(),
-            'product_id'        => Product::factory()->skill(),
-            'provider_id'       => User::factory(),
-            'input'             => ['prompt' => fake()->sentence()],
-            'output'            => ['result' => fake()->paragraph()],
-            'status_code'       => 200,
-            'duration_ms'       => fake()->numberBetween(50, 3000),
-            'cost'              => $cost,
-            'provider_income'   => $p,
-            'platform_income'   => $pl,
+            'request_id' => (string) Str::uuid(),
+            'user_id' => User::factory(),
+            'api_key_id' => ApiKey::factory(),
+            'product_id' => Product::factory()->skill(),
+            'provider_id' => User::factory(),
+            'input' => ['prompt' => fake()->sentence()],
+            'output' => ['result' => fake()->paragraph()],
+            'status_code' => 200,
+            'duration_ms' => fake()->numberBetween(50, 3000),
+            'cost' => $cost,
+            'provider_income' => $p,
+            'platform_income' => $pl,
             'influencer_income' => $inf,
-            'donation_amount'   => $d,
+            'donation_amount' => $d,
         ];
     }
 }

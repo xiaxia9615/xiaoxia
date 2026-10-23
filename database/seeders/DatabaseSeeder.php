@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $mainUser = User::factory()->create([
-            'name'  => 'Test User',
+            'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
 
@@ -38,9 +38,9 @@ class DatabaseSeeder extends Seeder
         $skillProduct = $products->where('type', 1)->first();
 
         ApiCall::factory()->count(10)->create([
-            'user_id'     => $mainUser->id,
-            'api_key_id'  => $apiKey->id,
-            'product_id'  => $skillProduct->id,
+            'user_id' => $mainUser->id,
+            'api_key_id' => $apiKey->id,
+            'product_id' => $skillProduct->id,
             'provider_id' => $mainUser->id,
         ]);
 

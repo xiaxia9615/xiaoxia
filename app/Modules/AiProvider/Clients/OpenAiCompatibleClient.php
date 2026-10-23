@@ -30,7 +30,7 @@ final class OpenAiCompatibleClient implements AiClientInterface
 
     public function chat(string $prompt): AiResponseDTO
     {
-        $endpoint = rtrim($this->baseUrl, '/') . '/chat/completions';
+        $endpoint = rtrim($this->baseUrl, '/').'/chat/completions';
 
         $request = Http::timeout(30);
 
@@ -40,7 +40,7 @@ final class OpenAiCompatibleClient implements AiClientInterface
 
         try {
             $response = $request->post($endpoint, [
-                'model'    => $this->modelName,
+                'model' => $this->modelName,
                 'messages' => [
                     ['role' => 'user', 'content' => $prompt],
                 ],
@@ -48,23 +48,23 @@ final class OpenAiCompatibleClient implements AiClientInterface
         } catch (ConnectionException $e) {
             // 网络超时 / 连接失败
             throw new RuntimeException(
-                $this->modelName . ' 请求失败：connection failed - ' . $e->getMessage(),
+                $this->modelName.' 请求失败：connection failed - '.$e->getMessage(),
                 0,
                 $e
             );
         } catch (RequestException $e) {
             // 非 2xx 响应（如 500、401）
             throw new RuntimeException(
-                $this->modelName . ' 请求失败：HTTP ' . $e->response->status(),
+                $this->modelName.' 请求失败：HTTP '.$e->response->status(),
                 0,
                 $e
             );
         }
 
-        $data  = $response->json();
+        $data = $response->json();
         $usage = is_array($data['usage'] ?? null) ? $data['usage'] : [];
 
-        $inputTokens  = (int) ($usage['prompt_tokens'] ?? 0);
+        $inputTokens = (int) ($usage['prompt_tokens'] ?? 0);
         $outputTokens = (int) ($usage['completion_tokens'] ?? 0);
 
         // 费用 = 输入 token 数 / 1000 * 输入单价 + 输出 token 数 / 1000 * 输出单价
@@ -72,10 +72,10 @@ final class OpenAiCompatibleClient implements AiClientInterface
             + $outputTokens / 1000 * $this->costPer1kOutput;
 
         return new AiResponseDTO(
-            content:      (string) ($data['choices'][0]['message']['content'] ?? ''),
-            inputTokens:  $inputTokens,
+            content: (string) ($data['choices'][0]['message']['content'] ?? ''),
+            inputTokens: $inputTokens,
             outputTokens: $outputTokens,
-            cost:         $cost,
+            cost: $cost,
         );
     }
 }

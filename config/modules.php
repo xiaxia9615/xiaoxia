@@ -16,12 +16,12 @@ return [
     'provider_pattern' => 'App\\Modules\\%s\\Providers\\%sServiceProvider',
 
     'dependencies' => [
-        'User'       => [],
-        'Ledger'     => ['User'],
-        'Product'    => ['User'],
-        'ApiKey'     => ['User', 'Product'],
+        'User' => [],
+        'Ledger' => ['User'],
+        'Product' => ['User'],
+        'ApiKey' => ['User', 'Product'],
         'AiProvider' => [],
-        'Skill'      => ['User', 'Product', 'ApiKey', 'Ledger', 'AiProvider'],
-        'Team'       => ['User', 'Ledger'],
+        'Skill' => ['User', 'Product', 'ApiKey', 'Ledger', 'AiProvider'],
+        'Team' => ['User', 'Ledger'],
     ],
 ];

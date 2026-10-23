@@ -36,14 +36,15 @@ class ApiKey extends Model
 
     public static function generate(int $userId, string $name = 'default'): array
     {
-        $plain = 'sk_' . Str::random(32);
+        $plain = 'sk_'.Str::random(32);
         $model = self::create([
-            'user_id'    => $userId,
-            'name'       => $name,
-            'key_hash'   => hash('sha256', $plain),
+            'user_id' => $userId,
+            'name' => $name,
+            'key_hash' => hash('sha256', $plain),
             'key_prefix' => substr($plain, 0, 11),
-            'status'     => 1,
+            'status' => 1,
         ]);
+
         return ['id' => $model->id, 'key' => $plain, 'name' => $name];
     }
 

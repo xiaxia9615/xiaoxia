@@ -21,7 +21,8 @@ final class CircuitBreaker
     /** 熔断持续时间（秒），到期自动恢复试探 */
     private const OPEN_SECONDS = 60;
 
-    private const KEY_OPEN_PREFIX       = 'circuit_breaker:provider:';
+    private const KEY_OPEN_PREFIX = 'circuit_breaker:provider:';
+
     private const KEY_FAIL_COUNT_PREFIX = 'circuit_breaker:fail_count:';
 
     /**

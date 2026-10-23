@@ -26,14 +26,14 @@ class SkillDetail extends Model
     protected function casts(): array
     {
         return [
-            'product_id'       => 'integer',
-            'pricing_type'     => 'integer',
-            'provider_share'   => 'integer',
-            'platform_share'   => 'integer',
+            'product_id' => 'integer',
+            'pricing_type' => 'integer',
+            'provider_share' => 'integer',
+            'platform_share' => 'integer',
             'influencer_share' => 'integer',
-            'donation_share'   => 'integer',
-            'free_quota'       => 'integer',
-            'config'           => 'array',
+            'donation_share' => 'integer',
+            'free_quota' => 'integer',
+            'config' => 'array',
             'request_template' => 'array',
         ];
     }
@@ -45,7 +45,10 @@ class SkillDetail extends Model
 
     public function getApiKeyAttribute(?string $value): ?string
     {
-        if ($value === null) return null;
+        if ($value === null) {
+            return null;
+        }
+
         return Crypt::decryptString($value);
     }
 
@@ -53,6 +56,7 @@ class SkillDetail extends Model
     {
         if ($value === null) {
             $this->attributes['api_key'] = null;
+
             return;
         }
         $this->attributes['api_key'] = Crypt::encryptString($value);

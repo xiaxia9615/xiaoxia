@@ -16,9 +16,9 @@ final class ModuleBoundaryTest extends TestCase
     public function test_shell_models_extend_module_models(): void
     {
         $expect = [
-            'app/Models/User.php'    => 'App\\Modules\\User\\Models\\User',
+            'app/Models/User.php' => 'App\\Modules\\User\\Models\\User',
             'app/Models/Product.php' => 'App\\Modules\\Product\\Models\\Product',
-            'app/Models/ApiKey.php'  => 'App\\Modules\\ApiKey\\Models\\ApiKey',
+            'app/Models/ApiKey.php' => 'App\\Modules\\ApiKey\\Models\\ApiKey',
         ];
         foreach ($expect as $shell => $target) {
             $this->assertFileExists(base_path($shell), "壳文件缺失: {$shell}");
@@ -35,10 +35,13 @@ final class ModuleBoundaryTest extends TestCase
         $violations = [];
         foreach ($this->moduleFiles() as $file) {
             $module = $this->moduleOf($file);
-            if ($module === '') continue;
+            if ($module === '') {
+                continue;
+            }
             $content = file_get_contents(base_path($file));
             if (! preg_match('/^namespace\s+([^;]+);/m', $content, $m)) {
                 $violations[] = "{$file} 无 namespace";
+
                 continue;
             }
             $ns = trim($m[1]);
@@ -46,7 +49,7 @@ final class ModuleBoundaryTest extends TestCase
                 $violations[] = "{$file} 命名空间 {$ns} 与模块 {$module} 不符";
             }
         }
-        $this->assertSame([], $violations, "命名空间违规：\n" . implode("\n", $violations));
+        $this->assertSame([], $violations, "命名空间违规：\n".implode("\n", $violations));
     }
 
     public function test_config_modules_have_providers(): void
@@ -60,7 +63,7 @@ final class ModuleBoundaryTest extends TestCase
                 $missing[] = "{$module} → {$class}";
             }
         }
-        $this->assertSame([], $missing, "缺失 Provider：\n" . implode("\n", $missing));
+        $this->assertSame([], $missing, "缺失 Provider：\n".implode("\n", $missing));
     }
 
     public function test_bootstrap_providers_has_only_two_entries(): void
@@ -77,17 +80,23 @@ final class ModuleBoundaryTest extends TestCase
         $violations = [];
         foreach ($this->moduleFiles() as $file) {
             $current = $this->moduleOf($file);
-            if ($current === '') continue;
+            if ($current === '') {
+                continue;
+            }
             $allowed = $whitelist[$current] ?? [];
-            if (in_array('*', $allowed, true)) continue;
+            if (in_array('*', $allowed, true)) {
+                continue;
+            }
             foreach ($this->usedModules($file) as $other) {
-                if ($other === $current) continue;
+                if ($other === $current) {
+                    continue;
+                }
                 if (! in_array($other, $allowed, true)) {
                     $violations[] = "{$file} 引用 [{$other}]，未在 dependencies[{$current}] 声明";
                 }
             }
         }
-        $this->assertSame([], $violations, "未声明的跨模块引用：\n" . implode("\n", $violations));
+        $this->assertSame([], $violations, "未声明的跨模块引用：\n".implode("\n", $violations));
     }
 
     public function test_module_dependencies_have_no_cycles(): void
@@ -103,7 +112,7 @@ final class ModuleBoundaryTest extends TestCase
                 }
             }
         }
-        $this->assertSame([], array_unique($cycles), "循环依赖：\n" . implode("\n", $cycles));
+        $this->assertSame([], array_unique($cycles), "循环依赖：\n".implode("\n", $cycles));
     }
 
     public function test_module_files_declare_strict_types(): void
@@ -115,13 +124,15 @@ final class ModuleBoundaryTest extends TestCase
                 $violations[] = $file;
             }
         }
-        $this->assertSame([], $violations, "缺 declare(strict_types=1)：\n" . implode("\n", $violations));
+        $this->assertSame([], $violations, "缺 declare(strict_types=1)：\n".implode("\n", $violations));
     }
 
     private function moduleFiles(): array
     {
         $root = base_path(self::MODULES_ROOT);
-        if (! is_dir($root)) return [];
+        if (! is_dir($root)) {
+            return [];
+        }
         $files = [];
         $it = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($root, RecursiveDirectoryIterator::SKIP_DOTS)
@@ -129,32 +140,45 @@ final class ModuleBoundaryTest extends TestCase
         foreach ($it as $file) {
             /** @var SplFileInfo $file */
             if ($file->isFile() && $file->getExtension() === 'php') {
-                $path = str_replace(base_path() . '/', '', $file->getPathname());
+                $path = str_replace(base_path().'/', '', $file->getPathname());
                 // Routes 文件是 Laravel 路由定义，不需要 namespace
-                if (str_contains($path, '/Routes/')) continue;
+                if (str_contains($path, '/Routes/')) {
+                    continue;
+                }
                 $files[] = $path;
             }
         }
         sort($files);
+
         return $files;
     }
 
     private function moduleOf(string $relativePath): string
     {
-        if (preg_match('#^app/Modules/([A-Za-z]+)/#', $relativePath, $m)) return $m[1];
+        if (preg_match('#^app/Modules/([A-Za-z]+)/#', $relativePath, $m)) {
+            return $m[1];
+        }
+
         return '';
     }
 
     private function extendsTarget(string $content, string $target): bool
     {
-        if (preg_match('/extends\s+\\\\?' . preg_quote($target, '/') . '\b/', $content)) return true;
-        if (preg_match('/use\s+\\\\?' . preg_quote($target, '/') . '\s+as\s+(\w+)\s*;/', $content, $m)) {
-            if (preg_match('/extends\s+' . preg_quote($m[1], '/') . '\b/', $content)) return true;
+        if (preg_match('/extends\s+\\\\?'.preg_quote($target, '/').'\b/', $content)) {
+            return true;
         }
-        if (preg_match('/use\s+\\\\?' . preg_quote($target, '/') . '\s*;/', $content)) {
+        if (preg_match('/use\s+\\\\?'.preg_quote($target, '/').'\s+as\s+(\w+)\s*;/', $content, $m)) {
+            if (preg_match('/extends\s+'.preg_quote($m[1], '/').'\b/', $content)) {
+                return true;
+            }
+        }
+        if (preg_match('/use\s+\\\\?'.preg_quote($target, '/').'\s*;/', $content)) {
             $short = substr($target, strrpos($target, '\\') + 1);
-            if (preg_match('/extends\s+' . preg_quote($short, '/') . '\b/', $content)) return true;
+            if (preg_match('/extends\s+'.preg_quote($short, '/').'\b/', $content)) {
+                return true;
+            }
         }
+
         return false;
     }
 
@@ -164,17 +188,23 @@ final class ModuleBoundaryTest extends TestCase
         $violations = [];
         foreach ($this->moduleFiles() as $file) {
             $current = $this->moduleOf($file);
-            if ($current === '') continue;
+            if ($current === '') {
+                continue;
+            }
             $allowed = $whitelist[$current] ?? [];
-            if (in_array('*', $allowed, true)) continue;
+            if (in_array('*', $allowed, true)) {
+                continue;
+            }
             foreach ($this->dbAccessedModules($file) as $other) {
-                if ($other === $current) continue;
+                if ($other === $current) {
+                    continue;
+                }
                 if (! in_array($other, $allowed, true)) {
                     $violations[] = "{$file} 跨模块 DB 访问 [{$other}]，未在 dependencies[{$current}] 声明";
                 }
             }
         }
-        $this->assertSame([], $violations, "未声明的跨模块 DB 访问：\n" . implode("\n", $violations));
+        $this->assertSame([], $violations, "未声明的跨模块 DB 访问：\n".implode("\n", $violations));
     }
 
     public function test_no_direct_cross_module_model_instantiation(): void
@@ -183,21 +213,27 @@ final class ModuleBoundaryTest extends TestCase
         $violations = [];
         foreach ($this->moduleFiles() as $file) {
             $current = $this->moduleOf($file);
-            if ($current === '') continue;
+            if ($current === '') {
+                continue;
+            }
             $allowed = $whitelist[$current] ?? [];
-            if (in_array('*', $allowed, true)) continue;
+            if (in_array('*', $allowed, true)) {
+                continue;
+            }
             $content = file_get_contents(base_path($file));
             // 检测直接实例化或静态调用其他模块 Model（非壳文件路径）
             if (preg_match_all('/\\bApp\\\\Modules\\\\([A-Za-z]+)\\\\Models\\\\([A-Za-z]+)\b/', $content, $m)) {
                 foreach ($m[1] as $i => $mod) {
-                    if ($mod === $current) continue;
+                    if ($mod === $current) {
+                        continue;
+                    }
                     if (! in_array($mod, $allowed, true)) {
                         $violations[] = "{$file} 直接引用 App\\Modules\\{$mod}\\Models\\{$m[2][$i]}，未在 dependencies[{$current}] 声明";
                     }
                 }
             }
         }
-        $this->assertSame([], $violations, "未声明的直接跨模块 Model 引用：\n" . implode("\n", $violations));
+        $this->assertSame([], $violations, "未声明的直接跨模块 Model 引用：\n".implode("\n", $violations));
     }
 
     public function test_cross_module_table_access_is_whitelisted(): void
@@ -207,9 +243,13 @@ final class ModuleBoundaryTest extends TestCase
         $violations = [];
         foreach ($this->moduleFiles() as $file) {
             $current = $this->moduleOf($file);
-            if ($current === '') continue;
+            if ($current === '') {
+                continue;
+            }
             $allowed = $whitelist[$current] ?? [];
-            if (in_array('*', $allowed, true)) continue;
+            if (in_array('*', $allowed, true)) {
+                continue;
+            }
             $content = file_get_contents(base_path($file));
             // 检测 DB::table()、Schema:: 等直接表名引用
             if (preg_match_all('/(?:DB::table\(|Schema::(?:table|create|drop|rename)\()\s*[\'"](([a-z_]+))[\'"]/', $content, $m)) {
@@ -221,7 +261,7 @@ final class ModuleBoundaryTest extends TestCase
                 }
             }
         }
-        $this->assertSame([], $violations, "未声明的跨模块表访问：\n" . implode("\n", $violations));
+        $this->assertSame([], $violations, "未声明的跨模块表访问：\n".implode("\n", $violations));
     }
 
     private function usedModules(string $relativePath): array
@@ -229,11 +269,16 @@ final class ModuleBoundaryTest extends TestCase
         $content = file_get_contents(base_path($relativePath));
         $modules = [];
         if (preg_match_all('/^use\s+App\\\\Modules\\\\([A-Za-z]+)\\\\/m', $content, $m)) {
-            foreach ($m[1] as $mod) $modules[] = $mod;
+            foreach ($m[1] as $mod) {
+                $modules[] = $mod;
+            }
         }
         if (preg_match_all('/^use\s+App\\\\Models\\\\([A-Za-z]+)\b/m', $content, $m)) {
-            foreach ($m[1] as $model) $modules[] = $model;
+            foreach ($m[1] as $model) {
+                $modules[] = $model;
+            }
         }
+
         return array_values(array_unique($modules));
     }
 
@@ -249,14 +294,19 @@ final class ModuleBoundaryTest extends TestCase
             if (preg_match_all($pattern, $content, $m)) {
                 foreach ($m[1] as $className) {
                     $module = $this->resolveModelModule($className, $content);
-                    if ($module !== '') $modules[] = $module;
+                    if ($module !== '') {
+                        $modules[] = $module;
+                    }
                 }
             }
         }
         // 检测通过壳文件 App\Models\* 的引用
         if (preg_match_all('/^use\s+App\\\\Models\\\\([A-Za-z]+)\b/m', $content, $m)) {
-            foreach ($m[1] as $model) $modules[] = $model;
+            foreach ($m[1] as $model) {
+                $modules[] = $model;
+            }
         }
+
         return array_values(array_unique($modules));
     }
 
@@ -272,11 +322,16 @@ final class ModuleBoundaryTest extends TestCase
         }
         // 检查是否通过 use ... as 别名导入
         if (preg_match('/^use\s+App\\\\Modules\\\\([A-Za-z]+)\\\\Models\\\\([A-Za-z]+)\s+as\s+(\w+)\s*;/m', $fileContent, $m)) {
-            if ($m[3] === $shortName) return $m[1];
+            if ($m[3] === $shortName) {
+                return $m[1];
+            }
         }
         if (preg_match('/^use\s+App\\\\Models\\\\([A-Za-z]+)\s+as\s+(\w+)\s*;/m', $fileContent, $m)) {
-            if ($m[2] === $shortName) return $m[1];
+            if ($m[2] === $shortName) {
+                return $m[1];
+            }
         }
+
         return '';
     }
 
@@ -285,13 +340,18 @@ final class ModuleBoundaryTest extends TestCase
         $map = [];
         foreach ($this->moduleFiles() as $file) {
             $module = $this->moduleOf($file);
-            if ($module === '') continue;
-            if (! str_contains($file, '/Models/')) continue;
+            if ($module === '') {
+                continue;
+            }
+            if (! str_contains($file, '/Models/')) {
+                continue;
+            }
             $content = file_get_contents(base_path($file));
             if (preg_match('/protected\s+\$table\s*=\s*[\'"](([a-z_]+))[\'"]/', $content, $m)) {
                 $map[$m[1]] = $module;
             }
         }
+
         return $map;
     }
 

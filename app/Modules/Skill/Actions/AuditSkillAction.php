@@ -1,6 +1,9 @@
 <?php
+
 declare(strict_types=1);
+
 namespace App\Modules\Skill\Actions;
+
 use App\Modules\Product\Contracts\SkillProductContract;
 use RuntimeException;
 
@@ -19,6 +22,7 @@ final class AuditSkillAction
         if ($result === null) {
             throw new RuntimeException("Skill not found: {$id}");
         }
+
         return $result;
     }
 }

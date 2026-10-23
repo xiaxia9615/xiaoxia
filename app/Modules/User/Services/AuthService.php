@@ -15,16 +15,16 @@ final class AuthService
     public function register(string $name, string $email, string $password): array
     {
         $user = User::create([
-            'name'     => $name,
-            'email'    => $email,
+            'name' => $name,
+            'email' => $email,
             'password' => $password,
-            'status'   => 1,
+            'status' => 1,
         ]);
 
         event(new UserRegistered(UserDto::fromModel($user)));
 
         return [
-            'user'  => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
+            'user' => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
             'token' => $user->createToken('api')->plainTextToken,
         ];
     }
@@ -38,7 +38,7 @@ final class AuthService
         }
 
         return [
-            'user'  => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
+            'user' => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
             'token' => $user->createToken('api')->plainTextToken,
         ];
     }

@@ -24,23 +24,23 @@ final class AiProviderTest extends TestCase
     private function makeProvider(array $overrides = []): AiProvider
     {
         return AiProvider::create(array_merge([
-            'name'         => 'deepseek',
+            'name' => 'deepseek',
             'display_name' => 'DeepSeek',
-            'base_url'     => 'https://api.deepseek.com/v1',
-            'api_key'      => 'sk-test-key',
-            'enabled'      => true,
+            'base_url' => 'https://api.deepseek.com/v1',
+            'api_key' => 'sk-test-key',
+            'enabled' => true,
         ], $overrides));
     }
 
     private function makeModel(AiProvider $provider, array $overrides = []): AiModel
     {
         return AiModel::create(array_merge([
-            'provider_id'          => $provider->id,
-            'name'                 => 'deepseek-chat',
-            'display_name'         => 'DeepSeek Chat',
-            'input_price_per_1k'   => 1,
-            'output_price_per_1k'  => 2,
-            'enabled'              => true,
+            'provider_id' => $provider->id,
+            'name' => 'deepseek-chat',
+            'display_name' => 'DeepSeek Chat',
+            'input_price_per_1k' => 1,
+            'output_price_per_1k' => 2,
+            'enabled' => true,
         ], $overrides));
     }
 
@@ -53,16 +53,16 @@ final class AiProviderTest extends TestCase
                     ['message' => ['content' => '你好，我是 DeepSeek']],
                 ],
                 'usage' => [
-                    'prompt_tokens'     => 10,
+                    'prompt_tokens' => 10,
                     'completion_tokens' => 20,
                 ],
             ], 200),
         ]);
 
         $provider = $this->makeProvider();
-        $model    = $this->makeModel($provider);
+        $model = $this->makeModel($provider);
 
-        $router   = new ChatRouter();
+        $router = new ChatRouter;
         $provider = $router->route($model);
 
         $result = $provider->chat($model, [
@@ -91,9 +91,9 @@ final class AiProviderTest extends TestCase
         ]);
 
         $provider = $this->makeProvider();
-        $model    = $this->makeModel($provider);
+        $model = $this->makeModel($provider);
 
-        $router       = new ChatRouter();
+        $router = new ChatRouter;
         $chatProvider = $router->route($model);
 
         $this->expectException(RuntimeException::class);
@@ -112,9 +112,9 @@ final class AiProviderTest extends TestCase
         ]);
 
         $provider = $this->makeProvider();
-        $model    = $this->makeModel($provider);
+        $model = $this->makeModel($provider);
 
-        $router       = new ChatRouter();
+        $router = new ChatRouter;
         $chatProvider = $router->route($model);
 
         $this->expectException(RuntimeException::class);
@@ -135,9 +135,9 @@ final class AiProviderTest extends TestCase
         ]);
 
         $provider = $this->makeProvider();
-        $model    = $this->makeModel($provider);
+        $model = $this->makeModel($provider);
 
-        $router       = new ChatRouter();
+        $router = new ChatRouter;
         $chatProvider = $router->route($model);
 
         $this->expectException(RuntimeException::class);
@@ -152,9 +152,9 @@ final class AiProviderTest extends TestCase
     public function test_disabled_provider_throws_runtime_exception(): void
     {
         $provider = $this->makeProvider(['enabled' => false]);
-        $model    = $this->makeModel($provider);
+        $model = $this->makeModel($provider);
 
-        $router = new ChatRouter();
+        $router = new ChatRouter;
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('is disabled');
@@ -166,9 +166,9 @@ final class AiProviderTest extends TestCase
     public function test_disabled_model_throws_runtime_exception(): void
     {
         $provider = $this->makeProvider();
-        $model    = $this->makeModel($provider, ['enabled' => false]);
+        $model = $this->makeModel($provider, ['enabled' => false]);
 
-        $router = new ChatRouter();
+        $router = new ChatRouter;
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('is disabled');
@@ -187,14 +187,14 @@ final class AiProviderTest extends TestCase
                     ['message' => ['content' => '你好，我是 GLM-4']],
                 ],
                 'usage' => [
-                    'prompt_tokens'     => 100,
+                    'prompt_tokens' => 100,
                     'completion_tokens' => 200,
                 ],
             ], 200),
         ]);
 
-        $client = new GlmClient();
-        $dto    = $client->chat('你好');
+        $client = new GlmClient;
+        $dto = $client->chat('你好');
 
         $this->assertInstanceOf(AiResponseDTO::class, $dto);
         $this->assertSame('你好，我是 GLM-4', $dto->content);
@@ -223,7 +223,7 @@ final class AiProviderTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('HTTP 500');
 
-        (new GlmClient())->chat('你好');
+        (new GlmClient)->chat('你好');
     }
 
     // ─── 场景 9：GlmClient 超时 → 抛 RuntimeException ───
@@ -240,6 +240,6 @@ final class AiProviderTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('connection failed');
 
-        (new GlmClient())->chat('你好');
+        (new GlmClient)->chat('你好');
     }
 }

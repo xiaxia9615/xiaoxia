@@ -21,7 +21,7 @@ class TeamUserFactory extends Factory
         return [
             'team_id' => Team::factory(),
             'user_id' => User::factory(),
-            'role'    => fake()->randomElement(['owner', 'admin', 'member']),
+            'role' => fake()->randomElement(['owner', 'admin', 'member']),
         ];
     }
 

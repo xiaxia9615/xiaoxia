@@ -22,46 +22,48 @@ final class SkillCallIdempotentTest extends TestCase
     private function makeUser(string $email): User
     {
         return User::create([
-            'name'     => 'test',
-            'email'    => $email,
+            'name' => 'test',
+            'email' => $email,
             'password' => bcrypt('password123'),
-            'status'   => 1,
+            'status' => 1,
         ]);
     }
 
     private function makeUserWithToken(string $email): array
     {
-        $user  = $this->makeUser($email);
-        $plain = 'sk_' . uniqid();
+        $user = $this->makeUser($email);
+        $plain = 'sk_'.uniqid();
         ApiKey::create([
-            'user_id'    => $user->id,
-            'name'       => 'test',
+            'user_id' => $user->id,
+            'name' => 'test',
             'key_prefix' => substr($plain, 0, 8),
-            'key_hash'   => hash('sha256', $plain),
+            'key_hash' => hash('sha256', $plain),
         ]);
         $token = $user->createToken('api')->plainTextToken;
+
         return [$user, $token];
     }
 
     private function makeSkill(int $price, int $providerId): Product
     {
         $product = Product::create([
-            'user_id'     => $providerId,
-            'type'        => 1,
-            'name'        => 'test skill',
-            'slug'        => 'test-' . uniqid(),
+            'user_id' => $providerId,
+            'type' => 1,
+            'name' => 'test skill',
+            'slug' => 'test-'.uniqid(),
             'description' => 'x',
-            'price'       => $price,
-            'status'      => 1,
+            'price' => $price,
+            'status' => 1,
         ]);
         SkillDetail::create([
-            'product_id'       => $product->id,
-            'endpoint'         => '/api/v1/skill/test',
-            'method'           => 'GET',
-            'provider_share'   => 70,
-            'platform_share'   => 15,
+            'product_id' => $product->id,
+            'endpoint' => '/api/v1/skill/test',
+            'method' => 'GET',
+            'provider_share' => 70,
+            'platform_share' => 15,
             'influencer_share' => 10,
         ]);
+
         return $product;
     }
 
@@ -69,18 +71,18 @@ final class SkillCallIdempotentTest extends TestCase
     {
         app(LedgerService::class)->record('topup', $user->id, [
             [
-                'owner_type'  => 'platform',
-                'owner_id'    => 0,
+                'owner_type' => 'platform',
+                'owner_id' => 0,
                 'account_type' => 'platform',
-                'direction'   => 'debit',
-                'amount'      => $amount,
+                'direction' => 'debit',
+                'amount' => $amount,
             ],
             [
-                'owner_type'  => 'user',
-                'owner_id'    => $user->id,
+                'owner_type' => 'user',
+                'owner_id' => $user->id,
                 'account_type' => 'balance',
-                'direction'   => 'credit',
-                'amount'      => $amount,
+                'direction' => 'credit',
+                'amount' => $amount,
             ],
         ]);
     }
@@ -93,12 +95,12 @@ final class SkillCallIdempotentTest extends TestCase
 
         [$caller, $token] = $this->makeUserWithToken('idem1@test.com');
         $provider = $this->makeUser('pidem1@test.com');
-        $skill    = $this->makeSkill(1000, $provider->id);
+        $skill = $this->makeSkill(1000, $provider->id);
         $this->topUp($caller, 5000);
 
-        $requestId = 'req-' . uniqid();
-        $payload   = ['input' => 'hello', 'request_id' => $requestId];
-        $headers   = ['Authorization' => "Bearer {$token}"];
+        $requestId = 'req-'.uniqid();
+        $payload = ['input' => 'hello', 'request_id' => $requestId];
+        $headers = ['Authorization' => "Bearer {$token}"];
 
         // 第一次调用
         $res1 = $this->postJson("/api/v1/skills/{$skill->id}/call", $payload, $headers)
@@ -134,23 +136,23 @@ final class SkillCallIdempotentTest extends TestCase
 
         [$caller, $token] = $this->makeUserWithToken('idem2@test.com');
         $provider = $this->makeUser('pidem2@test.com');
-        $skill    = $this->makeSkill(1000, $provider->id);
+        $skill = $this->makeSkill(1000, $provider->id);
         $this->topUp($caller, 5000);
 
         $headers = ['Authorization' => "Bearer {$token}"];
 
         // 第一次调用
         $res1 = $this->postJson("/api/v1/skills/{$skill->id}/call", [
-            'input'      => 'hello',
-            'request_id' => 'req-a-' . uniqid(),
+            'input' => 'hello',
+            'request_id' => 'req-a-'.uniqid(),
         ], $headers)->assertOk()->assertJsonPath('code', 0);
 
         $callId1 = $res1->json('data.call_id');
 
         // 第二次调用（不同 request_id）
         $res2 = $this->postJson("/api/v1/skills/{$skill->id}/call", [
-            'input'      => 'world',
-            'request_id' => 'req-b-' . uniqid(),
+            'input' => 'world',
+            'request_id' => 'req-b-'.uniqid(),
         ], $headers)->assertOk()->assertJsonPath('code', 0);
 
         $callId2 = $res2->json('data.call_id');
@@ -174,7 +176,7 @@ final class SkillCallIdempotentTest extends TestCase
 
         [$caller, $token] = $this->makeUserWithToken('idem3@test.com');
         $provider = $this->makeUser('pidem3@test.com');
-        $skill    = $this->makeSkill(1000, $provider->id);
+        $skill = $this->makeSkill(1000, $provider->id);
         $this->topUp($caller, 5000);
 
         $headers = ['Authorization' => "Bearer {$token}"];
@@ -220,30 +222,30 @@ final class SkillCallIdempotentTest extends TestCase
     {
         [$caller, $token] = $this->makeUserWithToken('idem4@test.com');
         $provider = $this->makeUser('pidem4@test.com');
-        $skill    = $this->makeSkill(1000, $provider->id);
+        $skill = $this->makeSkill(1000, $provider->id);
         $this->topUp($caller, 5000);
 
-        $requestId = 'concurrent-' . uniqid();
-        $payload   = ['input' => 'concurrent', 'request_id' => $requestId];
-        $headers   = ['Authorization' => "Bearer {$token}"];
+        $requestId = 'concurrent-'.uniqid();
+        $payload = ['input' => 'concurrent', 'request_id' => $requestId];
+        $headers = ['Authorization' => "Bearer {$token}"];
 
         // 模拟并发：在事务中先插入一条记录，再发起请求
         DB::beginTransaction();
         ApiCall::create([
-            'request_id'        => $requestId,
-            'user_id'           => $caller->id,
-            'api_key_id'        => 1,
-            'product_id'        => $skill->id,
-            'provider_id'       => $provider->id,
-            'input'             => ['text' => 'pre-existing'],
-            'output'            => ['message' => 'pre-existing'],
-            'status_code'       => 200,
-            'duration_ms'       => 10,
-            'cost'              => 1000,
-            'provider_income'   => 700,
-            'platform_income'   => 150,
+            'request_id' => $requestId,
+            'user_id' => $caller->id,
+            'api_key_id' => 1,
+            'product_id' => $skill->id,
+            'provider_id' => $provider->id,
+            'input' => ['text' => 'pre-existing'],
+            'output' => ['message' => 'pre-existing'],
+            'status_code' => 200,
+            'duration_ms' => 10,
+            'cost' => 1000,
+            'provider_income' => 700,
+            'platform_income' => 150,
             'influencer_income' => 100,
-            'donation_amount'   => 50,
+            'donation_amount' => 50,
         ]);
         DB::commit();
 
@@ -271,32 +273,32 @@ final class SkillCallIdempotentTest extends TestCase
     {
         [$caller, $token] = $this->makeUserWithToken('idem6@test.com');
         $provider = $this->makeUser('pidem6@test.com');
-        $skill    = $this->makeSkill(1000, $provider->id);
+        $skill = $this->makeSkill(1000, $provider->id);
         $this->topUp($caller, 5000);
 
-        $requestId = 'pre-inserted-' . uniqid();
+        $requestId = 'pre-inserted-'.uniqid();
 
         // 先直接插入一条记录（模拟并发中先落库的请求）
         $existing = ApiCall::create([
-            'request_id'        => $requestId,
-            'user_id'           => $caller->id,
-            'api_key_id'        => 1,
-            'product_id'        => $skill->id,
-            'provider_id'       => $provider->id,
-            'input'             => ['text' => 'pre-existing'],
-            'output'            => ['message' => 'pre-existing'],
-            'status_code'       => 200,
-            'duration_ms'       => 10,
-            'cost'              => 1000,
-            'provider_income'   => 700,
-            'platform_income'   => 150,
+            'request_id' => $requestId,
+            'user_id' => $caller->id,
+            'api_key_id' => 1,
+            'product_id' => $skill->id,
+            'provider_id' => $provider->id,
+            'input' => ['text' => 'pre-existing'],
+            'output' => ['message' => 'pre-existing'],
+            'status_code' => 200,
+            'duration_ms' => 10,
+            'cost' => 1000,
+            'provider_income' => 700,
+            'platform_income' => 150,
             'influencer_income' => 100,
-            'donation_amount'   => 50,
+            'donation_amount' => 50,
         ]);
 
         // 再调用接口传相同 request_id
         $res = $this->postJson("/api/v1/skills/{$skill->id}/call", [
-            'input'      => 'hello',
+            'input' => 'hello',
             'request_id' => $requestId,
         ], ['Authorization' => "Bearer {$token}"])
             ->assertOk()
@@ -321,12 +323,12 @@ final class SkillCallIdempotentTest extends TestCase
 
         [$caller, $token] = $this->makeUserWithToken('idem5@test.com');
         $provider = $this->makeUser('pidem5@test.com');
-        $skill    = $this->makeSkill(1000, $provider->id);
+        $skill = $this->makeSkill(1000, $provider->id);
         $this->topUp($caller, 5000);
 
-        $requestId = 'complete-' . uniqid();
-        $payload   = ['input' => 'test', 'request_id' => $requestId];
-        $headers   = ['Authorization' => "Bearer {$token}"];
+        $requestId = 'complete-'.uniqid();
+        $payload = ['input' => 'test', 'request_id' => $requestId];
+        $headers = ['Authorization' => "Bearer {$token}"];
 
         // 第一次调用
         $res1 = $this->postJson("/api/v1/skills/{$skill->id}/call", $payload, $headers)

@@ -29,8 +29,8 @@ final class ExecuteSkillAction
      */
     public function execute(int $userId, string $prompt): array
     {
-        $provider    = $this->selectBestProvider->execute();
-        $providerId  = (int) $provider['id'];
+        $provider = $this->selectBestProvider->execute();
+        $providerId = (int) $provider['id'];
 
         // 数据驱动：按选中 Provider 的 driver 配置实例化对应客户端
         $aiClient = $this->aiClientFactory->make($provider);
@@ -57,14 +57,14 @@ final class ExecuteSkillAction
 
         return [
             'provider' => [
-                'id'           => $providerId,
-                'name'         => (string) $provider['name'],
+                'id' => $providerId,
+                'name' => (string) $provider['name'],
                 'display_name' => (string) $provider['display_name'],
             ],
-            'content'      => $response->content,
-            'input_tokens'  => $response->inputTokens,
+            'content' => $response->content,
+            'input_tokens' => $response->inputTokens,
             'output_tokens' => $response->outputTokens,
-            'cost'         => $response->cost,
+            'cost' => $response->cost,
         ];
     }
 }

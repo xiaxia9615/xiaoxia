@@ -14,18 +14,20 @@ final class ApiKeyController
 
     public function index(Request $request): JsonResponse
     {
-        return response()->json(['code'=>0,'data'=>$this->service->listByUser($request->user())]);
+        return response()->json(['code' => 0, 'data' => $this->service->listByUser($request->user())]);
     }
 
     public function store(Request $request): JsonResponse
     {
-        $data = $request->validate(['name'=>'nullable|string|max:50']);
-        return response()->json(['code'=>0,'data'=>$this->service->generate($request->user(), $data['name'] ?? 'default')]);
+        $data = $request->validate(['name' => 'nullable|string|max:50']);
+
+        return response()->json(['code' => 0, 'data' => $this->service->generate($request->user(), $data['name'] ?? 'default')]);
     }
 
     public function destroy(Request $request, int $id): JsonResponse
     {
         $ok = $this->service->revoke($request->user(), $id);
-        return response()->json(['code'=>$ok ? 0 : 1], $ok ? 200 : 404);
+
+        return response()->json(['code' => $ok ? 0 : 1], $ok ? 200 : 404);
     }
 }

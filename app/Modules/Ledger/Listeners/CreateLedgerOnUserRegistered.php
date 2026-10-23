@@ -18,18 +18,18 @@ final readonly class CreateLedgerOnUserRegistered
         // 注册送 100 元体验金（10000 分）
         $this->ledger->record('signup_bonus', $event->user->id, [
             [
-                'owner_type'   => 'platform',
-                'owner_id'     => 0,
+                'owner_type' => 'platform',
+                'owner_id' => 0,
                 'account_type' => 'platform',
-                'direction'    => 'debit',
-                'amount'       => 100000,
+                'direction' => 'debit',
+                'amount' => 100000,
             ],
             [
-                'owner_type'   => 'user',
-                'owner_id'     => $event->user->id,
+                'owner_type' => 'user',
+                'owner_id' => $event->user->id,
                 'account_type' => 'balance',
-                'direction'    => 'credit',
-                'amount'       => 100000,
+                'direction' => 'credit',
+                'amount' => 100000,
             ],
         ]);
     }

@@ -35,7 +35,7 @@ final class GlmClient implements AiClientInterface
     {
         try {
             $response = Http::timeout(30)->post(self::ENDPOINT, [
-                'model'    => self::MODEL,
+                'model' => self::MODEL,
                 'messages' => [
                     ['role' => 'user', 'content' => $prompt],
                 ],
@@ -52,10 +52,10 @@ final class GlmClient implements AiClientInterface
             );
         }
 
-        $data  = $response->json();
+        $data = $response->json();
         $usage = is_array($data['usage'] ?? null) ? $data['usage'] : [];
 
-        $inputTokens  = (int) ($usage['prompt_tokens'] ?? 0);
+        $inputTokens = (int) ($usage['prompt_tokens'] ?? 0);
         $outputTokens = (int) ($usage['completion_tokens'] ?? 0);
 
         // 费用 = 输入 token 数 / 1000 * 输入单价 + 输出 token 数 / 1000 * 输出单价
@@ -63,10 +63,10 @@ final class GlmClient implements AiClientInterface
             + $outputTokens / 1000 * self::COST_PER_1K_OUTPUT;
 
         return new AiResponseDTO(
-            content:      (string) ($data['choices'][0]['message']['content'] ?? ''),
-            inputTokens:  $inputTokens,
+            content: (string) ($data['choices'][0]['message']['content'] ?? ''),
+            inputTokens: $inputTokens,
             outputTokens: $outputTokens,
-            cost:         $cost,
+            cost: $cost,
         );
     }
 }

@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace Tests\Feature\Skill;
 
 use App\Models\User;
@@ -18,21 +20,21 @@ final class SmartRoutingGatewayTest extends TestCase
     private function makeUser(string $email): User
     {
         return User::create([
-            'name'     => 'test',
-            'email'    => $email,
+            'name' => 'test',
+            'email' => $email,
             'password' => bcrypt('password123'),
-            'status'   => 1,
+            'status' => 1,
         ]);
     }
 
     private function makeProvider(array $overrides = []): AiProvider
     {
         return AiProvider::create(array_merge([
-            'name'         => 'provider-'.uniqid(),
+            'name' => 'provider-'.uniqid(),
             'display_name' => 'Provider',
-            'base_url'     => 'https://api.example.com/v1',
-            'api_key'      => 'sk-test-key',
-            'enabled'      => true,
+            'base_url' => 'https://api.example.com/v1',
+            'api_key' => 'sk-test-key',
+            'enabled' => true,
         ], $overrides));
     }
 
@@ -45,6 +47,7 @@ final class SmartRoutingGatewayTest extends TestCase
             ['owner_type' => 'platform', 'owner_id' => 0,          'account_type' => 'platform', 'direction' => 'debit',  'amount' => $millis],
             ['owner_type' => 'user',     'owner_id' => $userId,    'account_type' => 'balance', 'direction' => 'credit', 'amount' => $millis],
         ]);
+
         return $ledger->balance('user', $userId, 'balance');
     }
 
@@ -56,16 +59,16 @@ final class SmartRoutingGatewayTest extends TestCase
 
         // 成本 0.01 的高价 Provider
         $expensive = $this->makeProvider([
-            'name'               => 'expensive-provider',
-            'display_name'       => 'Expensive Provider',
-            'cost_per_1k_input'  => 0.005,
+            'name' => 'expensive-provider',
+            'display_name' => 'Expensive Provider',
+            'cost_per_1k_input' => 0.005,
             'cost_per_1k_output' => 0.005,
         ]);
         // 成本 0.003 的低价 Provider（模拟 GLM-5.3）
         $glm = $this->makeProvider([
-            'name'               => 'glm',
-            'display_name'       => 'GLM-5.3',
-            'cost_per_1k_input'  => 0.001,
+            'name' => 'glm',
+            'display_name' => 'GLM-5.3',
+            'cost_per_1k_input' => 0.001,
             'cost_per_1k_output' => 0.002,
         ]);
 
@@ -77,7 +80,7 @@ final class SmartRoutingGatewayTest extends TestCase
                     ['message' => ['content' => 'GLM-5.3 模拟响应']],
                 ],
                 'usage' => [
-                    'prompt_tokens'     => 100,
+                    'prompt_tokens' => 100,
                     'completion_tokens' => 200,
                 ],
             ], 200),
@@ -130,9 +133,9 @@ final class SmartRoutingGatewayTest extends TestCase
         $token = $user->createToken('api')->plainTextToken;
 
         $this->makeProvider([
-            'name'               => 'glm',
-            'display_name'       => 'GLM-5.3',
-            'cost_per_1k_input'  => 0.001,
+            'name' => 'glm',
+            'display_name' => 'GLM-5.3',
+            'cost_per_1k_input' => 0.001,
             'cost_per_1k_output' => 0.002,
         ]);
 
@@ -144,7 +147,7 @@ final class SmartRoutingGatewayTest extends TestCase
                     ['message' => ['content' => 'GLM-5.3 模拟响应']],
                 ],
                 'usage' => [
-                    'prompt_tokens'     => 100,
+                    'prompt_tokens' => 100,
                     'completion_tokens' => 200,
                 ],
             ], 200),
@@ -180,9 +183,9 @@ final class SmartRoutingGatewayTest extends TestCase
         $token = $user->createToken('api')->plainTextToken;
 
         $this->makeProvider([
-            'name'               => 'glm',
-            'display_name'       => 'GLM-5.3',
-            'cost_per_1k_input'  => 0.001,
+            'name' => 'glm',
+            'display_name' => 'GLM-5.3',
+            'cost_per_1k_input' => 0.001,
             'cost_per_1k_output' => 0.002,
         ]);
 
@@ -227,16 +230,16 @@ final class SmartRoutingGatewayTest extends TestCase
 
         // 成本 0.01 的高价 Provider（备用）
         $expensive = $this->makeProvider([
-            'name'               => 'expensive-provider',
-            'display_name'       => 'Expensive Provider',
-            'cost_per_1k_input'  => 0.005,
+            'name' => 'expensive-provider',
+            'display_name' => 'Expensive Provider',
+            'cost_per_1k_input' => 0.005,
             'cost_per_1k_output' => 0.005,
         ]);
         // 成本 0.003 的低价 Provider（首选）
         $this->makeProvider([
-            'name'               => 'glm',
-            'display_name'       => 'GLM-5.3',
-            'cost_per_1k_input'  => 0.001,
+            'name' => 'glm',
+            'display_name' => 'GLM-5.3',
+            'cost_per_1k_input' => 0.001,
             'cost_per_1k_output' => 0.002,
         ]);
 
@@ -254,7 +257,7 @@ final class SmartRoutingGatewayTest extends TestCase
                         ['message' => ['content' => '备用 Provider 响应']],
                     ],
                     'usage' => [
-                        'prompt_tokens'     => 100,
+                        'prompt_tokens' => 100,
                         'completion_tokens' => 200,
                     ],
                 ], 200),

@@ -27,6 +27,6 @@ final class ChatRouter
             );
         }
 
-        return new OpenAiCompatProvider();
+        return new OpenAiCompatProvider;
     }
 }

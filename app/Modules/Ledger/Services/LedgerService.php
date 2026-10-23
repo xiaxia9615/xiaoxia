@@ -18,13 +18,13 @@ final class LedgerService
                 $accountId = $this->ensureAccount($s['owner_type'], $s['owner_id'], $s['account_type']);
                 DB::table('ledger_entries')->insert([
                     'transaction_id' => $transactionId,
-                    'account_id'     => $accountId,
-                    'direction'      => $s['direction'],
-                    'amount'         => $s['amount'],
-                    'biz_type'       => $bizType,
-                    'biz_id'         => $bizId,
-                    'created_at'     => now(),
-                    'updated_at'     => now(),
+                    'account_id' => $accountId,
+                    'direction' => $s['direction'],
+                    'amount' => $s['amount'],
+                    'biz_type' => $bizType,
+                    'biz_id' => $bizId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
             }
         });
@@ -34,6 +34,7 @@ final class LedgerService
 
     /**
      * 查询账户流水分页（paginator toArray 结构），账户不存在返回 null
+     *
      * @return array<string, mixed>|null
      */
     public function entriesByUser(int $userId, string $accountType = 'balance'): ?array
@@ -43,7 +44,10 @@ final class LedgerService
             ->where('owner_id', $userId)
             ->where('account_type', $accountType)
             ->value('id');
-        if (! $accountId) return null;
+        if (! $accountId) {
+            return null;
+        }
+
         return DB::table('ledger_entries')
             ->where('account_id', $accountId)
             ->orderByDesc('id')
@@ -59,10 +63,12 @@ final class LedgerService
             ->where('account_type', $accountType)
             ->value('id');
 
-        if (! $accountId) return 0;
+        if (! $accountId) {
+            return 0;
+        }
 
         $credit = (int) DB::table('ledger_entries')->where('account_id', $accountId)->where('direction', 'credit')->sum('amount');
-        $debit  = (int) DB::table('ledger_entries')->where('account_id', $accountId)->where('direction', 'debit')->sum('amount');
+        $debit = (int) DB::table('ledger_entries')->where('account_id', $accountId)->where('direction', 'debit')->sum('amount');
 
         return $credit - $debit;
     }
@@ -81,6 +87,7 @@ final class LedgerService
         if ($amount <= 0) {
             throw new \RuntimeException('扣减金额必须为正整数（单位：毫）');
         }
+
         return DB::transaction(function () use ($ownerType, $ownerId, $accountType, $amount, $bizType, $bizId): string {
             // 悲观锁：锁定账户行，同一账户的并发扣减在此串行化
             $account = DB::table('ledger_accounts')
@@ -106,25 +113,26 @@ final class LedgerService
             DB::table('ledger_entries')->insert([
                 [
                     'transaction_id' => $transactionId,
-                    'account_id'     => $accountId,
-                    'direction'      => 'debit',
-                    'amount'         => $amount,
-                    'biz_type'       => $bizType,
-                    'biz_id'         => $bizId,
-                    'created_at'     => $now,
-                    'updated_at'     => $now,
+                    'account_id' => $accountId,
+                    'direction' => 'debit',
+                    'amount' => $amount,
+                    'biz_type' => $bizType,
+                    'biz_id' => $bizId,
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ],
                 [
                     'transaction_id' => $transactionId,
-                    'account_id'     => $this->ensureAccount('platform', 0, 'platform'),
-                    'direction'      => 'credit',
-                    'amount'         => $amount,
-                    'biz_type'       => $bizType,
-                    'biz_id'         => $bizId,
-                    'created_at'     => $now,
-                    'updated_at'     => $now,
+                    'account_id' => $this->ensureAccount('platform', 0, 'platform'),
+                    'direction' => 'credit',
+                    'amount' => $amount,
+                    'biz_type' => $bizType,
+                    'biz_id' => $bizId,
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ],
             ]);
+
             return $transactionId;
         });
     }
@@ -138,15 +146,17 @@ final class LedgerService
             ->where('currency', 'CNY')
             ->value('id');
 
-        if ($id) return (int) $id;
+        if ($id) {
+            return (int) $id;
+        }
 
         return (int) DB::table('ledger_accounts')->insertGetId([
-            'owner_type'   => $ownerType,
-            'owner_id'     => $ownerId,
+            'owner_type' => $ownerType,
+            'owner_id' => $ownerId,
             'account_type' => $accountType,
-            'currency'     => 'CNY',
-            'created_at'   => now(),
-            'updated_at'   => now(),
+            'currency' => 'CNY',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 }

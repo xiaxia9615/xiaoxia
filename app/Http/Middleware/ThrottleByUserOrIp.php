@@ -28,8 +28,8 @@ final class ThrottleByUserOrIp
             $retryAfter = max(1, RateLimiter::availableIn($limiterKey));
 
             return response()->json([
-                'code'        => 429,
-                'message'     => __('messages.rate_limited'),
+                'code' => 429,
+                'message' => __('messages.rate_limited'),
                 'retry_after' => $retryAfter,
             ], 429, ['Retry-After' => (string) $retryAfter]);
         }

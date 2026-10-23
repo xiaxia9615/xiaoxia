@@ -27,7 +27,7 @@ final class TeamBillingTest extends TestCase
     {
         parent::setUp();
         $this->billing = app(TeamBillingService::class);
-        $this->ledger  = app(LedgerService::class);
+        $this->ledger = app(LedgerService::class);
     }
 
     /**
@@ -38,32 +38,32 @@ final class TeamBillingTest extends TestCase
     private function makeTeamWithBalance(int $topUpAmount): array
     {
         $owner = User::create([
-            'name'     => 'team-owner',
-            'email'    => 'owner-'.Str::uuid().'@example.com',
+            'name' => 'team-owner',
+            'email' => 'owner-'.Str::uuid().'@example.com',
             'password' => bcrypt('password123'),
-            'status'   => 1,
+            'status' => 1,
         ]);
         $actor = User::create([
-            'name'     => 'team-actor',
-            'email'    => 'actor-'.Str::uuid().'@example.com',
+            'name' => 'team-actor',
+            'email' => 'actor-'.Str::uuid().'@example.com',
             'password' => bcrypt('password123'),
-            'status'   => 1,
+            'status' => 1,
         ]);
         $team = Team::create([
-            'name'     => '测试团队',
+            'name' => '测试团队',
             'owner_id' => $owner->id,
         ]);
         DB::table('team_user')->insert([
-            'team_id'    => $team->id,
-            'user_id'    => $owner->id,
-            'role'       => 'owner',
+            'team_id' => $team->id,
+            'user_id' => $owner->id,
+            'role' => 'owner',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
         DB::table('team_user')->insert([
-            'team_id'    => $team->id,
-            'user_id'    => $actor->id,
-            'role'       => 'member',
+            'team_id' => $team->id,
+            'user_id' => $actor->id,
+            'role' => 'member',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -76,18 +76,18 @@ final class TeamBillingTest extends TestCase
     {
         $this->ledger->record('topup', $user->id, [
             [
-                'owner_type'  => 'platform',
-                'owner_id'    => 0,
+                'owner_type' => 'platform',
+                'owner_id' => 0,
                 'account_type' => 'platform',
-                'direction'   => 'debit',
-                'amount'      => $amount,
+                'direction' => 'debit',
+                'amount' => $amount,
             ],
             [
-                'owner_type'  => 'user',
-                'owner_id'    => $user->id,
+                'owner_type' => 'user',
+                'owner_id' => $user->id,
                 'account_type' => 'balance',
-                'direction'   => 'credit',
-                'amount'      => $amount,
+                'direction' => 'credit',
+                'amount' => $amount,
             ],
         ]);
     }
@@ -166,7 +166,7 @@ final class TeamBillingTest extends TestCase
         $requestId = 'req-'.Str::uuid();
         $ctx = $this->makeContext($team, $actor, 77, $requestId);
 
-        $first  = $this->billing->charge($ctx, 3_000);
+        $first = $this->billing->charge($ctx, 3_000);
         $second = $this->billing->charge($ctx, 3_000);
 
         $this->assertSame($first, $second);
@@ -189,10 +189,10 @@ final class TeamBillingTest extends TestCase
     {
         [$team, $owner] = $this->makeTeamWithBalance(10_000);
         $outsider = User::create([
-            'name'     => 'outsider',
-            'email'    => 'outsider-'.Str::uuid().'@example.com',
+            'name' => 'outsider',
+            'email' => 'outsider-'.Str::uuid().'@example.com',
             'password' => bcrypt('password123'),
-            'status'   => 1,
+            'status' => 1,
         ]);
         $before = $this->ledger->balance('user', $owner->id, 'balance');
 
@@ -219,7 +219,7 @@ final class TeamBillingTest extends TestCase
         $this->assertFalse($breaker->isAvailable(1), '前置条件：Provider 1 应已熔断');
 
         // 熔断降级后（重试/重放同一请求）计费正确且不重复扣费
-        $first  = $this->billing->charge($ctx, 3_000);
+        $first = $this->billing->charge($ctx, 3_000);
         $second = $this->billing->charge($ctx, 3_000);
 
         $this->assertSame($first, $second);

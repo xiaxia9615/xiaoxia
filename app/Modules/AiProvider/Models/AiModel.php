@@ -19,10 +19,10 @@ class AiModel extends Model
     protected function casts(): array
     {
         return [
-            'provider_id'         => 'integer',
-            'input_price_per_1k'  => 'integer',
+            'provider_id' => 'integer',
+            'input_price_per_1k' => 'integer',
             'output_price_per_1k' => 'integer',
-            'enabled'             => 'boolean',
+            'enabled' => 'boolean',
         ];
     }
 

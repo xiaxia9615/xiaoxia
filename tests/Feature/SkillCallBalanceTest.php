@@ -30,12 +30,13 @@ final class SkillCallBalanceTest extends TestCase
         $user = $this->makeUser($email);
         $plain = 'sk_'.uniqid();
         ApiKey::create([
-            'user_id'    => $user->id,
-            'name'       => 'test',
+            'user_id' => $user->id,
+            'name' => 'test',
             'key_prefix' => substr($plain, 0, 8),
-            'key_hash'   => hash('sha256', $plain),
+            'key_hash' => hash('sha256', $plain),
         ]);
         $token = $user->createToken('api')->plainTextToken;
+
         return [$user, $token];
     }
 
@@ -52,6 +53,7 @@ final class SkillCallBalanceTest extends TestCase
             'provider_share' => 70, 'platform_share' => 15,
             'influencer_share' => 10,
         ]);
+
         return $product;
     }
 
@@ -88,8 +90,8 @@ final class SkillCallBalanceTest extends TestCase
         $skill = $this->makeSkill(1000, $provider->id);
 
         app(LedgerService::class)->record('topup', $caller->id, [
-            ['owner_type'=>'platform','owner_id'=>0,'account_type'=>'platform','direction'=>'debit','amount'=>5000],
-            ['owner_type'=>'user','owner_id'=>$caller->id,'account_type'=>'balance','direction'=>'credit','amount'=>5000],
+            ['owner_type' => 'platform', 'owner_id' => 0, 'account_type' => 'platform', 'direction' => 'debit', 'amount' => 5000],
+            ['owner_type' => 'user', 'owner_id' => $caller->id, 'account_type' => 'balance', 'direction' => 'credit', 'amount' => 5000],
         ]);
 
         $this->postJson("/api/v1/skills/{$skill->id}/call", ['input' => 'hi'], [

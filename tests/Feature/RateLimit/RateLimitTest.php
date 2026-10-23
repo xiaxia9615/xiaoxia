@@ -24,19 +24,19 @@ final class RateLimitTest extends TestCase
 
     private function makeUserWithToken(string $email): array
     {
-        $user  = User::create([
-            'name'     => 'ratelimit',
-            'email'    => $email,
+        $user = User::create([
+            'name' => 'ratelimit',
+            'email' => $email,
             'password' => bcrypt('password123'),
-            'status'   => 1,
+            'status' => 1,
             'is_admin' => false,
         ]);
-        $plain = 'sk_' . uniqid();
+        $plain = 'sk_'.uniqid();
         ApiKey::create([
-            'user_id'    => $user->id,
-            'name'       => 'ratelimit',
+            'user_id' => $user->id,
+            'name' => 'ratelimit',
             'key_prefix' => substr($plain, 0, 8),
-            'key_hash'   => hash('sha256', $plain),
+            'key_hash' => hash('sha256', $plain),
         ]);
         $token = $user->createToken('api')->plainTextToken;
 

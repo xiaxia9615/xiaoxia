@@ -1,6 +1,9 @@
 <?php
+
 declare(strict_types=1);
+
 namespace App\Modules\ApiKey\Providers;
+
 use App\Modules\ApiKey\Contracts\ApiCallContract;
 use App\Modules\ApiKey\Contracts\ApiKeyContract;
 use App\Modules\ApiKey\Services\ApiCallService;
@@ -20,9 +23,10 @@ final class ApiKeyServiceProvider extends ServiceProvider
             ApiCallService::class,
         );
     }
+
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
-        $this->loadRoutesFrom(__DIR__ . '/../Routes/api.php');
+        $this->loadRoutesFrom(__DIR__.'/../Routes/api.php');
     }
 }

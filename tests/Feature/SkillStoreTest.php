@@ -17,36 +17,37 @@ final class SkillStoreTest extends TestCase
     private function makeUser(string $email, bool $isAdmin = false): User
     {
         return User::create([
-            'name'     => 'test',
-            'email'    => $email,
+            'name' => 'test',
+            'email' => $email,
             'password' => bcrypt('password123'),
-            'status'   => 1,
+            'status' => 1,
             'is_admin' => $isAdmin,
         ]);
     }
 
     private function makeUserWithToken(string $email, bool $isAdmin = false): array
     {
-        $user  = $this->makeUser($email, $isAdmin);
-        $plain = 'sk_' . uniqid();
+        $user = $this->makeUser($email, $isAdmin);
+        $plain = 'sk_'.uniqid();
         ApiKey::create([
-            'user_id'    => $user->id,
-            'name'       => 'test',
+            'user_id' => $user->id,
+            'name' => 'test',
             'key_prefix' => substr($plain, 0, 8),
-            'key_hash'   => hash('sha256', $plain),
+            'key_hash' => hash('sha256', $plain),
         ]);
         $token = $user->createToken('api')->plainTextToken;
+
         return [$user, $token];
     }
 
     private function storePayload(array $overrides = []): array
     {
         return array_merge([
-            'name'        => 'test skill ' . uniqid(),
+            'name' => 'test skill '.uniqid(),
             'description' => 'a test skill',
-            'price'       => 1000,
-            'endpoint'    => 'https://api.example.com/skill',
-            'method'      => 'POST',
+            'price' => 1000,
+            'endpoint' => 'https://api.example.com/skill',
+            'method' => 'POST',
         ], $overrides);
     }
 
@@ -57,7 +58,7 @@ final class SkillStoreTest extends TestCase
         [$user, $token] = $this->makeUserWithToken('store1@test.com');
 
         $res = $this->postJson('/api/v1/skills', $this->storePayload([
-            'api_key'          => 'sk-secret-api-key-12345',
+            'api_key' => 'sk-secret-api-key-12345',
             'request_template' => ['model' => 'gpt-4', 'temperature' => 0.7],
         ]), ['Authorization' => "Bearer {$token}"])
             ->assertOk()
@@ -117,7 +118,7 @@ final class SkillStoreTest extends TestCase
         [$userB, $tokenB] = $this->makeUserWithToken('other@test.com');
         $this->patchJson("/api/v1/skills/{$productId}/audit", [
             'approve' => false,
-            'note'    => 'bad skill',
+            'note' => 'bad skill',
         ], ['Authorization' => "Bearer {$tokenB}"])
             ->assertStatus(403)
             ->assertJsonPath('code', 1);

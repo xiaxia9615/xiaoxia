@@ -38,6 +38,7 @@ class AiProvider extends Model
     {
         if ($value === null) {
             $this->attributes['api_key'] = null;
+
             return;
         }
 

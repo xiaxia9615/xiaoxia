@@ -1,6 +1,9 @@
 <?php
+
 declare(strict_types=1);
+
 namespace App\Modules\Ledger\Events;
+
 final readonly class AiUsageRecorded
 {
     public function __construct(

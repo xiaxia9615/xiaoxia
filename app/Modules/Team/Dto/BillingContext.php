@@ -18,6 +18,5 @@ final class BillingContext
         public readonly int $apiKeyId,
         public readonly string $requestId,
         public readonly string $billingScope = 'team',
-    ) {
-    }
+    ) {}
 }

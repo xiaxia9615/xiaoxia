@@ -28,6 +28,7 @@ final class SkillCallController
 
         try {
             $result = $this->service->call($request->user(), $id, $input, $requestId);
+
             return response()->json(['code' => 0, 'message' => 'success', 'data' => $result]);
         } catch (RuntimeException $e) {
             // 业务异常：信息是给用户看的
@@ -38,6 +39,7 @@ final class SkillCallController
                 'product_id' => $id,
                 'error' => $e->getMessage(),
             ]);
+
             return response()->json(['code' => 1, 'message' => '系统繁忙，请稍后重试'], 500);
         }
     }

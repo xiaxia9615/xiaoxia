@@ -1,6 +1,9 @@
 <?php
+
 declare(strict_types=1);
+
 namespace App\Modules\AiProvider\DTOs;
+
 final class AiResponseDTO
 {
     public function __construct(

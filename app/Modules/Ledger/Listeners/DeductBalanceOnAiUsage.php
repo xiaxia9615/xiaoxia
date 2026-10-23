@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace App\Modules\Ledger\Listeners;
 
 use App\Modules\Ledger\Events\AiUsageRecorded;
@@ -51,13 +53,13 @@ final readonly class DeductBalanceOnAiUsage
 
             // 扣费流水：与真实扣款同一事务，任一失败整体回滚
             DB::table('ai_usage_deductions')->insert([
-                'user_id'       => $event->userId,
-                'provider_id'   => $event->providerId,
-                'cost'          => $event->cost,
-                'input_tokens'  => $event->inputTokens,
+                'user_id' => $event->userId,
+                'provider_id' => $event->providerId,
+                'cost' => $event->cost,
+                'input_tokens' => $event->inputTokens,
                 'output_tokens' => $event->outputTokens,
-                'created_at'    => now(),
-                'updated_at'    => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         });
     }

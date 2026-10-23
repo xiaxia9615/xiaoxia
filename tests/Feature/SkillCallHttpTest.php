@@ -11,6 +11,7 @@ use App\Modules\Ledger\Services\LedgerService;
 use App\Modules\Product\Models\Product;
 use App\Modules\Skill\Models\SkillDetail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -21,46 +22,48 @@ final class SkillCallHttpTest extends TestCase
     private function makeUser(string $email): User
     {
         return User::create([
-            'name'     => 'test',
-            'email'    => $email,
+            'name' => 'test',
+            'email' => $email,
             'password' => bcrypt('password123'),
-            'status'   => 1,
+            'status' => 1,
         ]);
     }
 
     private function makeUserWithToken(string $email): array
     {
-        $user  = $this->makeUser($email);
-        $plain = 'sk_' . uniqid();
+        $user = $this->makeUser($email);
+        $plain = 'sk_'.uniqid();
         ApiKey::create([
-            'user_id'    => $user->id,
-            'name'       => 'test',
+            'user_id' => $user->id,
+            'name' => 'test',
             'key_prefix' => substr($plain, 0, 8),
-            'key_hash'   => hash('sha256', $plain),
+            'key_hash' => hash('sha256', $plain),
         ]);
         $token = $user->createToken('api')->plainTextToken;
+
         return [$user, $token];
     }
 
     private function makeSkill(int $price, int $providerId, array $detailOverrides = []): Product
     {
         $product = Product::create([
-            'user_id'     => $providerId,
-            'type'        => 1,
-            'name'        => 'test skill',
-            'slug'        => 'test-' . uniqid(),
+            'user_id' => $providerId,
+            'type' => 1,
+            'name' => 'test skill',
+            'slug' => 'test-'.uniqid(),
             'description' => 'x',
-            'price'       => $price,
-            'status'      => 1,
+            'price' => $price,
+            'status' => 1,
         ]);
         SkillDetail::create(array_merge([
-            'product_id'       => $product->id,
-            'endpoint'         => 'https://api.example.com/skill',
-            'method'           => 'POST',
-            'provider_share'   => 70,
-            'platform_share'   => 15,
+            'product_id' => $product->id,
+            'endpoint' => 'https://api.example.com/skill',
+            'method' => 'POST',
+            'provider_share' => 70,
+            'platform_share' => 15,
             'influencer_share' => 10,
         ], $detailOverrides));
+
         return $product;
     }
 
@@ -68,18 +71,18 @@ final class SkillCallHttpTest extends TestCase
     {
         app(LedgerService::class)->record('topup', $user->id, [
             [
-                'owner_type'  => 'platform',
-                'owner_id'    => 0,
+                'owner_type' => 'platform',
+                'owner_id' => 0,
                 'account_type' => 'platform',
-                'direction'   => 'debit',
-                'amount'      => $amount,
+                'direction' => 'debit',
+                'amount' => $amount,
             ],
             [
-                'owner_type'  => 'user',
-                'owner_id'    => $user->id,
+                'owner_type' => 'user',
+                'owner_id' => $user->id,
                 'account_type' => 'balance',
-                'direction'   => 'credit',
-                'amount'      => $amount,
+                'direction' => 'credit',
+                'amount' => $amount,
             ],
         ]);
     }
@@ -94,8 +97,8 @@ final class SkillCallHttpTest extends TestCase
 
         [$caller, $token] = $this->makeUserWithToken('http1@test.com');
         $provider = $this->makeUser('phttp1@test.com');
-        $skill    = $this->makeSkill(1000, $provider->id, [
-            'api_key'          => 'sk-test-api-key',
+        $skill = $this->makeSkill(1000, $provider->id, [
+            'api_key' => 'sk-test-api-key',
             'request_template' => ['model' => 'gpt-4', 'temperature' => 0.7],
         ]);
         $this->topUp($caller, 5000);
@@ -140,7 +143,7 @@ final class SkillCallHttpTest extends TestCase
 
         [$caller, $token] = $this->makeUserWithToken('http2@test.com');
         $provider = $this->makeUser('phttp2@test.com');
-        $skill    = $this->makeSkill(1000, $provider->id);
+        $skill = $this->makeSkill(1000, $provider->id);
         $this->topUp($caller, 5000);
 
         $this->postJson("/api/v1/skills/{$skill->id}/call", [
@@ -167,7 +170,7 @@ final class SkillCallHttpTest extends TestCase
 
         [$caller, $token] = $this->makeUserWithToken('http3@test.com');
         $provider = $this->makeUser('phttp3@test.com');
-        $skill    = $this->makeSkill(1000, $provider->id);
+        $skill = $this->makeSkill(1000, $provider->id);
         $this->topUp($caller, 5000);
 
         $this->postJson("/api/v1/skills/{$skill->id}/call", [
@@ -191,13 +194,13 @@ final class SkillCallHttpTest extends TestCase
         Http::fake([
             'api.example.com/*' => function () {
                 // 模拟连接超时
-                throw new \Illuminate\Http\Client\ConnectionException('cURL error 28: Connection timed out');
+                throw new ConnectionException('cURL error 28: Connection timed out');
             },
         ]);
 
         [$caller, $token] = $this->makeUserWithToken('http4@test.com');
         $provider = $this->makeUser('phttp4@test.com');
-        $skill    = $this->makeSkill(1000, $provider->id);
+        $skill = $this->makeSkill(1000, $provider->id);
         $this->topUp($caller, 5000);
 
         $this->postJson("/api/v1/skills/{$skill->id}/call", [
@@ -224,7 +227,7 @@ final class SkillCallHttpTest extends TestCase
 
         [$caller, $token] = $this->makeUserWithToken('http5@test.com');
         $provider = $this->makeUser('phttp5@test.com');
-        $skill    = $this->makeSkill(1000, $provider->id);
+        $skill = $this->makeSkill(1000, $provider->id);
         $this->topUp($caller, 5000);
 
         $this->postJson("/api/v1/skills/{$skill->id}/call", [
@@ -251,7 +254,7 @@ final class SkillCallHttpTest extends TestCase
 
         [$caller, $token] = $this->makeUserWithToken('http6@test.com');
         $provider = $this->makeUser('phttp6@test.com');
-        $skill    = $this->makeSkill(1000, $provider->id, [
+        $skill = $this->makeSkill(1000, $provider->id, [
             'method' => 'GET',
         ]);
         $this->topUp($caller, 5000);

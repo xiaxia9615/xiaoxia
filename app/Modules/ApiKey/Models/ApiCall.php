@@ -26,19 +26,19 @@ class ApiCall extends Model
     protected function casts(): array
     {
         return [
-            'user_id'           => 'integer',
-            'api_key_id'        => 'integer',
-            'product_id'        => 'integer',
-            'provider_id'       => 'integer',
-            'input'             => 'array',
-            'output'            => 'array',
-            'status_code'       => 'integer',
-            'duration_ms'       => 'integer',
-            'cost'              => 'integer',
-            'provider_income'   => 'integer',
-            'platform_income'   => 'integer',
+            'user_id' => 'integer',
+            'api_key_id' => 'integer',
+            'product_id' => 'integer',
+            'provider_id' => 'integer',
+            'input' => 'array',
+            'output' => 'array',
+            'status_code' => 'integer',
+            'duration_ms' => 'integer',
+            'cost' => 'integer',
+            'provider_income' => 'integer',
+            'platform_income' => 'integer',
             'influencer_income' => 'integer',
-            'donation_amount'   => 'integer',
+            'donation_amount' => 'integer',
         ];
     }
 

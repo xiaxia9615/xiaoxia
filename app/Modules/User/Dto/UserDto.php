@@ -17,8 +17,8 @@ final readonly class UserDto
     public static function fromModel(User $user): self
     {
         return new self(
-            id:    $user->id,
-            name:  $user->name,
+            id: $user->id,
+            name: $user->name,
             email: $user->email,
         );
     }

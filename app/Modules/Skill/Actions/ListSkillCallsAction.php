@@ -1,6 +1,9 @@
 <?php
+
 declare(strict_types=1);
+
 namespace App\Modules\Skill\Actions;
+
 use App\Modules\ApiKey\Contracts\ApiCallContract;
 
 final class ListSkillCallsAction

@@ -21,7 +21,7 @@ final class AiClientFactory
     public const DRIVER_OPENAI_COMPATIBLE = 'openai_compatible';
 
     /**
-     * @param array<string, mixed> $provider Provider 信息数组（来自路由策略，严禁传 Model）
+     * @param  array<string, mixed>  $provider  Provider 信息数组（来自路由策略，严禁传 Model）
      */
     public function make(array $provider): AiClientInterface
     {
@@ -29,15 +29,15 @@ final class AiClientFactory
 
         if ($driver === self::DRIVER_OPENAI_COMPATIBLE) {
             return new OpenAiCompatibleClient(
-                baseUrl:        (string) ($provider['base_url'] ?? ''),
-                modelName:      (string) ($provider['model_name'] ?? ''),
+                baseUrl: (string) ($provider['base_url'] ?? ''),
+                modelName: (string) ($provider['model_name'] ?? ''),
                 costPer1kInput: (float) ($provider['cost_per_1k_input'] ?? 0),
                 costPer1kOutput: (float) ($provider['cost_per_1k_output'] ?? 0),
-                apiKey:         isset($provider['api_key']) ? (string) $provider['api_key'] : null,
+                apiKey: isset($provider['api_key']) ? (string) $provider['api_key'] : null,
             );
         }
 
         // 默认驱动：智谱 GLM 专用客户端（历史行为兼容）
-        return new GlmClient();
+        return new GlmClient;
     }
 }

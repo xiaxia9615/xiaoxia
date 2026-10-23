@@ -38,19 +38,19 @@ final class LowestCostStrategy
                 $totalCost = (float) $provider->cost_per_1k_input
                     + (float) $provider->cost_per_1k_output;
                 if ($bestCost === null || bccomp((string) $totalCost, (string) $bestCost, 6) < 0) {
-                    $bestCost  = $totalCost;
+                    $bestCost = $totalCost;
                     $best = [
-                        'id'                => $provider->id,
-                        'name'              => $provider->name,
-                        'display_name'      => $provider->display_name,
+                        'id' => $provider->id,
+                        'name' => $provider->name,
+                        'display_name' => $provider->display_name,
                         'cost_per_1k_input' => (float) $provider->cost_per_1k_input,
                         'cost_per_1k_output' => (float) $provider->cost_per_1k_output,
                         'total_cost_per_1k' => $totalCost,
                         // 数据驱动字段：供客户端工厂按 Provider 配置实例化客户端
-                        'driver'            => $provider->driver,
-                        'model_name'        => $provider->model_name,
-                        'base_url'          => $provider->base_url,
-                        'api_key'           => $provider->api_key,
+                        'driver' => $provider->driver,
+                        'model_name' => $provider->model_name,
+                        'base_url' => $provider->base_url,
+                        'api_key' => $provider->api_key,
                     ];
                 }
             });
@@ -58,6 +58,7 @@ final class LowestCostStrategy
             // 所有 Provider 均被熔断（或无可用 Provider）
             throw new RuntimeException('所有 AI 服务暂不可用，请稍后再试');
         }
+
         return $best;
     }
 }
