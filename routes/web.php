@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminLedgerController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
@@ -21,5 +22,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/users/{id}', [AdminUserController::class, 'show'])->whereNumber('id')->name('users.show');
     Route::patch('/users/{id}/role', [AdminUserController::class, 'updateRole'])->whereNumber('id')->name('users.updateRole');
     Route::post('/users/{id}/toggle', [AdminUserController::class, 'toggle'])->whereNumber('id')->name('users.toggle');
+
+    Route::get('/ledger', [AdminLedgerController::class, 'index'])->name('ledger.index');
+    Route::get('/ledger/{accountId}/entries', [AdminLedgerController::class, 'entries'])
+        ->whereNumber('accountId')->name('ledger.entries');
     // 后续资源路由陆续添加
 });
