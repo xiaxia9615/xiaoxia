@@ -1,0 +1,16 @@
+#!/bin/bash
+MSG=$(cat "$1")
+# 剔除注释行后再判断, 避免模板本身触发
+CLEAN=$(echo "$MSG" | grep -vE '^#' | tr '\n' ' ')
+if echo "$CLEAN" | grep -qiE "^(fix|feat|refactor).*(enforce|implement|guard|scoping)"; then
+  echo ""
+  echo "⚠️  message 声称改了功能/防护, 确认 diff 真的有对应代码:"
+  echo ""
+  git diff --staged --stat
+  echo ""
+  echo "  如果没有, 请把 message 改成实际做了什么 (如 test/docs/chore)"
+  echo "  如果有, 回车继续; 按 Ctrl+C 取消并修改 message"
+  echo ""
+  read -r -p "  继续提交? [Enter 继续 / Ctrl+C 取消] " _
+fi
+exit 0
