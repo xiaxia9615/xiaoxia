@@ -89,3 +89,10 @@
 [31m[红] 残留: app/Providers/AppServiceProvider.php:14:        var_dump($x);[0m
 [33m[黄] 有未提交改动[0m
 [33m[黄] 人工核对 message 与 diff 一致性[0m
+
+## 2026-10-24 管理后台 A/D/B1/B2 完成后
+- tests: 83 passed / 368 assertions
+- 管理后台: 登录 / 仪表盘 / 用户管理 / Ledger 可用（B3-B6 待做）
+- admin 判定: 统一 is_admin（spatie 保留不参与判定）
+- 数据库: users=6, ledger_accounts=11, ledger_entries=20
+- origin/main: 6c3ea34
