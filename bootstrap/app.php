@@ -29,9 +29,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // 5xx 级异常：通过 Log::withContext 补充 user_id 与 request_id 追踪上下文。
         // 返回 true 保持框架默认日志记录，不重复记录，也不阻止默认报告。
         $exceptions->reportable(function (Throwable $e): bool {
-            // 非 5xx 的 HTTP 异常（如 4xx 业务异常）无需追踪上下文
+            // 非 5xx 的 HTTP 异常（401/403/404/429 等 4xx）不记录 error 日志，避免污染磁盘
             if ($e instanceof HttpExceptionInterface && $e->getStatusCode() < 500) {
-                return true;
+                return false;
             }
 
             // CLI（队列/定时任务）无 HTTP 请求上下文，直接交回默认日志

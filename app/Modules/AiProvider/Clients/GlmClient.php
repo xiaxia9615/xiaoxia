@@ -34,7 +34,7 @@ final class GlmClient implements AiClientInterface
     public function chat(string $prompt): AiResponseDTO
     {
         try {
-            $response = Http::timeout(30)->post(self::ENDPOINT, [
+            $response = Http::connectTimeout(5)->timeout(30)->post(self::ENDPOINT, [
                 'model' => self::MODEL,
                 'messages' => [
                     ['role' => 'user', 'content' => $prompt],

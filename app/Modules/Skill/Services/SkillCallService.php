@@ -72,7 +72,7 @@ final class SkillCallService
         // 发起真实 HTTP 调用
         $startTime = microtime(true);
         try {
-            $http = Http::timeout(30);
+            $http = Http::connectTimeout(5)->timeout(30);
             if ($detail->api_key) {
                 $http = $http->withToken($detail->api_key);
             }

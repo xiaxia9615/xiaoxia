@@ -32,7 +32,7 @@ final class OpenAiCompatibleClient implements AiClientInterface
     {
         $endpoint = rtrim($this->baseUrl, '/').'/chat/completions';
 
-        $request = Http::timeout(30);
+        $request = Http::connectTimeout(5)->timeout(30);
 
         if ($this->apiKey !== null && $this->apiKey !== '') {
             $request = $request->withToken($this->apiKey);
