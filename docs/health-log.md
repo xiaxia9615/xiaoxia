@@ -94,5 +94,5 @@
 - tests: 83 passed / 368 assertions
 - 管理后台: 登录 / 仪表盘 / 用户管理 / Ledger 可用（B3-B6 待做）
 - admin 判定: 统一 is_admin（spatie 保留不参与判定）
-- 数据库: users=6, ledger_accounts=11, ledger_entries=20
+- 数据库: users=6, ledger_accounts=1, ledger_entries=10（孤儿数据已清理，剩余为平台账户真实数据）
 - origin/main: 6c3ea34
