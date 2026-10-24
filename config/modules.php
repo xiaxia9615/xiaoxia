@@ -23,5 +23,6 @@ return [
         'AiProvider' => [],
         'Skill' => ['User', 'Product', 'ApiKey', 'Ledger', 'AiProvider'],
         'Team' => ['User', 'Ledger'],
+        'System' => ['User', 'Product', 'ApiKey', 'Skill'],
     ],
 ];
