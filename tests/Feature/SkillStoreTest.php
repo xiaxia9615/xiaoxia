@@ -22,6 +22,7 @@ final class SkillStoreTest extends TestCase
             'password' => bcrypt('password123'),
             'status' => 1,
             'is_admin' => $isAdmin,
+            'is_active' => true,
         ]);
     }
 

@@ -37,6 +37,10 @@ final class AuthService
             throw new RuntimeException('invalid credentials');
         }
 
+        if (! $user->is_active || (int) $user->status !== 1) {
+            throw new RuntimeException('account disabled');
+        }
+
         return [
             'user' => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
             'token' => $user->createToken('api')->plainTextToken,

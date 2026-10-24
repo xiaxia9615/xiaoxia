@@ -21,6 +21,7 @@ final class LedgerIdorTest extends TestCase
             'email' => $email,
             'password' => bcrypt('password123'),
             'status' => 1,
+            'is_active' => true,
         ]);
     }
 
