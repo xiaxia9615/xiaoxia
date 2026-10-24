@@ -1,0 +1,26 @@
+#!/bin/bash
+# pre-push hook: 推送前快速门禁
+# 策略 B: 只跑 php artisan test (已含 Architecture 套件, 快)
+# composer audit 留给砖6 每周依赖审计, 不在此处拖慢每次 push
+#
+# 应急 bypass: git push --no-verify
+#   但需事后手动跑 ./healthcheck.sh 补记, 不得作为常态
+
+# 1. 必须消费 stdin (git 通过 stdin 传入待推送的 ref 列表),
+#    否则 git push 可能挂起
+while read -r local_ref local_sha remote_ref remote_sha; do
+  : # 仅消费, 不逐 ref 判断
+done
+
+# 2. 快速门禁: 全量测试 (含 Architecture 套件)
+#    退出码必须取自 php artisan test 本身, 不能经管道丢失
+LOG=$(mktemp)
+if ! php artisan test > "$LOG" 2>&1; then
+  tail -20 "$LOG"
+  rm -f "$LOG"
+  echo "pre-push: 测试失败, 拒推"
+  exit 1
+fi
+rm -f "$LOG"
+
+exit 0
