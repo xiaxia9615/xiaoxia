@@ -53,13 +53,7 @@
             <h3 class="text-sm font-semibold text-slate-900 mb-3">最近活动</h3>
             <x-table
                 :headers="['时间', '用户', '产品', '状态码', '耗时']"
-                :rows="collect($activity)->map(fn ($a) => [
-                    $a['created_at'],
-                    e($a['user']),
-                    e($a['product']),
-                    '<span class="' . ($a['status_code'] < 400 ? 'text-emerald-600' : 'text-red-600') . '">' . $a['status_code'] . '</span>',
-                    $a['duration_ms'] . ' ms',
-                ])->all()"
+                :rows="$activityRows"
                 empty="暂无 API 调用记录" />
         </div>
     </div>

@@ -10,7 +10,7 @@ class LoginController extends Controller
 {
     public function show()
     {
-        if (Auth::check() && Auth::user()->hasRole('admin')) {
+        if (Auth::check() && Auth::user()->is_admin) {
             return redirect()->route('admin.dashboard');
         }
 
@@ -27,7 +27,7 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            if (! Auth::user()->hasRole('admin')) {
+            if (! Auth::user()->is_admin) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();

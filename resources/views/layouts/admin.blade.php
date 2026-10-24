@@ -13,34 +13,28 @@
                 <span class="text-lg font-bold text-indigo-600">管理后台</span>
             </div>
             <nav class="p-3 space-y-1">
-                <a href="{{ route('admin.dashboard') }}"
-                   class="flex items-center px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-100' }}">
-                    仪表盘
-                </a>
-                <a href="{{ route('admin.users.index') }}"
-                   class="flex items-center px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.users.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-100' }}">
-                    用户管理
-                </a>
-                <a href="#"
-                   class="flex items-center px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.ledger.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-100' }}">
-                    Ledger
-                </a>
-                <a href="#"
-                   class="flex items-center px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.ai-providers.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-100' }}">
-                    AI 供应商
-                </a>
-                <a href="#"
-                   class="flex items-center px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.skills.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-100' }}">
-                    技能
-                </a>
-                <a href="#"
-                   class="flex items-center px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.api-keys.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-100' }}">
-                    API Keys
-                </a>
-                <a href="#"
-                   class="flex items-center px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.system.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-100' }}">
-                    系统
-                </a>
+                @php
+                    $nav = [
+                        ['route' => 'admin.dashboard',       'label' => '仪表盘'],
+                        ['route' => 'admin.users.index',     'label' => '用户'],
+                        ['route' => 'admin.ledger.index',    'label' => 'Ledger'],
+                        ['route' => 'admin.ai-providers.index', 'label' => 'AI 供应商'],
+                        ['route' => 'admin.skills.index',    'label' => '技能'],
+                        ['route' => 'admin.api-keys.index',  'label' => 'API Keys'],
+                        ['route' => 'admin.system.health',   'label' => '系统'],
+                    ];
+                @endphp
+                @foreach($nav as $item)
+                    @if(Route::has($item['route']))
+                        <a href="{{ route($item['route']) }}"
+                           class="flex items-center px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs($item['route'].'*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-100' }}">
+                            {{ $item['label'] }}
+                        </a>
+                    @else
+                        <span class="flex items-center px-3 py-2 rounded-md text-sm font-medium text-slate-400 cursor-not-allowed"
+                              title="待实现">{{ $item['label'] }}</span>
+                    @endif
+                @endforeach
             </nav>
         </aside>
 

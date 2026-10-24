@@ -6,7 +6,6 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 final class AdminAccessTest extends TestCase
@@ -27,8 +26,7 @@ final class AdminAccessTest extends TestCase
     private function makeAdmin(string $email): User
     {
         $admin = $this->makeUser($email);
-        Role::firstOrCreate(['name' => 'admin']);
-        $admin->assignRole('admin');
+        $admin->update(['is_admin' => true]);
 
         return $admin;
     }

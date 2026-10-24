@@ -10,7 +10,7 @@ class EnsureUserIsAdmin
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user() || ! $request->user()->hasRole('admin')) {
+        if (! $request->user() || ! $request->user()->is_admin) {
             abort(403, '需要管理员权限');
         }
 
