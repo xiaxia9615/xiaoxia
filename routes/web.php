@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAiProviderController;
 use App\Http\Controllers\Admin\AdminLedgerController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -26,5 +27,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/ledger', [AdminLedgerController::class, 'index'])->name('ledger.index');
     Route::get('/ledger/{accountId}/entries', [AdminLedgerController::class, 'entries'])
         ->whereNumber('accountId')->name('ledger.entries');
+
+    Route::get('/ai-providers', [AdminAiProviderController::class, 'index'])->name('ai-providers.index');
+    Route::get('/ai-providers/{id}/models', [AdminAiProviderController::class, 'models'])
+        ->whereNumber('id')->name('ai-providers.models');
     // 后续资源路由陆续添加
 });
