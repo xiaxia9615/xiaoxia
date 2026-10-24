@@ -21,7 +21,6 @@ class AdminUserService
     {
         return User::query()
             ->with('roles')
-            ->withCount(['apiKeys as api_keys_count'])
             ->where('id', $id)
             ->firstOrFail();
     }
