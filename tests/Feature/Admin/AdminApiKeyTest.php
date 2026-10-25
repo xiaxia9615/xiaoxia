@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Admin;
 
+use App\Models\Product;
 use App\Models\User;
+use App\Modules\Skill\Models\SkillDetail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -93,7 +95,44 @@ final class AdminApiKeyTest extends TestCase
 
     public function test_revoked_key_rejects_api_call(): void
     {
-        $this->markTestSkipped('鉴权不检查 status（ApiKeyQueryService::findActiveKeyForUser 无 status 过滤），吊销不立即失效，记入 tech-debt');
+        $user = User::factory()->create();
+        $product = Product::factory()->skill()->create();
+        SkillDetail::factory()->create(['product_id' => $product->id]);
+
+        $plain = 'sk_' . uniqid();
+        $keyId = DB::table('api_keys')->insertGetId([
+            'user_id'    => $user->id,
+            'name'       => 'revoke-test',
+            'key_prefix' => substr($plain, 0, 8),
+            'key_hash'   => hash('sha256', $plain),
+            'status'     => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // 吊销前：key 通过前置检查，应走到余额检查（余额不足）而非 no api key
+        $preResponse = $this->actingAs($user, 'sanctum')
+            ->postJson("/api/v1/skills/{$product->id}/call", ['input' => ['text' => 'hi']]);
+        $preResponse->assertStatus(400);
+        $this->assertStringNotContainsString(
+            'no api key',
+            (string) $preResponse->json('message'),
+            '吊销前不应被 key 前置检查拒绝'
+        );
+
+        // 吊销
+        $this->actingAs(User::factory()->create(['is_admin' => true]))
+            ->delete("/admin/api-keys/{$keyId}");
+
+        // 吊销后：key 前置检查应拒绝
+        $postResponse = $this->actingAs($user, 'sanctum')
+            ->postJson("/api/v1/skills/{$product->id}/call", ['input' => ['text' => 'hi']]);
+        $postResponse->assertStatus(400);
+        $this->assertSame(
+            'no api key for this user',
+            (string) $postResponse->json('message'),
+            '吊销后应被 key 前置检查拒绝'
+        );
     }
 
     public function test_non_admin_forbidden(): void

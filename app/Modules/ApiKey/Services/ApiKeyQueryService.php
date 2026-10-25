@@ -11,7 +11,9 @@ final class ApiKeyQueryService implements ApiKeyContract
 {
     public function findActiveKeyForUser(int $userId): ?array
     {
-        $key = ApiKey::where('user_id', $userId)->first();
+        $key = ApiKey::where('user_id', $userId)
+            ->where('status', 1)
+            ->first();
         if (! $key) {
             return null;
         }
