@@ -32,6 +32,8 @@ app/Modules/
 - 技能调用闭环：POST /api/v1/skills/{id}/call
 - 五方分账：提供者 / 平台 / 达人 / 公益 / 调用方
 - 复式记账：ledger_accounts + ledger_entries，借贷相等
+- 多 AI 供应商路由：14 个供应商配置，超时 + 熔断
+- API Key 管理：创建 / 吊销 / 按用户隔离
 
 ## API（18 条）
 
@@ -39,6 +41,7 @@ app/Modules/
 - ApiKey: 列表 / 生成 / 吊销
 - Skill: 列表 / 详情 / 创建 / 审核 / 调用 / 调用记录 / 网关
 - Product: 列表 / 详情
+- Ledger: 余额 / 流水
 
 统一前缀：/api/v1/
 
@@ -47,12 +50,14 @@ app/Modules/
 入口：https://xiaoxia.ren/login
 权限：`users.is_admin = 1` 可访问（spatie 角色保留，当前判定用 is_admin 字段）
 
-已实现页面：
+已实现页面（8/8）：
 - `/admin/dashboard`   仪表盘（统计卡片 + 系统健康 + 服务进程 + 最近活动）
 - `/admin/users`       用户管理（列表 / 详情 / 改角色 / 禁用）
 - `/admin/ledger`      Ledger 账户与流水（余额按 ledger_entries 汇总）
-
-待实现：AI 供应商 / 技能 / API Keys / 系统页
+- `/admin/ai-providers` AI 供应商（API Key 脱敏展示）
+- `/admin/skills`      技能管理 + 调用记录
+- `/admin/api-keys`    API Key 管理（吊销生效，前置检查已过滤已吊销 key）
+- `/admin/system`      系统页（health / 备份 / 日志）
 
 ## 本地开发
 
@@ -66,7 +71,7 @@ php artisan migrate --seed
 php artisan test                        # 全量测试
 php artisan test tests/Architecture     # 架构守卫
 
-当前基线：83 passed / 368 assertions
+当前基线：105 passed / 413 assertions / 0 skipped
 
 ## 文档
 
@@ -77,9 +82,9 @@ php artisan test tests/Architecture     # 架构守卫
 
 ## 开发状态
 
-- 工程基建：完备（83 测试 / 架构守卫 / 自检 / 每日备份 / Let's Encrypt 证书）
-- 管理后台：进行中（4/8 页面完成：登录 / 仪表盘 / 用户 / Ledger）
-- 功能层：骨架完整，部分模块待填充（Ledger 无业务数据、Team 未开放路由）
+- 工程基建：完备（105 测试 / 架构守卫 / 自检 / 每日备份 / Let's Encrypt 证书）
+- 管理后台：完成（8/8 页面：登录 / 仪表盘 / 用户 / Ledger / AI 供应商 / 技能 / API Keys / 系统页）
+- 功能层：骨架完整，部分模块待填充（Ledger 无业务数据、Team 未开放路由、ai_models 无数据）
 - 产品方向：规划中
 
 
