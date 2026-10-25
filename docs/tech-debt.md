@@ -9,7 +9,7 @@
 - [ ] **管理操作无结构化审计**: 吊销 API Key 等操作目前只 Log::info，
       无 audit_logs 表。J 阶段建表后应改为写数据库审计，含 actor/target/ip。
 
-- [ ] **API Key 吊销不立即失效**: api_keys.status=0（吊销）后，
-      ApiKeyQueryService::findActiveKeyForUser 查询不过滤 status，
-      该 key 仍可通过 API 鉴权。需在 API 鉴权中间件加
-      where('status', 1) 或等价检查。
+- [x] ~~API Key 吊销不立即失效~~ — 2026-10-25 修复：
+      ApiKeyQueryService::findActiveKeyForUser 查询加 where('status', 1)，
+      吊销后的 key 不再通过 skill 调用前置检查（业务逻辑一致性修复，
+      鉴权层 findByPlain 本就过滤 status）。测试 98 passed / 0 skipped。
