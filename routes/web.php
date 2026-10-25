@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminAiProviderController;
 use App\Http\Controllers\Admin\AdminLedgerController;
+use App\Http\Controllers\Admin\AdminSkillController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
@@ -31,5 +32,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/ai-providers', [AdminAiProviderController::class, 'index'])->name('ai-providers.index');
     Route::get('/ai-providers/{id}/models', [AdminAiProviderController::class, 'models'])
         ->whereNumber('id')->name('ai-providers.models');
-    // 后续资源路由陆续添加
+    Route::get('/skills', [AdminSkillController::class, 'index'])->name('skills.index');
+    Route::get('/skills/calls', [AdminSkillController::class, 'calls'])->name('skills.calls');
+    Route::get('/skills/{id}', [AdminSkillController::class, 'show'])
+        ->whereNumber('id')->name('skills.show');
 });
