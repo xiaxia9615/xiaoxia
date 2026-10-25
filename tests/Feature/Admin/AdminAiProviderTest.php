@@ -7,6 +7,7 @@ namespace Tests\Feature\Admin;
 use App\Models\User;
 use App\Modules\AiProvider\Models\AiProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 final class AdminAiProviderTest extends TestCase
@@ -57,6 +58,27 @@ final class AdminAiProviderTest extends TestCase
         $response->assertDontSee(self::FULL_KEY);
         // 断言含脱敏形式（末 4 位）
         $response->assertSee('sk-****7890');
+    }
+
+    public function test_admin_can_view_provider_models(): void
+    {
+        $provider = $this->makeProvider();
+
+        DB::table('ai_models')->insert([
+            'provider_id'         => $provider->id,
+            'name'                => 'gpt-4o',
+            'display_name'        => 'GPT-4o',
+            'input_price_per_1k'  => 5,
+            'output_price_per_1k' => 15,
+            'enabled'             => 1,
+            'created_at'          => now(),
+            'updated_at'          => now(),
+        ]);
+
+        $this->actingAs($this->admin())
+             ->get("/admin/ai-providers/{$provider->id}/models")
+             ->assertOk()
+             ->assertSee('GPT-4o');
     }
 
     public function test_non_admin_forbidden(): void
