@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminAiProviderController;
 use App\Http\Controllers\Admin\AdminApiKeyController;
 use App\Http\Controllers\Admin\AdminLedgerController;
 use App\Http\Controllers\Admin\AdminSkillController;
+use App\Http\Controllers\Admin\AdminSystemController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
@@ -40,4 +41,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/api-keys', [AdminApiKeyController::class, 'index'])->name('api-keys.index');
     Route::delete('/api-keys/{id}', [AdminApiKeyController::class, 'revoke'])
         ->whereNumber('id')->name('api-keys.revoke');
+    Route::get('/system/health', [AdminSystemController::class, 'health'])->name('system.health');
+    Route::get('/system/backups', [AdminSystemController::class, 'backups'])->name('system.backups');
+    Route::get('/system/logs', [AdminSystemController::class, 'logs'])->name('system.logs');
 });
