@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAiProviderController;
+use App\Http\Controllers\Admin\AdminApiKeyController;
 use App\Http\Controllers\Admin\AdminLedgerController;
 use App\Http\Controllers\Admin\AdminSkillController;
 use App\Http\Controllers\Admin\AdminUserController;
@@ -36,4 +37,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/skills/calls', [AdminSkillController::class, 'calls'])->name('skills.calls');
     Route::get('/skills/{id}', [AdminSkillController::class, 'show'])
         ->whereNumber('id')->name('skills.show');
+    Route::get('/api-keys', [AdminApiKeyController::class, 'index'])->name('api-keys.index');
+    Route::delete('/api-keys/{id}', [AdminApiKeyController::class, 'revoke'])
+        ->whereNumber('id')->name('api-keys.revoke');
 });
