@@ -34,3 +34,4 @@ Thumbs.db
 .env.testing
 
 .backup-d0/
+reports/
