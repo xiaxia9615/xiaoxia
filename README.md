@@ -104,17 +104,9 @@ php artisan test tests/Architecture     # 架构守卫
 
 ## 许可
 
-Copyright (c) 2026 嗣夏平台. All rights reserved.
+本项目采用 **AGPL-3.0 + 商业许可** 双轨模式：
 
-本软件及其源代码、架构设计、文档均为嗣夏平台的专有财产，受著作权法保护。
+- **开源 / 社区使用**：在 [AGPL-3.0](./LICENSE) 下自由使用、修改、分发。若修改后作为网络服务提供，需按 AGPL-3.0 公开源代码。
+- **商业 / 闭源使用**：如需在闭源产品中集成，或提供不公开源代码的 SaaS 服务，**必须**获取[商业许可](./LICENSE-COMMERCIAL.md)。商业联系 `al@qssxmall.cn`，技术咨询 `2444160808@qq.com`。
 
-未经著作权人事先书面许可，任何个人或组织不得：
-- 复制、修改、分发本软件或其任何部分
-- 将本软件用于商业用途
-- 移除或修改本软件中的版权声明
-
-This software and its source code, architecture design, and documentation are the proprietary property of 嗣夏平台, protected by copyright law.
-
-No part of this software may be reproduced, modified, distributed, or used for commercial purposes without prior written permission from the copyright holder.
-
-详见 [LICENSE.txt](LICENSE.txt)。
+Copyright (c) 2026 嗣夏平台.
