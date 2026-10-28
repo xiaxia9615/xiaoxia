@@ -35,3 +35,5 @@ Thumbs.db
 
 .backup-d0/
 reports/
+.env.backup-*
+env.bak
