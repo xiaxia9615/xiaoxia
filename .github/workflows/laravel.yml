@@ -59,21 +59,11 @@ jobs:
         run: |
           cp .env.example .env
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist
 
       - name: Generate APP_KEY
         run: php artisan key:generate
-
-      - name: Build frontend assets
-        run: |
-          npm install --ignore-scripts
-          npm run build
 
       - name: Run migrations
         run: php artisan migrate --force
