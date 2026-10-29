@@ -17,6 +17,12 @@
 
 - [x] ~~旧专有 LICENSE.txt 与 AGPL 冲突~~ — 2026-10-28 删除，
       `composer.json` license 改为 `AGPL-3.0-or-later`。
+- [x] ~~无版本控制 / 无 CI / 前端构建未隔离~~ — 2026-10-29 修复：
+      建立 GitHub 远程仓库（github.com/xiaxia9615/xiaoxia）并完成双轨开源配置；
+      上线 GitHub Actions CI（配置路径：`.github/workflows/laravel.yml`，
+      PHP 8.5 + MySQL 8 + Redis，push/PR 到 main 触发）；
+      测试环境禁用 Vite，隔离前端构建依赖（`tests/TestCase.php` 的
+      `setUp()` 中调用 `$this->withoutVite()`）。
 
 ## 未修复 · 架构类（D1–D4 计划内）
 
