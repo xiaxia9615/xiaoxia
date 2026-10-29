@@ -59,11 +59,11 @@ jobs:
         run: |
           cp .env.example .env
 
-      - name: Generate APP_KEY
-        run: php artisan key:generate
-
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist
+
+      - name: Generate APP_KEY
+        run: php artisan key:generate
 
       - name: Run migrations
         run: php artisan migrate --force
