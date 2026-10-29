@@ -32,6 +32,8 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        $this->withoutVite();
+
         $connection = config('database.default');
         $database = config('database.connections.'.$connection.'.database');
 
