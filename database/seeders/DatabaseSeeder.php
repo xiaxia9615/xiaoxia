@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
         if (app()->environment('production')) {
             $this->command->warn('生产环境: 仅执行基础数据 (ProductionSeeder)');
             $this->call(ProductionSeeder::class);
+            $this->call(AiModelsSeeder::class);
             return;
         }
 
@@ -20,5 +21,7 @@ class DatabaseSeeder extends Seeder
             ProductionSeeder::class,
             DevelopmentSeeder::class,
         ]);
+
+        $this->call(AiModelsSeeder::class);
     }
 }
