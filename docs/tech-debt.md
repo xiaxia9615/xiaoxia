@@ -67,12 +67,16 @@
 
 ### P1 · 数据层
 
-- [ ] **Skill 裸查 `api_calls` 6 处**：`AdminSkillService.php` 直接
+- [x] **Skill 裸查 `api_calls` 6 处**：`AdminSkillService.php` 直接
       `DB::table('api_calls')`，绕过已存在的 `ApiCallContract`。
       方案：改注入 `ApiCallContract`。
+      - 2026-10-31 修复：`AdminSkillService` 改为构造函数注入 `ApiCallContract`，
+        契约新增 countsByProduct / paginateCalls / callStats 三个最小化方法。
 
 - [ ] **30 处模块内裸表待收敛**：各模块 `DB::table` 散落在业务 Service 中。
       方案：收敛到 `*QueryService`，不追求全量 Eloquent 化。
+      - ApiKey 模块部分 — 2026-10-31 修复，抽离 `AdminApiKeyQueryService`
+        （paginateKeys / revokeById / stats），`AdminApiKeyService` 6 处裸查清零。
 
 ## 未修复 · 结构类
 
