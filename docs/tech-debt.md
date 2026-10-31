@@ -27,6 +27,11 @@
       抽离 `LedgerContract` 接口（record/balance/debit 最小方法集），
       迁移 `AiUsageRecorded` 至 `Contracts/Events`，解除了跨模块对
       Ledger 内部实现类的直接依赖。架构守卫测试全绿。
+- [x] ~~Skill → AiProvider 三处~~ — 2026-10-31 修复：
+      抽离 `AiExecutionContract` 接口，新建 `AiExecutionService` 将
+      SelectBestProviderAction / AiClientFactory / CircuitBreaker 的
+      编排逻辑封装进 AiProvider 模块，Skill 模块改为构造函数注入
+      契约，解除了对 AiProvider 内部实现类的直接依赖。架构守卫测试全绿。
 
 ## 未修复 · 架构类（D1–D4 计划内）
 
