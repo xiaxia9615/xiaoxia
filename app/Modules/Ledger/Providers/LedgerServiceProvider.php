@@ -9,7 +9,7 @@ use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Ledger\Listeners\CreateLedgerOnUserRegistered;
 use App\Modules\Ledger\Listeners\DeductBalanceOnAiUsage;
 use App\Modules\Ledger\Services\LedgerService;
-use App\Modules\User\Events\UserRegistered;
+use App\Modules\User\Contracts\Events\UserRegistered;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 

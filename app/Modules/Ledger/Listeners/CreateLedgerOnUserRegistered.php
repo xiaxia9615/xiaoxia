@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Ledger\Listeners;
 
 use App\Modules\Ledger\Services\LedgerService;
-use App\Modules\User\Events\UserRegistered;
+use App\Modules\User\Contracts\Events\UserRegistered;
 
 final readonly class CreateLedgerOnUserRegistered
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\User\Events;
+namespace App\Modules\User\Contracts\Events;
 
 use App\Modules\User\Dto\UserDto;
 

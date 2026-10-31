@@ -6,7 +6,7 @@ namespace App\Modules\User\Services;
 
 use App\Models\User;
 use App\Modules\User\Dto\UserDto;
-use App\Modules\User\Events\UserRegistered;
+use App\Modules\User\Contracts\Events\UserRegistered;
 use Illuminate\Support\Facades\Hash;
 use RuntimeException;
 
