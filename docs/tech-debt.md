@@ -45,9 +45,9 @@
 
 ### P0 · 跨模块内部类引用（T2 逐个修）
 
-- [ ] **Skill → AiProvider 三处**：`SelectBestProviderAction`、
+- [x] **Skill → AiProvider 三处**：`SelectBestProviderAction`、
       `AiClientFactory`、`CircuitBreaker`（`ExecuteSkillAction.php:7-9`）。
-      方案：AiProvider 补 `AiExecutionContract`，把三者编排封装进 AiProvider。
+      方案：AiProvider 补 `AiExecutionContract`，把三者编排封装进 AiProvider，2026-10-31 修复：抽离 AiExecutionContract 接口。
 
 - [ ] **Skill → Ledger 两处**：`LedgerService`（`SkillCallService.php:10`）、
       `AiUsageRecorded`（`ExecuteSkillAction.php:10`）。
