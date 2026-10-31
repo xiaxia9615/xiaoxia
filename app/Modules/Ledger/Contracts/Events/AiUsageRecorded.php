@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\Ledger\Events;
+namespace App\Modules\Ledger\Contracts\Events;
 
 final readonly class AiUsageRecorded
 {

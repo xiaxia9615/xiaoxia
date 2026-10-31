@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Team\Services;
 
-use App\Modules\Ledger\Services\LedgerService;
+use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Team\Dto\BillingContext;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
  */
 final class TeamBillingService
 {
-    public function __construct(private readonly LedgerService $ledger) {}
+    public function __construct(private readonly LedgerContract $ledger) {}
 
     /**
      * 团队计费：扣 billing_owner_id 的 balance 账户，记录 actor_user_id。

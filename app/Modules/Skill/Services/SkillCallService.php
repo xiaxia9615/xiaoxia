@@ -7,7 +7,7 @@ namespace App\Modules\Skill\Services;
 use App\Models\User;
 use App\Modules\ApiKey\Contracts\ApiCallContract;
 use App\Modules\ApiKey\Contracts\ApiKeyContract;
-use App\Modules\Ledger\Services\LedgerService;
+use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Product\Contracts\SkillProductContract;
 use App\Modules\Skill\Models\SkillDetail;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -20,7 +20,7 @@ use RuntimeException;
 final class SkillCallService
 {
     public function __construct(
-        private readonly LedgerService $ledger,
+        private readonly LedgerContract $ledger,
         private readonly SkillProductContract $products,
         private readonly ApiKeyContract $apiKeys,
         private readonly ApiCallContract $apiCalls,

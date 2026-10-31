@@ -7,7 +7,7 @@ namespace App\Modules\Skill\Actions;
 use App\Modules\AiProvider\Actions\SelectBestProviderAction;
 use App\Modules\AiProvider\Services\AiClientFactory;
 use App\Modules\AiProvider\Services\CircuitBreaker;
-use App\Modules\Ledger\Events\AiUsageRecorded;
+use App\Modules\Ledger\Contracts\Events\AiUsageRecorded;
 use Illuminate\Support\Facades\Event;
 use Throwable;
 

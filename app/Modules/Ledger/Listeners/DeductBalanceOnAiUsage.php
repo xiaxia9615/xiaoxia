@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Ledger\Listeners;
 
-use App\Modules\Ledger\Events\AiUsageRecorded;
+use App\Modules\Ledger\Contracts\Events\AiUsageRecorded;
 use App\Modules\Ledger\Services\LedgerService;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;

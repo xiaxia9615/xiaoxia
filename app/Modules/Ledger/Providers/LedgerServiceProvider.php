@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Modules\Ledger\Providers;
 
-use App\Modules\Ledger\Events\AiUsageRecorded;
+use App\Modules\Ledger\Contracts\Events\AiUsageRecorded;
+use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Ledger\Listeners\CreateLedgerOnUserRegistered;
 use App\Modules\Ledger\Listeners\DeductBalanceOnAiUsage;
+use App\Modules\Ledger\Services\LedgerService;
 use App\Modules\User\Events\UserRegistered;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
@@ -15,7 +17,7 @@ final class LedgerServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->bind(LedgerContract::class, LedgerService::class);
     }
 
     public function boot(): void

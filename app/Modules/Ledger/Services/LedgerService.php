@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Modules\Ledger\Services;
 
+use App\Modules\Ledger\Contracts\LedgerContract;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-final class LedgerService
+final class LedgerService implements LedgerContract
 {
     public function record(string $bizType, int $bizId, array $splits): string
     {
