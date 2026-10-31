@@ -23,6 +23,10 @@
       PHP 8.5 + MySQL 8 + Redis，push/PR 到 main 触发）；
       测试环境禁用 Vite，隔离前端构建依赖（`tests/TestCase.php` 的
       `setUp()` 中调用 `$this->withoutVite()`）。
+- [x] ~~Skill → Ledger 两处 / Team → Ledger 一处 / Ledger 无 Contracts 目录~~ — 2026-10-31 修复：
+      抽离 `LedgerContract` 接口（record/balance/debit 最小方法集），
+      迁移 `AiUsageRecorded` 至 `Contracts/Events`，解除了跨模块对
+      Ledger 内部实现类的直接依赖。架构守卫测试全绿。
 
 ## 未修复 · 架构类（D1–D4 计划内）
 
