@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace App\Modules\Skill\Services;
 
+use App\Modules\ApiKey\Contracts\ApiCallContract;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 
 final class AdminSkillService
 {
+    public function __construct(
+        private readonly ApiCallContract $apiCalls,
+    ) {}
+
     public function paginateSkills(int $perPage = 30)
     {
         $skills = DB::table('skill_details as sd')
@@ -23,16 +28,16 @@ final class AdminSkillService
                 'sd.api_key',
                 'sd.free_quota',
             )
-            ->selectSub(
-                DB::table('api_calls')
-                    ->selectRaw('COUNT(*)')
-                    ->whereColumn('product_id', 'sd.product_id'),
-                'calls_count'
-            )
             ->orderByDesc('sd.id')
             ->paginate($perPage);
 
-        $skills->getCollection()->transform(function ($skill) {
+        // 通过契约批量统计各产品的调用次数（替代原 selectSub 裸查子查询）
+        $counts = $this->apiCalls->countsByProduct(
+            $skills->getCollection()->pluck('product_id')->filter()->unique()->values()->all()
+        );
+
+        $skills->getCollection()->transform(function ($skill) use ($counts) {
+            $skill->calls_count = $counts[(int) $skill->product_id] ?? 0;
             $skill->masked_api_key = $this->maskApiKey(
                 $skill->api_key ? Crypt::decryptString($skill->api_key) : null
             );
@@ -45,15 +50,9 @@ final class AdminSkillService
 
     public function paginateCalls(int $perPage = 30, ?string $status = null)
     {
-        $query = DB::table('api_calls')
-            ->select('id', 'request_id', 'user_id', 'product_id', 'status_code', 'duration_ms', 'cost', 'created_at')
-            ->orderByDesc('id');
+        $statusCode = ($status !== null && $status !== '') ? (int) $status : null;
 
-        if ($status !== null && $status !== '') {
-            $query->where('status_code', (int) $status);
-        }
-
-        return $query->paginate($perPage);
+        return $this->apiCalls->paginateCalls($perPage, $statusCode);
     }
 
     public function getSkill(int $id): ?object
@@ -99,11 +98,13 @@ final class AdminSkillService
 
     public function stats(): array
     {
+        $callStats = $this->apiCalls->callStats();
+
         return [
             'skills'        => DB::table('skill_details')->count(),
-            'calls_total'   => DB::table('api_calls')->count(),
-            'calls_today'   => DB::table('api_calls')->whereDate('created_at', today())->count(),
-            'calls_success' => DB::table('api_calls')->where('status_code', 200)->count(),
+            'calls_total'   => $callStats['total'],
+            'calls_today'   => $callStats['today'],
+            'calls_success' => $callStats['success'],
         ];
     }
 
