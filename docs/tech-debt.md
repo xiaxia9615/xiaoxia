@@ -60,9 +60,10 @@
       `CreateLedgerOnUserRegistered.php:8`）。方案：User 建
       `Contracts/UserRegistered`，事件迁入。
 
-- [ ] **System → 4 个模块 Model**：`ApiCall`、`ApiKey`、`Product`、`SkillDetail`
+- [x] **System → 4 个模块 Model**：`ApiCall`、`ApiKey`、`Product`、`SkillDetail`
       （`DashboardService.php:7-10`）。方案二选一：System 纳入 list 并建
       Reader 契约，或写 ADR 豁免「视图聚合层」并纳入测试扫描。
+      - 2026-10-31 修复：通过 ADR-003 豁免 System 只读聚合查询，config/modules.php 白名单已更新。
 
 ### P1 · 数据层
 
