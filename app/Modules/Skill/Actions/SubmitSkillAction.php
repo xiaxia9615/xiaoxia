@@ -24,7 +24,7 @@ final class SubmitSkillAction
 
         $product = $this->products->findSkill($skillId);
         if ($product === null || (int) ($product['user_id'] ?? 0) !== $userId) {
-            abort(403, '无权操作他人技能'); // 强制 403
+            abort(403, '无权操作他人技能');
         }
 
         $status = $detail->status instanceof SkillStatus ? $detail->status : SkillStatus::from((string) $detail->status);
