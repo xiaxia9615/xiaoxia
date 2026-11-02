@@ -1,0 +1,86 @@
+name: 技能生命周期（管理员）
+description: ''
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/admin/skills/{id}/audit'
+    metadata:
+      custom: []
+      groupName: 技能生命周期（管理员）
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 审核技能
+      description: '管理员审核待审核技能，通过后状态变更为 published，拒绝后变更为 rejected。仅管理员可调用。'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {SANCTUM_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: '技能 ID。'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      approve:
+        custom: []
+        name: approve
+        description: 是否通过审核。
+        required: true
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      note:
+        custom: []
+        name: note
+        description: 'optional 审核备注，最长 255 字符。'
+        required: false
+        example: 内容合规
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      approve: true
+      note: 内容合规
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"code": 0, "data": {"id": 1, "status": 1, "skill_status": "published"}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"code": 1, "message": "not found"}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null

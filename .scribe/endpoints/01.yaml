@@ -1,0 +1,64 @@
+name: 开发者入驻
+description: ''
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/developers/apply
+    metadata:
+      custom: []
+      groupName: 开发者入驻
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 申请成为开发者
+      description: |-
+        已登录用户提交开发者入驻申请，申请后状态变更为 pending，等待管理员审核。
+        重复申请（pending/approved 状态）将返回 400。
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {SANCTUM_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      reason:
+        custom: []
+        name: reason
+        description: 'optional 申请理由，最长 500 字符。'
+        required: false
+        example: 希望上架天气查询技能
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      reason: 希望上架天气查询技能
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"code": 0, "data": {"user_id": 1, "developer_status": "pending"}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 400
+        content: '{"code": 1, "message": "当前状态不允许提交开发者申请"}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
