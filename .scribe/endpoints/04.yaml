@@ -1,0 +1,201 @@
+name: 技能生命周期
+description: ''
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/skills
+    metadata:
+      custom: []
+      groupName: 技能生命周期
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 创建技能草稿
+      description: '认证开发者创建技能草稿，创建后状态为 draft。仅开发者可调用，非开发者返回 400。'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {SANCTUM_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: '技能名称，最长 100 字符。'
+        required: true
+        example: 天气查询技能
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: '技能描述，最长 500 字符。'
+        required: true
+        example: 查询指定城市天气
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: '价格（分），0 到 100000000。'
+        required: true
+        example: 100
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      endpoint:
+        custom: []
+        name: endpoint
+        description: '调用地址，合法 URL。'
+        required: true
+        example: 'https://api.example.com/weather'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      method:
+        custom: []
+        name: method
+        description: '调用方法，GET 或 POST。'
+        required: true
+        example: POST
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      api_key:
+        custom: []
+        name: api_key
+        description: 'optional 第三方 API Key。'
+        required: false
+        example: sk-xxx
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      request_template:
+        custom: []
+        name: request_template
+        description: 'optional 请求模板。'
+        required: false
+        example: []
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      name: 天气查询技能
+      description: 查询指定城市天气
+      price: 100
+      endpoint: 'https://api.example.com/weather'
+      method: POST
+      api_key: sk-xxx
+      request_template: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"code": 0, "data": {"id": 1, "status": "draft"}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 400
+        content: '{"code": 1, "message": "仅认证开发者可创建技能"}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/skills/{id}/submit'
+    metadata:
+      custom: []
+      groupName: 技能生命周期
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 提交技能审核
+      description: |-
+        开发者将技能从草稿（draft）提交审核，状态变更为 pending。仅技能所有者可操作，
+        非所有者返回 403。
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {SANCTUM_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: '技能 ID。'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"code": 0, "data": {"id": 1, "status": "pending"}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 400
+        content: '{"code": 1, "message": "当前状态不允许提交审核"}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"code": 1, "message": "无权操作他人技能"}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
