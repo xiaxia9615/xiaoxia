@@ -21,7 +21,7 @@ final class SkillStoreTest extends TestCase
             'email' => $email,
             'password' => bcrypt('password123'),
             'status' => 1,
-            'is_admin' => $isAdmin,
+            'is_admin' => $isAdmin, 'is_developer' => true, 'developer_status' => \App\Modules\User\Enums\DeveloperStatus::APPROVED,
             'is_active' => true,
         ]);
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Skill\Models;
 
 use App\Models\Product;
+use App\Modules\Skill\Enums\SkillStatus;
 use Database\Factories\SkillDetailFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,7 +19,7 @@ class SkillDetail extends Model
     protected $table = 'skill_details';
 
     protected $fillable = [
-        'product_id', 'endpoint', 'method', 'api_key', 'request_template',
+        'product_id', 'status', 'endpoint', 'method', 'api_key', 'request_template',
         'pricing_type', 'provider_share', 'platform_share', 'influencer_share',
         'donation_share', 'free_quota', 'config',
     ];
@@ -27,6 +28,7 @@ class SkillDetail extends Model
     {
         return [
             'product_id' => 'integer',
+            'status' => SkillStatus::class,
             'pricing_type' => 'integer',
             'provider_share' => 'integer',
             'platform_share' => 'integer',

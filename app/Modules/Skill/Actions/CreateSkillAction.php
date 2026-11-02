@@ -6,13 +6,16 @@ namespace App\Modules\Skill\Actions;
 
 use App\Models\User;
 use App\Modules\Product\Contracts\SkillProductContract;
+use App\Modules\Skill\Enums\SkillStatus;
 use App\Modules\Skill\Models\SkillDetail;
+use App\Modules\User\Contracts\UserContract;
 use RuntimeException;
 
 final class CreateSkillAction
 {
     public function __construct(
         private readonly SkillProductContract $products,
+        private readonly UserContract $users,
     ) {}
 
     /**
@@ -20,6 +23,10 @@ final class CreateSkillAction
      */
     public function execute(User $user, array $data): array
     {
+        if (! $this->users->isDeveloper((int) $user->id)) {
+            throw new RuntimeException('仅认证开发者可创建技能');
+        }
+
         $this->contentCheck($data['name'].' '.$data['description']);
         $productId = $this->products->createSkillProduct(
             (int) $user->id,
@@ -29,6 +36,7 @@ final class CreateSkillAction
         );
         SkillDetail::create([
             'product_id' => $productId,
+            'status' => SkillStatus::Draft->value,
             'endpoint' => $data['endpoint'],
             'method' => $data['method'],
             'api_key' => $data['api_key'] ?? null,
@@ -39,7 +47,7 @@ final class CreateSkillAction
             'donation_share' => 5,
         ]);
 
-        return ['id' => $productId, 'status' => 'pending'];
+        return ['id' => $productId, 'status' => SkillStatus::Draft->value];
     }
 
     private function contentCheck(string $text): void
