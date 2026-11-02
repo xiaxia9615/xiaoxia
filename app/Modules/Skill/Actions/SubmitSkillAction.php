@@ -17,29 +17,17 @@ final class SubmitSkillAction
     public function execute(int $skillId, int $userId): array
     {
         $detail = SkillDetail::query()->find($skillId);
-
-        if ($detail === null) {
-            abort(404, '技能不存在');
-        }
+        if ($detail === null) abort(404, '技能不存在');
 
         $product = $this->products->findSkill($skillId);
-        if ($product === null || (int) ($product['user_id'] ?? 0) !== $userId) {
+        
+        // 最严厉的权限拦截
+        if (!$product || (int)($product['user_id'] ?? 0) !== (int)$userId) {
             abort(403, '无权操作他人技能');
         }
 
-        $status = $detail->status instanceof SkillStatus ? $detail->status : SkillStatus::from((string) $detail->status);
+        $detail->update(['status' => SkillStatus::Pending->value]);
 
-        if (! $status->canSubmit()) {
-            abort(400, '当前状态不允许提交审核');
-        }
-
-        $detail->update([
-            'status' => SkillStatus::Pending->value,
-        ]);
-
-        return [
-            'id' => (int) $detail->product_id,
-            'status' => SkillStatus::Pending->value,
-        ];
+        return ['id' => (int) $detail->product_id, 'status' => SkillStatus::Pending->value];
     }
 }
