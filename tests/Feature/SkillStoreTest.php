@@ -23,7 +23,7 @@ class SkillStoreTest extends TestCase
         $other = User::factory()->create();
         
         // 强制覆盖所有的状态，确保是 Pending
-        $product = Product::factory()->create(['user_id' => $owner->id]);
+        $product = Product::factory()->skill()->create(['user_id' => $owner->id]);
         $skill = SkillDetail::factory()->create([
             'product_id' => $product->id, 
             'status' => SkillStatus::Pending->value
@@ -45,7 +45,7 @@ class SkillStoreTest extends TestCase
         $admin = User::factory()->create();
         $admin->forceFill(['is_admin' => true, 'is_active' => 1, 'status' => 1])->save();
         
-        $product = Product::factory()->create(['user_id' => $owner->id]);
+        $product = Product::factory()->skill()->create(['user_id' => $owner->id]);
         $skill = SkillDetail::factory()->create([
             'product_id' => $product->id, 
             'status' => SkillStatus::Pending->value
