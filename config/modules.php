@@ -11,6 +11,8 @@ return [
         'Ledger',
         'AiProvider',
         'Team',
+        'Wallet',
+        'Payment',
     ],
 
     'provider_pattern' => 'App\\Modules\\%s\\Providers\\%sServiceProvider',
@@ -24,5 +26,7 @@ return [
         'Skill' => ['User', 'Product', 'ApiKey', 'Ledger', 'AiProvider'],
         'Team' => ['User', 'Ledger'],
         'System' => ['User', 'Product', 'ApiKey', 'Skill'],
+        'Wallet' => [],
+        'Payment' => [],
     ],
 ];
