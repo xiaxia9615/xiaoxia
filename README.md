@@ -35,7 +35,7 @@ app/Modules/
 
 - 技能调用闭环：POST /api/v1/skills/{id}/call
 - 复式记账：ledger_accounts + ledger_entries，借贷相等
-- 多 AI 供应商路由：14 个供应商配置，超时 + 熔断
+- 多 AI 供应商路由：17 个供应商配置，11 个模型已入库（覆盖 OpenAI、Anthropic、Google Gemini、通义千问、DeepSeek），超时 + 熔断
 - API Key 管理：创建 / 吊销 / 按用户隔离
 - 五方分账角色定义：提供者（开发者）/ 平台 / 达人 / 公益 / 调用方
 - 开发者生态：开发者入驻与技能全生命周期审核（草稿 -> 提审 -> 审核发布）
@@ -99,7 +99,7 @@ php artisan test tests/Architecture     # 架构守卫
 - 工程基建：100% 完备（98 测试 / 架构守卫 / 自检 / 每日备份 / Let's Encrypt 证书）
 - 治理层：进行中（白名单粒度升级，详见 `docs/progress.md`）
 - 管理后台：完成（8/8 页面：登录 / 仪表盘 / 用户 / Ledger / AI 供应商 / 技能 / API Keys / 系统页）
-- 功能层：技能调用闭环已跑通；Ledger 账户体系就绪（1 个 platform 账户），业务数据待积累；Team 未开放路由；ai_models 无数据
+- 功能层：技能调用闭环已跑通；Ledger 账户体系就绪（1 个 platform 账户），业务数据待积累；Team 未开放路由；ai_models 已入库 11 个模型（5 个供应商）
 - 开发者生态：已完成（入驻申请 / 技能上架 / 后台审核，98 个测试通过）
 - 角色体系：五方分账角色已定义；达人/商家/服务商的完整业务流程规划中
 - 产品方向：规划中
