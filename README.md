@@ -1,113 +1,34 @@
-# 嗣夏
-
-> 平台初期采用“自营模式”专注打磨核心交易与 AI 能力底座。开发者入驻与多方分账模块已在底层完成开发，但目前暂未对外开放（代码处于休眠状态），待未来资质升级后随时可重启。
+# 嗣夏（Xiaoxia）
+自营模式的 AI 技能与能力服务平台，基于 Laravel 13 打造的高性能、金融级 AI 交易底座。
 
 域名：https://xiaoxia.ren
 
-## 技术栈
+## 合规与模式说明
+本项目主体为**个体工商户**（栖霞区青丝嗣夏百货中心），采用**自营模式**。平台官方自营上架 AI 技能，用户充值后购买。
+平台保留**单级达人分销**体系（严格遵循合规要求，禁止多级分销）。开发者入驻模块已开发完毕，但目前暂未开放（API 隐藏，代码休眠）。
 
+## 技术栈
 Laravel 13 · PHP 8.5 · MySQL 8 · Redis · Nginx
 
-## 架构：模块化单体
-
-\`\`\`
-app/Modules/
-├── User/       用户、认证
-├── Product/    商品与技能
-├── ApiKey/     API Key 与调用记录
-├── Skill/      技能详情、调用代理
-├── Ledger/     复式记账、五方分账
-├── AiProvider/ AI 供应商配置与模型路由
-└── Team/       团队与团队计费（骨架，未开放路由）
-\`\`\`
-
-核心规则：
-- 每个模块独立命名空间 App\Modules\{模块}
-- 模块间依赖通过 `config/modules.php` 白名单声明（当前模块级，规划升级为命名空间级，详见 `docs/progress.md`）
-- 老 app/Models/* 为兼容壳，新代码用 App\Modules\*\Models\*
-- 架构守卫 `tests/Architecture/` 自动拦截越界（12 项，含正向白名单检查；反向未声明依赖检查规划中）
+## 核心模块
+User（用户） / Product（商品） / Order（订单） / Wallet（钱包） / Ledger（复式记账） / Skill（技能） / ApiKey（鉴权） / AiProvider（AI路由） / Distributor（单级分销） / System（后台）
 
 ## 核心能力
-
-已实现：
-
-- 技能调用闭环：POST /api/v1/skills/{id}/call
-- 复式记账：ledger_accounts + ledger_entries，借贷相等
-- 多 AI 供应商路由：17 个供应商配置，11 个模型已入库（覆盖 OpenAI、Anthropic、Google Gemini、通义千问、DeepSeek），超时 + 熔断
-- API Key 管理：创建 / 吊销 / 按用户隔离
-- 五方分账角色定义：提供者（开发者）/ 平台 / 达人 / 公益 / 调用方
-- 开发者生态：开发者入驻与技能全生命周期审核（草稿 -> 提审 -> 审核发布）
-
-规划中（各角色完整流程）：
-
-- 达人：分销推广与佣金结算
-- 商家：商品/服务供给与订单交易
-- 服务商：服务体系与对接流程
-
-## API（21+ 条）
-
-- Auth: register / login / logout / me
-- ApiKey: 列表 / 生成 / 吊销
-- Skill: 列表 / 详情 / 创建 / 审核 / 调用 / 调用记录 / 网关
-- Developer: 入驻申请 / 我的技能 / 提交审核
-- Product: 列表 / 详情
-- Ledger: 余额 / 流水
-
-统一前缀：/api/v1/
+- **电商交易闭环**：商品管理 ➡️ 创建订单 ➡️ 支付 ➡️ 退款回滚。
+- **单级达人分销**：绑定关系、自动按比例计算达人佣金。
+- **金融级复式记账**：底层 BigInt（毫）精度，悲观锁防超扣。
+- **多 AI 供应商路由**：17 个供应商，14 个模型入库，支持熔断。
 
 ## 管理后台
-
 入口：https://xiaoxia.ren/login
-权限：`users.is_admin = 1` 可访问（spatie 角色保留，当前判定用 is_admin 字段）
+已实现 11 个页面（含订单管理、商品管理、钱包流水等）。
 
-已实现页面（8/8）：
-- `/admin/dashboard`   仪表盘（统计卡片 + 系统健康 + 服务进程 + 最近活动）
-- `/admin/users`       用户管理（列表 / 详情 / 改角色 / 禁用）
-- `/admin/ledger`      Ledger 账户与流水（余额按 ledger_entries 汇总）
-- `/admin/ai-providers` AI 供应商（API Key 脱敏展示）
-- `/admin/skills`      技能管理 + 调用记录
-- `/admin/api-keys`    API Key 管理（吊销生效，前置检查已过滤已吊销 key）
-- `/admin/system`      系统页（health / 备份 / 日志）
+## 测试与质量
+**当前基线**：`126 passed / 4 skipped`（442 个断言）。
 
-## 本地开发
-
-composer install
-cp .env.example .env
-php artisan key:generate
-php artisan migrate --seed
-
-## 测试
-
-php artisan test                        # 全量测试
-php artisan test tests/Architecture     # 架构守卫
-
-当前基线：98 passed / 385 assertions
-
-## 文档
-
-- docs/adr/           架构决策记录
-- docs/tech-debt.md   技术债清单
-- docs/health-log.md  健康度基线日志
-- docs/progress.md     项目进度与路线图
-- docs/ops.md         运维手册（部署 / 备份 / 证书 / 管理后台）
-- API 文档：https://xiaoxia.ren/docs
-
-## 开发状态
-
-- 工程基建：100% 完备（98 测试 / 架构守卫 / 自检 / 每日备份 / Let's Encrypt 证书）
-- 治理层：进行中（白名单粒度升级，详见 `docs/progress.md`）
-- 管理后台：完成（8/8 页面：登录 / 仪表盘 / 用户 / Ledger / AI 供应商 / 技能 / API Keys / 系统页）
-- 功能层：技能调用闭环已跑通；Ledger 账户体系就绪（1 个 platform 账户），业务数据待积累；Team 未开放路由；ai_models 已入库 11 个模型（5 个供应商）
-- 开发者生态：已完成（入驻申请 / 技能上架 / 后台审核，98 个测试通过）
-- 角色体系：五方分账角色已定义；达人/商家/服务商的完整业务流程规划中
-- 产品方向：规划中
-
-
-## 许可
-
-本项目采用 **AGPL-3.0 + 商业许可** 双轨模式：
-
-- **开源 / 社区使用**：在 [AGPL-3.0](./LICENSE) 下自由使用、修改、分发。若修改后作为网络服务提供，需按 AGPL-3.0 公开源代码。
-- **商业 / 闭源使用**：如需在闭源产品中集成，或提供不公开源代码的 SaaS 服务，**必须**获取[商业许可](./LICENSE-COMMERCIAL.md)。商业联系 `al@qssxmall.cn`，技术咨询 `2444160808@qq.com`。
+## 许可与联系
+AGPL-3.0 + 商业许可 双轨模式。
+**商业联系**：al@qssxmall.cn
+**技术咨询**：2444160808@qq.com
 
 Copyright (c) 2026 嗣夏平台.
