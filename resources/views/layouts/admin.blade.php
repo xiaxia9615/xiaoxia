@@ -17,6 +17,8 @@
                     $nav = [
                         ['route' => 'admin.dashboard',       'label' => '仪表盘'],
                         ['route' => 'admin.users.index',     'label' => '用户'],
+                        ['route' => 'admin.orders.index',    'label' => '订单管理'],
+                        ['route' => 'admin.products.index',  'label' => '商品管理'],
                         ['route' => 'admin.ledger.index',    'label' => 'Ledger'],
                         ['route' => 'admin.ai-providers.index', 'label' => 'AI 供应商'],
                         ['route' => 'admin.skills.index',    'label' => '技能'],
