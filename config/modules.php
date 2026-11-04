@@ -13,6 +13,7 @@ return [
         'Team',
         'Wallet',
         'Payment',
+        'Order',
     ],
 
     'provider_pattern' => 'App\\Modules\\%s\\Providers\\%sServiceProvider',
@@ -28,5 +29,6 @@ return [
         'System' => ['User', 'Product', 'ApiKey', 'Skill'],
         'Wallet' => ['User', 'Ledger'],
         'Payment' => [],
+        'Order' => ['User', 'Product', 'Ledger'],
     ],
 ];

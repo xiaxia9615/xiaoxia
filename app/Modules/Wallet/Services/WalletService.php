@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Wallet\Services;
 
-use App\Models\User;
+use App\Modules\User\Models\User;
 use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Wallet\Models\Wallet;
 use App\Modules\Wallet\Models\WalletTransaction;
