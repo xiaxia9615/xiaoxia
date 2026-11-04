@@ -4,192 +4,183 @@ declare(strict_types=1);
 
 namespace App\Modules\Wallet\Services;
 
+use App\Models\User;
+use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Wallet\Models\Wallet;
 use App\Modules\Wallet\Models\WalletTransaction;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 final class WalletService
 {
-    /**
-     * 冻结资金：可用余额减少，冻结余额增加，记录流水。
-     * 并发安全：事务内 lockForUpdate 锁定钱包行，串行化同一钱包的并发操作。
-     *
-     * @param  int  $userId  用户 ID
-     * @param  int  $amountInCents  金额（单位：分，整数）
-     */
-    public function freezeFunds(int $userId, int $amountInCents): void
+    public function __construct(
+        private readonly LedgerContract $ledger,
+    ) {}
+
+    public function deposit(User $user, int $amount, string $outTradeNo): array
     {
-        $this->assertPositiveAmount($amountInCents);
+        return DB::transaction(function () use ($user, $amount, $outTradeNo) {
+            $wallet = Wallet::firstOrCreate(['user_id' => $user->id]);
 
-        DB::transaction(function () use ($userId, $amountInCents): void {
-            $wallet = $this->lockWallet($userId);
+            try {
+                $transaction = WalletTransaction::create([
+                    'out_trade_no' => $outTradeNo,
+                    'wallet_id' => $wallet->id,
+                    'type' => 'recharge',
+                    'amount' => $amount,
+                    'description' => '余额充值',
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                if ($e->getCode() === '23000') {
+                    return ['status' => 'already_processed', 'message' => '订单已处理'];
+                }
+                throw $e;
+            }
 
-            $balanceInCents = $this->toCents((string) $wallet->balance);
+            $this->ledger->record('wallet_recharge', $transaction->id, [
+                ['owner_type' => 'user', 'owner_id' => $user->id, 'account_type' => 'balance', 'direction' => 'credit', 'amount' => $amount],
+                ['owner_type' => 'platform', 'owner_id' => 0, 'account_type' => 'platform', 'direction' => 'debit', 'amount' => $amount],
+            ]);
 
-            if ($balanceInCents < $amountInCents) {
+            $wallet->increment('balance', $amount);
+
+            return ['status' => 'success', 'amount' => $amount];
+        });
+    }
+
+    public function deduct(User $user, int $amount, string $outTradeNo): array
+    {
+        return DB::transaction(function () use ($user, $amount, $outTradeNo) {
+            $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
+
+            if (! $wallet || $wallet->balance < $amount) {
                 throw new RuntimeException('余额不足');
             }
 
-            $wallet->update([
-                'balance' => $this->toDecimal($balanceInCents - $amountInCents),
-                'frozen_balance' => $this->toDecimal($this->toCents((string) $wallet->frozen_balance) + $amountInCents),
+            try {
+                $transaction = WalletTransaction::create([
+                    'out_trade_no' => $outTradeNo,
+                    'wallet_id' => $wallet->id,
+                    'type' => 'deduct',
+                    'amount' => $amount,
+                    'description' => '余额扣除',
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                if ($e->getCode() === '23000') {
+                    return ['status' => 'already_processed', 'message' => '订单已处理'];
+                }
+                throw $e;
+            }
+
+            $this->ledger->record('wallet_deduct', $transaction->id, [
+                ['owner_type' => 'user', 'owner_id' => $user->id, 'account_type' => 'balance', 'direction' => 'debit', 'amount' => $amount],
+                ['owner_type' => 'platform', 'owner_id' => 0, 'account_type' => 'platform', 'direction' => 'credit', 'amount' => $amount],
             ]);
 
-            $this->recordTransaction($wallet->id, 'freeze', $amountInCents, '冻结资金');
+            $wallet->decrement('balance', $amount);
+
+            return ['status' => 'success', 'amount' => $amount];
         });
     }
 
     /**
-     * 结算扣款：扣除冻结余额，记录流水。
+     * 冻结资金：可用余额 → 冻结余额
      */
-    public function deductFunds(int $userId, int $amountInCents): void
+    public function freezeFunds(User $user, int $amount): void
     {
-        $this->assertPositiveAmount($amountInCents);
+        DB::transaction(function () use ($user, $amount) {
+            $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->firstOrFail();
 
-        DB::transaction(function () use ($userId, $amountInCents): void {
-            $wallet = $this->lockWallet($userId);
+            if ($wallet->balance < $amount) {
+                throw new RuntimeException('余额不足');
+            }
 
-            $frozenInCents = $this->toCents((string) $wallet->frozen_balance);
+            $wallet->decrement('balance', $amount);
+            $wallet->increment('frozen_balance', $amount);
 
-            if ($frozenInCents < $amountInCents) {
+            WalletTransaction::create([
+                'wallet_id' => $wallet->id,
+                'type' => 'freeze',
+                'amount' => $amount,
+                'description' => '资金冻结',
+            ]);
+
+            $this->ledger->record('wallet_freeze', $wallet->id, [
+                ['owner_type' => 'user', 'owner_id' => $user->id, 'account_type' => 'balance', 'direction' => 'debit', 'amount' => $amount],
+                ['owner_type' => 'user', 'owner_id' => $user->id, 'account_type' => 'frozen', 'direction' => 'credit', 'amount' => $amount],
+            ]);
+        });
+    }
+
+    /**
+     * 结算扣款：从冻结余额中扣除
+     */
+    public function deductFunds(User $user, int $amount): void
+    {
+        DB::transaction(function () use ($user, $amount) {
+            $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->firstOrFail();
+
+            if ($wallet->frozen_balance < $amount) {
                 throw new RuntimeException('冻结余额不足');
             }
 
-            $wallet->update([
-                'frozen_balance' => $this->toDecimal($frozenInCents - $amountInCents),
+            $wallet->decrement('frozen_balance', $amount);
+
+            WalletTransaction::create([
+                'wallet_id' => $wallet->id,
+                'type' => 'deduct',
+                'amount' => $amount,
+                'description' => '结算扣款',
             ]);
 
-            $this->recordTransaction($wallet->id, 'deduct', $amountInCents, '结算扣款');
+            $this->ledger->record('wallet_deduct_funds', $wallet->id, [
+                ['owner_type' => 'user', 'owner_id' => $user->id, 'account_type' => 'frozen', 'direction' => 'debit', 'amount' => $amount],
+                ['owner_type' => 'platform', 'owner_id' => 0, 'account_type' => 'platform', 'direction' => 'credit', 'amount' => $amount],
+            ]);
         });
     }
 
     /**
-     * 退款：冻结余额退回可用余额，记录流水。
+     * 退款：冻结余额退回到可用余额
      */
-    public function refundFunds(int $userId, int $amountInCents): void
+    public function refundFunds(User $user, int $amount): void
     {
-        $this->assertPositiveAmount($amountInCents);
+        DB::transaction(function () use ($user, $amount) {
+            $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->firstOrFail();
 
-        DB::transaction(function () use ($userId, $amountInCents): void {
-            $wallet = $this->lockWallet($userId);
-
-            $frozenInCents = $this->toCents((string) $wallet->frozen_balance);
-
-            if ($frozenInCents < $amountInCents) {
+            if ($wallet->frozen_balance < $amount) {
                 throw new RuntimeException('冻结余额不足');
             }
 
-            $wallet->update([
-                'balance' => $this->toDecimal($this->toCents((string) $wallet->balance) + $amountInCents),
-                'frozen_balance' => $this->toDecimal($frozenInCents - $amountInCents),
+            $wallet->decrement('frozen_balance', $amount);
+            $wallet->increment('balance', $amount);
+
+            WalletTransaction::create([
+                'wallet_id' => $wallet->id,
+                'type' => 'refund',
+                'amount' => $amount,
+                'description' => '资金退款',
             ]);
 
-            $this->recordTransaction($wallet->id, 'refund', $amountInCents, '冻结退回');
+            $this->ledger->record('wallet_refund', $wallet->id, [
+                ['owner_type' => 'user', 'owner_id' => $user->id, 'account_type' => 'frozen', 'direction' => 'debit', 'amount' => $amount],
+                ['owner_type' => 'user', 'owner_id' => $user->id, 'account_type' => 'balance', 'direction' => 'credit', 'amount' => $amount],
+            ]);
         });
     }
 
     /**
-     * 充值：增加可用余额，记录流水。
-     */
-    public function deposit(int $userId, int $amountInCents): void
-    {
-        $this->assertPositiveAmount($amountInCents);
-
-        DB::transaction(function () use ($userId, $amountInCents): void {
-            $wallet = $this->lockWallet($userId);
-
-            $wallet->update([
-                'balance' => $this->toDecimal($this->toCents((string) $wallet->balance) + $amountInCents),
-            ]);
-
-            $this->recordTransaction($wallet->id, 'deposit', $amountInCents, '充值');
-        });
-    }
-
-    /**
-     * 查询钱包（不存在时自动创建），返回余额（分）。
+     * 获取用户余额
      *
      * @return array{balance: int, frozen_balance: int}
      */
-    public function getBalance(int $userId): array
+    public function getBalance(User $user): array
     {
-        $wallet = $this->ensureWallet($userId);
+        $wallet = Wallet::firstOrCreate(['user_id' => $user->id]);
 
         return [
-            'balance' => $this->toCents((string) $wallet->balance),
-            'frozen_balance' => $this->toCents((string) $wallet->frozen_balance),
+            'balance' => (int) $wallet->balance,
+            'frozen_balance' => (int) $wallet->frozen_balance,
         ];
-    }
-
-    private function lockWallet(int $userId): Wallet
-    {
-        $wallet = Wallet::query()
-            ->where('user_id', $userId)
-            ->lockForUpdate()
-            ->first();
-
-        if ($wallet !== null) {
-            return $wallet;
-        }
-
-        // 钱包不存在：先创建（user_id 唯一索引兜底并发重复创建），再锁定读取
-        try {
-            Wallet::query()->create(['user_id' => $userId]);
-        } catch (QueryException) {
-            // 并发下已被其他事务创建，忽略后继续锁定读取
-        }
-
-        return Wallet::query()
-            ->where('user_id', $userId)
-            ->lockForUpdate()
-            ->firstOrFail();
-    }
-
-    private function ensureWallet(int $userId): Wallet
-    {
-        return Wallet::query()->where('user_id', $userId)->first()
-            ?? Wallet::query()->create(['user_id' => $userId]);
-    }
-
-    private function recordTransaction(int $walletId, string $type, int $amountInCents, string $description): void
-    {
-        WalletTransaction::query()->create([
-            'wallet_id' => $walletId,
-            'type' => $type,
-            'amount' => $this->toDecimal($amountInCents),
-            'description' => $description,
-        ]);
-    }
-
-    private function assertPositiveAmount(int $amountInCents): void
-    {
-        if ($amountInCents <= 0) {
-            throw new RuntimeException('金额必须为正整数（分）');
-        }
-    }
-
-    /**
-     * 金额统一以整数（分）计算，仅在读写数据库时转换。
-     * 转换全程使用字符串/整数运算，禁止 float，避免浮点精度问题。
-     */
-    private function toCents(string $decimalAmount): int
-    {
-        $parts = explode('.', $decimalAmount);
-        $whole = (int) $parts[0];
-        $frac = isset($parts[1])
-            ? (int) substr(str_pad($parts[1], 2, '0', STR_PAD_RIGHT), 0, 2)
-            : 0;
-
-        return $whole * 100 + $frac;
-    }
-
-    private function toDecimal(int $amountInCents): string
-    {
-        $sign = $amountInCents < 0 ? '-' : '';
-        $abs = abs($amountInCents);
-
-        return $sign.intdiv($abs, 100).'.'.str_pad((string) ($abs % 100), 2, '0', STR_PAD_LEFT);
     }
 }
