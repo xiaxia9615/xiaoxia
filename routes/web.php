@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\AdminAiProviderController;
 use App\Http\Controllers\Admin\AdminApiKeyController;
 use App\Http\Controllers\Admin\AdminDeveloperController;
 use App\Http\Controllers\Admin\AdminLedgerController;
+use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminSkillController;
 use App\Http\Controllers\Admin\AdminSkillPendingController;
 use App\Http\Controllers\Admin\AdminSystemController;
@@ -59,4 +61,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // 钱包管理
     Route::get('/wallets', [AdminWalletController::class, 'index'])->name('wallets.index');
     Route::get('/wallets/recharges', [AdminWalletController::class, 'recharges'])->name('wallets.recharges');
+
+    // 订单管理
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders/{id}/refund', [AdminOrderController::class, 'refund'])->whereNumber('id')->name('orders.refund');
+
+    // 商品管理
+    Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
+    Route::post('/products/{id}/force-archive', [AdminProductController::class, 'forceArchive'])->whereNumber('id')->name('products.forceArchive');
 });
