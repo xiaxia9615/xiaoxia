@@ -36,6 +36,7 @@ final class AdminDeveloperViewTest extends TestCase
 
     public function test_admin_can_view_developers_page(): void
     {
+        $this->markTestSkipped('开发者模块已关闭，切换为自营模式');
         $dev = $this->pendingDeveloper();
 
         $this->actingAs($this->admin())
@@ -46,6 +47,7 @@ final class AdminDeveloperViewTest extends TestCase
 
     public function test_normal_user_forbidden_on_developers(): void
     {
+        $this->markTestSkipped('开发者模块已关闭，切换为自营模式');
         $this->actingAs($this->normalUser())
             ->get('/admin/developers')
             ->assertForbidden();
@@ -53,6 +55,7 @@ final class AdminDeveloperViewTest extends TestCase
 
     public function test_admin_can_approve_developer(): void
     {
+        $this->markTestSkipped('开发者模块已关闭，切换为自营模式');
         $dev = $this->pendingDeveloper();
 
         $this->actingAs($this->admin())
@@ -66,6 +69,7 @@ final class AdminDeveloperViewTest extends TestCase
 
     public function test_admin_can_reject_developer(): void
     {
+        $this->markTestSkipped('开发者模块已关闭，切换为自营模式');
         $dev = $this->pendingDeveloper();
 
         $this->actingAs($this->admin())

@@ -50,9 +50,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/system/backups', [AdminSystemController::class, 'backups'])->name('system.backups');
     Route::get('/system/logs', [AdminSystemController::class, 'logs'])->name('system.logs');
 
-    // 开发者审核
-    Route::get('/developers', [AdminDeveloperController::class, 'index'])->name('developers.index');
-    Route::post('/developers/{id}/audit', [AdminDeveloperController::class, 'audit'])->whereNumber('id')->name('developers.audit');
+    // 开发者审核（自营模式暂时关闭，考取资质后恢复）
+    // Route::get('/developers', [AdminDeveloperController::class, 'index'])->name('developers.index');
+    // Route::post('/developers/{id}/audit', [AdminDeveloperController::class, 'audit'])->whereNumber('id')->name('developers.audit');
 
     // 技能审核
     Route::get('/skills/pending', [AdminSkillPendingController::class, 'index'])->name('skills.pending');

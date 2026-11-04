@@ -23,9 +23,10 @@ final class CreateSkillAction
      */
     public function execute(User $user, array $data): array
     {
-        if (! $this->users->isDeveloper((int) $user->id)) {
-            throw new RuntimeException('仅认证开发者可创建技能');
-        }
+        // 自营模式：暂时关闭开发者入驻校验，登录即可创建（考取资质后恢复）
+        // if (! $this->users->isDeveloper((int) $user->id)) {
+        //     throw new RuntimeException('仅认证开发者可创建技能');
+        // }
 
         $this->contentCheck($data['name'].' '.$data['description']);
         $productId = $this->products->createSkillProduct(
