@@ -13,8 +13,8 @@ class Wallet extends Model
     protected function casts(): array
     {
         return [
-            'balance' => 'decimal:2',
-            'frozen_balance' => 'decimal:2',
+            'balance' => 'integer',
+            'frozen_balance' => 'integer',
         ];
     }
 }
