@@ -2,10 +2,13 @@
 
 use App\Http\Controllers\Admin\AdminAiProviderController;
 use App\Http\Controllers\Admin\AdminApiKeyController;
+use App\Http\Controllers\Admin\AdminDeveloperController;
 use App\Http\Controllers\Admin\AdminLedgerController;
 use App\Http\Controllers\Admin\AdminSkillController;
+use App\Http\Controllers\Admin\AdminSkillPendingController;
 use App\Http\Controllers\Admin\AdminSystemController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminWalletController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
@@ -44,4 +47,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/system/health', [AdminSystemController::class, 'health'])->name('system.health');
     Route::get('/system/backups', [AdminSystemController::class, 'backups'])->name('system.backups');
     Route::get('/system/logs', [AdminSystemController::class, 'logs'])->name('system.logs');
+
+    // 开发者审核
+    Route::get('/developers', [AdminDeveloperController::class, 'index'])->name('developers.index');
+    Route::post('/developers/{id}/audit', [AdminDeveloperController::class, 'audit'])->whereNumber('id')->name('developers.audit');
+
+    // 技能审核
+    Route::get('/skills/pending', [AdminSkillPendingController::class, 'index'])->name('skills.pending');
+    Route::post('/skills/pending/{id}/audit', [AdminSkillPendingController::class, 'audit'])->whereNumber('id')->name('skills.pending.audit');
+
+    // 钱包管理
+    Route::get('/wallets', [AdminWalletController::class, 'index'])->name('wallets.index');
+    Route::get('/wallets/recharges', [AdminWalletController::class, 'recharges'])->name('wallets.recharges');
 });

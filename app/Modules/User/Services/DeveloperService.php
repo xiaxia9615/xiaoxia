@@ -6,6 +6,7 @@ namespace App\Modules\User\Services;
 
 use App\Modules\User\Enums\DeveloperStatus;
 use App\Modules\User\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use RuntimeException;
 
 class DeveloperService
@@ -68,6 +69,17 @@ class DeveloperService
             'is_developer' => (bool) $user->is_developer,
             'developer_status' => $this->resolveStatus($user->developer_status)->value,
         ];
+    }
+
+    /**
+     * 管理员分页查询待审核的开发者列表
+     */
+    public function paginatePendingDevelopers(int $perPage = 20): LengthAwarePaginator
+    {
+        return User::query()
+            ->where('developer_status', DeveloperStatus::Pending)
+            ->orderBy('id')
+            ->paginate($perPage);
     }
 
     private function resolveStatus(DeveloperStatus|string $status): DeveloperStatus
