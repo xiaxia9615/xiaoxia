@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 final class DistributorController
 {
     /**
-     * 绑定上级达人（一个用户仅可绑定一次，重复绑定幂等返回）
+     * 绑定上级达人（一个用户仅可绑定一次，重复绑定返回 400）
      *
      * @group 分销管理
      * @authenticated
@@ -38,13 +38,9 @@ final class DistributorController
             return response()->json(['code' => 1, 'message' => '达人不存在'], 400);
         }
 
-        // 幂等：已绑定同一达人直接返回成功
-        $exists = DistributorRelation::query()
-            ->where('user_id', $userId)
-            ->where('distributor_id', $distributorId)
-            ->first();
-        if ($exists) {
-            return response()->json(['code' => 0, 'data' => $exists, 'message' => '已绑定该达人']);
+        // 一个用户仅可绑定一次：已存在绑定关系时严格拒绝
+        if (DistributorRelation::query()->where('user_id', $userId)->exists()) {
+            return response()->json(['code' => 1, 'message' => '已绑定达人，不可重复绑定'], 400);
         }
 
         try {
@@ -53,12 +49,9 @@ final class DistributorController
                 'distributor_id' => $distributorId,
             ]);
         } catch (QueryException $e) {
-            // 23000: 唯一键冲突（并发下重复绑定）
+            // 23000: 唯一键冲突（并发下重复绑定），同样拒绝
             if ($e->getCode() === '23000') {
-                $relation = DistributorRelation::query()
-                    ->where('user_id', $userId)
-                    ->first();
-                return response()->json(['code' => 0, 'data' => $relation, 'message' => '已绑定达人']);
+                return response()->json(['code' => 1, 'message' => '已绑定达人，不可重复绑定'], 400);
             }
 
             throw $e;
@@ -76,7 +69,7 @@ final class DistributorController
     public function show(Request $request): JsonResponse
     {
         $relation = DistributorRelation::query()
-            ->with('distributor:id,name,nickname')
+            ->with('distributor:id,name')
             ->where('user_id', (int) $request->user()->id)
             ->first();
 
