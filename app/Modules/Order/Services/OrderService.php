@@ -6,6 +6,7 @@ namespace App\Modules\Order\Services;
 
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Models\Order;
+use App\Modules\Distributor\Models\DistributorRelation;
 use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Product\Models\Product;
 use Illuminate\Database\QueryException;
@@ -62,7 +63,7 @@ final class OrderService
      * 2. 已支付订单幂等返回，严禁重复扣款；
      * 3. 仅待支付订单可支付；
      * 4. 严格按订单 amount（价格快照）扣款，绝不读商品最新价格；
-     * 5. 扣款成功后置为 Paid，预留 LedgerContract 分账挂载点。
+     * 5. 扣款成功后置为 Paid，并按比例分账（开发者/达人/平台）。
      *
      * @return array{status: string, order: Order, message?: string}
      *
@@ -103,8 +104,10 @@ final class OrderService
             $order->paid_at = now();
             $order->save();
 
-            // TODO: LedgerContract 分账逻辑（卖家/平台分账），本次预留挂载点
-            Log::info('order paid, ledger settlement pending', [
+            // 分账：开发者 80%；买家绑定上级达人时达人 10%、平台 10%，否则平台 20%；误差归平台
+            $this->settleCommission($order);
+
+            Log::info('order paid, commission settled', [
                 'order_no' => $order->order_no,
                 'amount' => $order->amount,
             ]);
@@ -141,6 +144,69 @@ final class OrderService
 
             return $order;
         });
+    }
+
+    /**
+     * 订单分账（在 payOrder 事务内执行，与扣款原子提交）：
+     * - 无达人：开发者 80%，平台 20%；
+     * - 有达人：开发者 80%，达人 10%，平台 10%；
+     * - 金额单位为毫，向下取整，舍入误差归入平台；
+     * - 幂等：事务内先查 order_commission 流水，已分账订单直接跳过，防止重复分账。
+     */
+    private function settleCommission(Order $order): void
+    {
+        // 幂等：同一订单的分账流水已存在则跳过（payOrder 已对订单行加悲观锁，此处双保险）
+        $settled = DB::table('ledger_entries')
+            ->where('biz_type', 'order_commission')
+            ->where('biz_id', $order->id)
+            ->exists();
+        if ($settled) {
+            return;
+        }
+
+        $amount = (int) $order->amount;
+
+        // 开发者分成 80%，向下取整
+        $developerShare = intdiv($amount * 80, 100);
+
+        // 买家绑定的上级达人（一个用户仅绑定一个达人）
+        $distributorId = (int) DistributorRelation::query()
+            ->where('user_id', $order->user_id)
+            ->value('distributor_id');
+
+        // 复式记账：支付时货款已全额计入平台账户，分账先从平台转出，再分给各方，账目保持平衡
+        $splits = [
+            ['owner_type' => 'platform', 'owner_id' => 0, 'account_type' => 'platform', 'direction' => 'debit', 'amount' => $amount],
+        ];
+
+        $paidOut = 0;
+
+        $developerId = $this->developerIdOf($order);
+        if ($developerId > 0) {
+            $splits[] = ['owner_type' => 'user', 'owner_id' => $developerId, 'account_type' => 'balance', 'direction' => 'credit', 'amount' => $developerShare];
+            $paidOut += $developerShare;
+        }
+
+        if ($distributorId > 0) {
+            $distributorShare = intdiv($amount * 10, 100);
+            $splits[] = ['owner_type' => 'user', 'owner_id' => $distributorId, 'account_type' => 'balance', 'direction' => 'credit', 'amount' => $distributorShare];
+            $paidOut += $distributorShare;
+        }
+
+        // 平台分成 = 总额 - 开发者 - 达人，舍入误差自然归入平台
+        $splits[] = ['owner_type' => 'platform', 'owner_id' => 0, 'account_type' => 'platform', 'direction' => 'credit', 'amount' => $amount - $paidOut];
+
+        $this->ledger->record('order_commission', $order->id, $splits);
+    }
+
+    /**
+     * 取订单开发者（商品提供者）用户ID，商品软删除后仍可追溯
+     */
+    private function developerIdOf(Order $order): int
+    {
+        $product = Product::withTrashed()->find($order->product_id);
+
+        return (int) ($product->user_id ?? 0);
     }
 
     /**
