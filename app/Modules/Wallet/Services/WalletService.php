@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Wallet\Models\Wallet;
 use App\Modules\Wallet\Models\WalletTransaction;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -167,6 +168,33 @@ final class WalletService
                 ['owner_type' => 'user', 'owner_id' => $user->id, 'account_type' => 'balance', 'direction' => 'credit', 'amount' => $amount],
             ]);
         });
+    }
+
+    /**
+     * 管理员分页查询所有钱包及其充值流水
+     */
+    public function paginateWallets(int $perPage = 20): LengthAwarePaginator
+    {
+        return Wallet::query()
+            ->with(['user' => function ($q) {
+                $q->select('id', 'name', 'email');
+            }])
+            ->orderBy('id')
+            ->paginate($perPage);
+    }
+
+    /**
+     * 管理员分页查询所有充值流水
+     */
+    public function paginateRecharges(int $perPage = 20): LengthAwarePaginator
+    {
+        return WalletTransaction::query()
+            ->with(['wallet.user' => function ($q) {
+                $q->select('id', 'name', 'email');
+            }])
+            ->where('type', 'recharge')
+            ->orderByDesc('id')
+            ->paginate($perPage);
     }
 
     /**

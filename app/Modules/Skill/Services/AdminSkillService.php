@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Modules\Skill\Services;
 
 use App\Modules\ApiKey\Contracts\ApiCallContract;
+use App\Modules\Skill\Enums\SkillStatus;
+use App\Modules\Skill\Models\SkillDetail;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 
@@ -53,6 +56,18 @@ final class AdminSkillService
         $statusCode = ($status !== null && $status !== '') ? (int) $status : null;
 
         return $this->apiCalls->paginateCalls($perPage, $statusCode);
+    }
+
+    /**
+     * 管理员分页查询待审核的技能列表
+     */
+    public function paginatePendingSkills(int $perPage = 20): LengthAwarePaginator
+    {
+        return SkillDetail::query()
+            ->with('product')
+            ->where('status', SkillStatus::Pending)
+            ->orderBy('id')
+            ->paginate($perPage);
     }
 
     public function getSkill(int $id): ?object

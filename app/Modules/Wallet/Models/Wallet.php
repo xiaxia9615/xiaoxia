@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Wallet\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Wallet extends Model
 {
@@ -16,5 +18,10 @@ class Wallet extends Model
             'balance' => 'integer',
             'frozen_balance' => 'integer',
         ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
