@@ -23,7 +23,7 @@
                         ['route' => 'admin.ai-providers.index', 'label' => 'AI 供应商'],
                         ['route' => 'admin.skills.index',    'label' => '技能'],
                         ['route' => 'admin.skills.pending',  'label' => '技能审核'],
-                        ['route' => 'admin.developers.index', 'label' => '开发者审核'],
+                        // ['route' => 'admin.developers.index', 'label' => '开发者审核'], // 自营模式暂时隐藏
                         ['route' => 'admin.api-keys.index',  'label' => 'API Keys'],
                         ['route' => 'admin.wallets.index',   'label' => '钱包'],
                         ['route' => 'admin.system.health',   'label' => '系统'],
