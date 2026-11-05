@@ -8,7 +8,7 @@ use App\Modules\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class Withdrawal extends Model
+class Withdrawal extends Model
 {
     public const STATUS_PENDING = 'pending';
     public const STATUS_APPROVED = 'approved';
