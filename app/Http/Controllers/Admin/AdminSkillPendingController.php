@@ -30,16 +30,16 @@ final class AdminSkillPendingController extends Controller
             e((string) $s->endpoint),
             e((string) $s->method),
             '<span class="px-2 py-0.5 text-xs rounded-full bg-amber-50 text-amber-700">待审核</span>',
-            '<form method="POST" action="' . route('admin.skills.pending.audit', $s->product_id) . '" class="inline-flex gap-2">'
-                . csrf_field()
-                . '<button type="submit" name="action" value="approve" class="px-2 py-1 text-xs rounded bg-emerald-100 text-emerald-700 hover:bg-emerald-200">通过</button>'
-                . '<button type="submit" name="action" value="reject" class="px-2 py-1 text-xs rounded bg-red-100 text-red-700 hover:bg-red-200">驳回</button>'
-                . '</form>',
+            '<form method="POST" action="'.route('admin.skills.pending.audit', $s->product_id).'" class="inline-flex gap-2">'
+                .csrf_field()
+                .'<button type="submit" name="action" value="approve" class="px-2 py-1 text-xs rounded bg-emerald-100 text-emerald-700 hover:bg-emerald-200">通过</button>'
+                .'<button type="submit" name="action" value="reject" class="px-2 py-1 text-xs rounded bg-red-100 text-red-700 hover:bg-red-200">驳回</button>'
+                .'</form>',
         ])->all();
 
         return view('admin.skills.pending', [
             'skills' => $skills,
-            'rows'   => $rows,
+            'rows' => $rows,
         ]);
     }
 
@@ -57,8 +57,8 @@ final class AdminSkillPendingController extends Controller
         Log::info('admin.audit_skill', [
             'operator' => $request->user()->id,
             'skill_id' => $id,
-            'approve'  => $approve,
-            'ip'       => $request->ip(),
+            'approve' => $approve,
+            'ip' => $request->ip(),
         ]);
 
         return back()->with('status', $approve ? '技能已通过审核' : '技能已驳回');

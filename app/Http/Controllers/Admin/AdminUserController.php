@@ -29,7 +29,7 @@ class AdminUserController extends Controller
         ];
 
         return view('admin.users.show', [
-            'user'  => $user,
+            'user' => $user,
             'stats' => $stats,
         ]);
     }
@@ -48,9 +48,9 @@ class AdminUserController extends Controller
 
         Log::info('admin.update_role', [
             'operator' => $request->user()->id,
-            'target'   => $id,
-            'role'     => $data['role'],
-            'ip'       => $request->ip(),
+            'target' => $id,
+            'role' => $data['role'],
+            'ip' => $request->ip(),
         ]);
 
         return back()->with('status', '角色已更新');
@@ -66,9 +66,9 @@ class AdminUserController extends Controller
 
         Log::info('admin.toggle_active', [
             'operator' => $request->user()->id,
-            'target'   => $id,
-            'active'   => $active,
-            'ip'       => $request->ip(),
+            'target' => $id,
+            'active' => $active,
+            'ip' => $request->ip(),
         ]);
 
         return back()->with('status', $active ? '已启用' : '已禁用');

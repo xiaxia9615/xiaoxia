@@ -17,12 +17,14 @@ final class SubmitSkillAction
     public function execute(int $skillId, int $userId): array
     {
         $detail = SkillDetail::query()->find($skillId);
-        if ($detail === null) abort(404, '技能不存在');
+        if ($detail === null) {
+            abort(404, '技能不存在');
+        }
 
         $product = $this->products->findSkill($skillId);
-        
+
         // 最严厉的权限拦截
-        if (!$product || (int)($product['user_id'] ?? 0) !== (int)$userId) {
+        if (! $product || (int) ($product['user_id'] ?? 0) !== (int) $userId) {
             abort(403, '无权操作他人技能');
         }
 

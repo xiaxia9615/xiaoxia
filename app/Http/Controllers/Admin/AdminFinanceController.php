@@ -13,7 +13,6 @@ use App\Modules\Wallet\Services\WithdrawalService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class AdminFinanceController extends Controller
@@ -59,12 +58,12 @@ final class AdminFinanceController extends Controller
             ->count() ?? 0);
 
         return view('admin.finance.index', [
-            'totalRecharge'       => $totalRecharge,
-            'todayRecharge'       => $todayRecharge,
-            'todayWithdrawal'     => $todayWithdrawal,
+            'totalRecharge' => $totalRecharge,
+            'todayRecharge' => $todayRecharge,
+            'todayWithdrawal' => $todayWithdrawal,
             'todayOrderSettlement' => $todayOrderSettlement,
-            'netAsset'            => $netAsset,
-            'pendingWithdrawals'  => $pendingWithdrawals,
+            'netAsset' => $netAsset,
+            'pendingWithdrawals' => $pendingWithdrawals,
         ]);
     }
 
@@ -94,7 +93,7 @@ final class AdminFinanceController extends Controller
 
         return view('admin.finance.recharges', [
             'transactions' => $transactions,
-            'rows'         => $rows,
+            'rows' => $rows,
         ]);
     }
 
@@ -123,7 +122,7 @@ final class AdminFinanceController extends Controller
 
         return view('admin.finance.withdrawals', [
             'withdrawals' => $withdrawals,
-            'rows'        => $rows,
+            'rows' => $rows,
         ]);
     }
 
@@ -132,7 +131,7 @@ final class AdminFinanceController extends Controller
      */
     public function exportRecharges(Request $request): StreamedResponse
     {
-        $fileName = 'recharges_' . now()->format('Ymd') . '.csv';
+        $fileName = 'recharges_'.now()->format('Ymd').'.csv';
 
         $transactions = WalletTransaction::query()
             ->with(['wallet.user' => fn ($q) => $q->select('id', 'name', 'email')])
@@ -165,7 +164,7 @@ final class AdminFinanceController extends Controller
      */
     public function exportWithdrawals(Request $request): StreamedResponse
     {
-        $fileName = 'withdrawals_' . now()->format('Ymd') . '.csv';
+        $fileName = 'withdrawals_'.now()->format('Ymd').'.csv';
 
         $withdrawals = Withdrawal::query()
             ->with(['user' => fn ($q) => $q->select('id', 'name', 'email')])

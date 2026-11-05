@@ -27,16 +27,16 @@ final class AdminDeveloperController extends Controller
             e((string) $u->email),
             '<span class="px-2 py-0.5 text-xs rounded-full bg-amber-50 text-amber-700">待审核</span>',
             e((string) ($u->created_at ?? '-')),
-            '<form method="POST" action="' . route('admin.developers.audit', $u->id) . '" class="inline-flex gap-2">'
-                . csrf_field()
-                . '<button type="submit" name="action" value="approve" class="px-2 py-1 text-xs rounded bg-emerald-100 text-emerald-700 hover:bg-emerald-200">通过</button>'
-                . '<button type="submit" name="action" value="reject" class="px-2 py-1 text-xs rounded bg-red-100 text-red-700 hover:bg-red-200">驳回</button>'
-                . '</form>',
+            '<form method="POST" action="'.route('admin.developers.audit', $u->id).'" class="inline-flex gap-2">'
+                .csrf_field()
+                .'<button type="submit" name="action" value="approve" class="px-2 py-1 text-xs rounded bg-emerald-100 text-emerald-700 hover:bg-emerald-200">通过</button>'
+                .'<button type="submit" name="action" value="reject" class="px-2 py-1 text-xs rounded bg-red-100 text-red-700 hover:bg-red-200">驳回</button>'
+                .'</form>',
         ])->all();
 
         return view('admin.developers.index', [
             'developers' => $developers,
-            'rows'       => $rows,
+            'rows' => $rows,
         ]);
     }
 
@@ -53,9 +53,9 @@ final class AdminDeveloperController extends Controller
 
         Log::info('admin.audit_developer', [
             'operator' => $request->user()->id,
-            'target'   => $id,
-            'approve'  => $approve,
-            'ip'       => $request->ip(),
+            'target' => $id,
+            'approve' => $approve,
+            'ip' => $request->ip(),
         ]);
 
         return back()->with('status', $approve ? '开发者已通过审核' : '开发者申请已驳回');

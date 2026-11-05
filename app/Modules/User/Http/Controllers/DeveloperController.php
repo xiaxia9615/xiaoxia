@@ -61,6 +61,7 @@ final class DeveloperController
      * @group 开发者入驻（管理员）
      *
      * @urlParam id integer required 用户 ID。Example: 1
+     *
      * @bodyParam approve boolean required 是否通过审核。Example: true
      *
      * @response {"code": 0, "data": {"user_id": 1, "is_developer": true, "developer_status": "approved"}}

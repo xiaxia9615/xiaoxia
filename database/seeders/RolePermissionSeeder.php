@@ -43,13 +43,13 @@ class RolePermissionSeeder extends Seeder
 
         // 现有用户赋角色: 全部 user, id=1 加 admin
         User::all()->each(function (User $u) {
-            if (!$u->hasRole('user')) {
+            if (! $u->hasRole('user')) {
                 $u->assignRole('user');
             }
         });
 
         $first = User::find(1);
-        if ($first && !$first->hasRole('admin')) {
+        if ($first && ! $first->hasRole('admin')) {
             $first->assignRole('admin');
         }
 

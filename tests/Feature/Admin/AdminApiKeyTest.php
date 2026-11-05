@@ -22,13 +22,14 @@ final class AdminApiKeyTest extends TestCase
 
     private function makeApiKey(int $userId, int $status = 1): int
     {
-        $plain = 'sk_' . uniqid();
+        $plain = 'sk_'.uniqid();
+
         return DB::table('api_keys')->insertGetId([
-            'user_id'    => $userId,
-            'name'       => 'test-key-' . uniqid(),
+            'user_id' => $userId,
+            'name' => 'test-key-'.uniqid(),
             'key_prefix' => substr($plain, 0, 8),
-            'key_hash'   => hash('sha256', $plain),
-            'status'     => $status,
+            'key_hash' => hash('sha256', $plain),
+            'status' => $status,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -48,15 +49,15 @@ final class AdminApiKeyTest extends TestCase
     public function test_key_hash_not_shown(): void
     {
         $user = User::factory()->create();
-        $plain = 'sk_supersecret_' . uniqid();
+        $plain = 'sk_supersecret_'.uniqid();
         $hash = hash('sha256', $plain);
 
         DB::table('api_keys')->insert([
-            'user_id'    => $user->id,
-            'name'       => 'leak-test',
+            'user_id' => $user->id,
+            'name' => 'leak-test',
             'key_prefix' => substr($plain, 0, 8),
-            'key_hash'   => $hash,
-            'status'     => 1,
+            'key_hash' => $hash,
+            'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -99,13 +100,13 @@ final class AdminApiKeyTest extends TestCase
         $product = Product::factory()->skill()->create();
         SkillDetail::factory()->create(['product_id' => $product->id]);
 
-        $plain = 'sk_' . uniqid();
+        $plain = 'sk_'.uniqid();
         $keyId = DB::table('api_keys')->insertGetId([
-            'user_id'    => $user->id,
-            'name'       => 'revoke-test',
+            'user_id' => $user->id,
+            'name' => 'revoke-test',
             'key_prefix' => substr($plain, 0, 8),
-            'key_hash'   => hash('sha256', $plain),
-            'status'     => 1,
+            'key_hash' => hash('sha256', $plain),
+            'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

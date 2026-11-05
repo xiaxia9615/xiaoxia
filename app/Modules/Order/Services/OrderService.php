@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Modules\Order\Services;
 
-use App\Modules\Order\Enums\OrderStatus;
-use App\Modules\Order\Models\Order;
 use App\Modules\Distributor\Models\DistributorRelation;
 use App\Modules\Ledger\Contracts\LedgerContract;
+use App\Modules\Order\Enums\OrderStatus;
+use App\Modules\Order\Models\Order;
 use App\Modules\Product\Models\Product;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;

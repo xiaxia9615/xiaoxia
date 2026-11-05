@@ -32,9 +32,9 @@ final class AdminLedgerController extends Controller
         ])->all();
 
         return view('admin.ledger.index', [
-            'stats'    => $this->service->stats(),
+            'stats' => $this->service->stats(),
             'accounts' => $accounts,
-            'rows'     => $rows,
+            'rows' => $rows,
         ]);
     }
 
@@ -59,8 +59,8 @@ final class AdminLedgerController extends Controller
 
         return view('admin.ledger.entries', [
             'accountId' => $accountId,
-            'entries'   => $entries,
-            'rows'      => $rows,
+            'entries' => $entries,
+            'rows' => $rows,
         ]);
     }
 }

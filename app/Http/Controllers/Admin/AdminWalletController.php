@@ -30,7 +30,7 @@ final class AdminWalletController extends Controller
 
         return view('admin.wallets.index', [
             'wallets' => $wallets,
-            'rows'    => $rows,
+            'rows' => $rows,
         ]);
     }
 
@@ -50,7 +50,7 @@ final class AdminWalletController extends Controller
 
         return view('admin.wallets.recharges', [
             'transactions' => $transactions,
-            'rows'         => $rows,
+            'rows' => $rows,
         ]);
     }
 }

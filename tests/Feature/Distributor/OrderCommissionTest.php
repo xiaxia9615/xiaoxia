@@ -1,12 +1,13 @@
 <?php
+
 namespace Tests\Feature\Distributor;
 
 use App\Models\User;
+use App\Modules\Distributor\Models\DistributorRelation;
 use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Models\Order;
 use App\Modules\Product\Models\Product;
-use App\Modules\Distributor\Models\DistributorRelation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;

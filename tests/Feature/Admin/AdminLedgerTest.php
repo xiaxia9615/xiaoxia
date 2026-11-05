@@ -22,12 +22,12 @@ final class AdminLedgerTest extends TestCase
     private function makeAccount(int $ownerId = 1): int
     {
         return (int) DB::table('ledger_accounts')->insertGetId([
-            'owner_type'   => 'user',
-            'owner_id'     => $ownerId,
+            'owner_type' => 'user',
+            'owner_id' => $ownerId,
             'account_type' => 'balance',
-            'currency'     => 'CNY',
-            'created_at'   => now(),
-            'updated_at'   => now(),
+            'currency' => 'CNY',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 
@@ -35,13 +35,13 @@ final class AdminLedgerTest extends TestCase
     {
         DB::table('ledger_entries')->insert([
             'transaction_id' => (string) Str::uuid(),
-            'account_id'     => $accountId,
-            'direction'      => $direction,
-            'amount'         => $amount,
-            'biz_type'       => 'test',
-            'biz_id'         => 1,
-            'created_at'     => now(),
-            'updated_at'     => now(),
+            'account_id' => $accountId,
+            'direction' => $direction,
+            'amount' => $amount,
+            'biz_type' => 'test',
+            'biz_id' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 

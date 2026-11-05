@@ -25,15 +25,15 @@ final class AdminSkillController extends Controller
             e((string) $s->endpoint),
             e((string) $s->method),
             e((string) $s->pricing_type),
-            '<code>' . e($s->masked_api_key) . '</code>',
+            '<code>'.e($s->masked_api_key).'</code>',
             $s->calls_count,
-            '<a href="' . route('admin.skills.show', $s->id) . '" class="text-indigo-600 hover:text-indigo-800">详情</a>',
+            '<a href="'.route('admin.skills.show', $s->id).'" class="text-indigo-600 hover:text-indigo-800">详情</a>',
         ])->all();
 
         return view('admin.skills.index', [
-            'stats'  => $this->service->stats(),
+            'stats' => $this->service->stats(),
             'skills' => $skills,
-            'rows'   => $rows,
+            'rows' => $rows,
         ]);
     }
 
@@ -47,16 +47,16 @@ final class AdminSkillController extends Controller
             $c->user_id,
             $c->product_id,
             $c->status_code === 200
-                ? '<span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span class="text-sm text-slate-600">' . $c->status_code . '</span></span>'
-                : '<span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500"></span><span class="text-sm text-slate-600">' . $c->status_code . '</span></span>',
-            $c->duration_ms . 'ms',
+                ? '<span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span class="text-sm text-slate-600">'.$c->status_code.'</span></span>'
+                : '<span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500"></span><span class="text-sm text-slate-600">'.$c->status_code.'</span></span>',
+            $c->duration_ms.'ms',
             number_format($c->cost / 100, 4),
             '-',
         ])->all();
 
         return view('admin.skills.calls', [
-            'calls'   => $calls,
-            'rows'    => $rows,
+            'calls' => $calls,
+            'rows' => $rows,
             'filters' => ['status' => $request->query('status')],
         ]);
     }
@@ -65,7 +65,7 @@ final class AdminSkillController extends Controller
     {
         $skill = $this->service->getSkill($id);
 
-        if (!$skill) {
+        if (! $skill) {
             abort(404);
         }
 

@@ -57,8 +57,8 @@ final class AdminApiKeyQueryService
     public function stats(): array
     {
         return [
-            'total'   => DB::table('api_keys')->count(),
-            'active'  => DB::table('api_keys')->where('status', 1)->count(),
+            'total' => DB::table('api_keys')->count(),
+            'active' => DB::table('api_keys')->where('status', 1)->count(),
             'revoked' => DB::table('api_keys')->where('status', 0)->count(),
             'expired' => DB::table('api_keys')
                 ->whereNotNull('expires_at')

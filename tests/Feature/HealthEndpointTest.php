@@ -15,7 +15,7 @@ class HealthEndpointTest extends TestCase
             ->assertJson([
                 'status' => 'ok',
                 'checks' => [
-                    'db'    => true,
+                    'db' => true,
                     'cache' => true,
                 ],
             ]);

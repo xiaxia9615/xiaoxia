@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             $this->command->warn('生产环境: 仅执行基础数据 (ProductionSeeder)');
             $this->call(ProductionSeeder::class);
             $this->call(AiModelsSeeder::class);
+
             return;
         }
 

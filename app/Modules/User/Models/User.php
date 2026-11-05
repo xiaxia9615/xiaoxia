@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Modules\User\Models;
 
+use App\Modules\User\Enums\DeveloperStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use App\Modules\User\Enums\DeveloperStatus;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable;
 
     protected $guarded = []; // 解除所有赋值限制
 

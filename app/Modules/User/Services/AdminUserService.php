@@ -25,7 +25,6 @@ class AdminUserService
             ->firstOrFail();
     }
 
-
     /**
      * 修改角色. 写操作.
      *

@@ -25,13 +25,13 @@ final class AdminSystemController extends Controller
 
         $rows = array_map(fn ($b): array => [
             e($b['name']),
-            number_format($b['size'] / 1024, 1) . ' KB',
+            number_format($b['size'] / 1024, 1).' KB',
             e($b['mtime']),
         ], $backups);
 
         return view('admin.system.backups', [
             'backups' => $backups,
-            'rows'    => $rows,
+            'rows' => $rows,
         ]);
     }
 

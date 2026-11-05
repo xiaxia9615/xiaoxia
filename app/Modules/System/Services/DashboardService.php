@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Modules\System\Services;
 
+use App\Models\User;
 use App\Modules\ApiKey\Models\ApiCall;
 use App\Modules\ApiKey\Models\ApiKey;
 use App\Modules\Product\Models\Product;
 use App\Modules\Skill\Models\SkillDetail;
-use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -20,7 +20,7 @@ class DashboardService
     public function systemHealth(): array
     {
         return [
-            'db'    => rescue(fn () => DB::select('SELECT 1') !== null, false),
+            'db' => rescue(fn () => DB::select('SELECT 1') !== null, false),
             'cache' => rescue(fn () => Cache::put('admin_probe', 1, 5) !== false, false),
         ];
     }
@@ -31,12 +31,12 @@ class DashboardService
     public function tableCounts(): array
     {
         return [
-            'users'        => User::count(),
-            'products'     => Product::count(),
-            'skills'       => SkillDetail::count(),
-            'api_keys'     => ApiKey::count(),
-            'calls_total'  => ApiCall::count(),
-            'calls_today'  => ApiCall::whereDate('created_at', today())->count(),
+            'users' => User::count(),
+            'products' => Product::count(),
+            'skills' => SkillDetail::count(),
+            'api_keys' => ApiKey::count(),
+            'calls_total' => ApiCall::count(),
+            'calls_today' => ApiCall::whereDate('created_at', today())->count(),
         ];
     }
 
@@ -50,12 +50,12 @@ class DashboardService
             ->limit(10)
             ->get(['id', 'user_id', 'product_id', 'status_code', 'duration_ms', 'created_at'])
             ->map(fn (ApiCall $call) => [
-                'id'          => $call->id,
-                'user'        => $call->user?->name ?? ('#' . $call->user_id),
-                'product'     => ('#' . $call->product_id),
+                'id' => $call->id,
+                'user' => $call->user?->name ?? ('#'.$call->user_id),
+                'product' => ('#'.$call->product_id),
                 'status_code' => $call->status_code,
                 'duration_ms' => $call->duration_ms,
-                'created_at'  => $call->created_at?->format('m-d H:i'),
+                'created_at' => $call->created_at?->format('m-d H:i'),
             ])
             ->all();
     }
@@ -66,9 +66,9 @@ class DashboardService
     public function serviceStatus(): array
     {
         return [
-            'nginx'   => $this->systemdActive('nginx'),
+            'nginx' => $this->systemdActive('nginx'),
             'php-fpm' => $this->systemdActive('php8.5-fpm'),
-            'worker'  => $this->workerRunning(),
+            'worker' => $this->workerRunning(),
         ];
     }
 
