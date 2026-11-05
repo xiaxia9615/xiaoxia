@@ -88,7 +88,7 @@ final class AdminFinanceController extends Controller
             e((string) ($t->wallet->user->email ?? '-')),
             number_format($t->amount / 1000, 2),
             e((string) $t->type),
-            e((string) ($t->created_at ?? '-')),
+            e($t->created_at?->format('Y-m-d H:i:s') ?? '-'),
         ])->all();
 
         return view('admin.finance.recharges', [
@@ -116,8 +116,8 @@ final class AdminFinanceController extends Controller
             e((string) ($w->user->email ?? '-')),
             number_format($w->amount / 1000, 2),
             e((string) $w->status),
-            e((string) ($w->audited_at ?? '-')),
-            e((string) ($w->created_at ?? '-')),
+            e($w->audited_at?->format('Y-m-d H:i:s') ?? '-'),
+            e($w->created_at?->format('Y-m-d H:i:s') ?? '-'),
         ])->all();
 
         return view('admin.finance.withdrawals', [
