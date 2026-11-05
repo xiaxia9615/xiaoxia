@@ -24,24 +24,24 @@ final class AdminFinanceController extends Controller
      */
     public function index(): View
     {
-        // 平台总充值额：钱包充值流水求和（单位：毫）
-        $totalRecharge = (int) WalletTransaction::query()
+        // 平台总充值额：钱包充值流水求和（单位：毫），null 时默认 0
+        $totalRecharge = (int) (WalletTransaction::query()
             ->where('type', 'recharge')
-            ->sum('amount');
+            ->sum('amount') ?? 0);
 
-        // 今日新增充值金额（单位：毫）
-        $todayRecharge = (int) WalletTransaction::query()
+        // 今日新增充值金额（单位：毫），null 时默认 0
+        $todayRecharge = (int) (WalletTransaction::query()
             ->where('type', 'recharge')
             ->whereDate('created_at', today())
-            ->sum('amount');
+            ->sum('amount') ?? 0);
 
         // 平台净资产：统一通过 LedgerContract 查询，不直接读 wallet 表
-        $netAsset = $this->ledger->balance('platform', 0, 'platform');
+        $netAsset = (int) ($this->ledger->balance('platform', 0, 'platform') ?? 0);
 
         // 待处理提现数量
-        $pendingWithdrawals = Withdrawal::query()
+        $pendingWithdrawals = (int) (Withdrawal::query()
             ->where('status', Withdrawal::STATUS_PENDING)
-            ->count();
+            ->count() ?? 0);
 
         return view('admin.finance.index', [
             'totalRecharge'      => $totalRecharge,
