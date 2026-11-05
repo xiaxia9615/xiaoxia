@@ -55,12 +55,6 @@ class SkillStoreTest extends TestCase
         $response = $this->actingAs($admin, 'sanctum')
              ->postJson("/api/v1/admin/skills/{$skill->id}/audit", ['approve' => true]);
              
-        // 如果还不是 200，直接打印出真实的报错信息
-        if ($response->status() !== 200) {
-            dump("真实的响应状态码: " . $response->status());
-            dump("真实的响应内容: ", $response->json());
-        }
-
         $response->assertOk();
     }
 }
