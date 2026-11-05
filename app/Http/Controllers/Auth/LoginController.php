@@ -10,8 +10,12 @@ class LoginController extends Controller
 {
     public function show()
     {
-        if (Auth::check() && Auth::user()->is_admin) {
-            return redirect()->route('admin.dashboard');
+        if (Auth::check() && (Auth::user()->is_admin || Auth::user()->is_finance)) {
+            if (Auth::user()->is_admin) {
+                return redirect()->route('admin.dashboard');
+            }
+
+            return redirect()->route('admin.finance.index');
         }
 
         return view('auth.login');
@@ -24,10 +28,12 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            if (! Auth::user()->is_admin) {
+            $user = Auth::user();
+
+            if (! $user->is_admin && ! $user->is_finance) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
@@ -35,7 +41,11 @@ class LoginController extends Controller
                 return back()->withErrors(['email' => '需要管理员权限']);
             }
 
-            return redirect()->intended(route('admin.dashboard'));
+            if ($user->is_admin) {
+                return redirect()->intended(route('admin.dashboard'));
+            }
+
+            return redirect()->intended(route('admin.finance.index'));
         }
 
         return back()->withErrors(['email' => '邮箱或密码错误']);
