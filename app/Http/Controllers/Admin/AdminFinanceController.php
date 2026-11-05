@@ -7,11 +7,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Withdrawal;
 use App\Modules\Ledger\Contracts\LedgerContract;
+use App\Modules\Order\Models\Order;
 use App\Modules\Wallet\Models\WalletTransaction;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class AdminFinanceController extends Controller
 {
@@ -20,22 +23,33 @@ final class AdminFinanceController extends Controller
     ) {}
 
     /**
-     * 财务中心首页：平台总充值额、今日新增充值、平台净资产、待处理提现数量。
+     * 财务中心首页：平台总充值额、今日数据、平台净资产、待处理提现。
      */
     public function index(): View
     {
-        // 平台总充值额：钱包充值流水求和（单位：毫），null 时默认 0
+        // 平台总充值额（单位：毫）
         $totalRecharge = (int) (WalletTransaction::query()
             ->where('type', 'recharge')
             ->sum('amount') ?? 0);
 
-        // 今日新增充值金额（单位：毫），null 时默认 0
+        // 今日新增充值金额（单位：毫）
         $todayRecharge = (int) (WalletTransaction::query()
             ->where('type', 'recharge')
             ->whereDate('created_at', today())
             ->sum('amount') ?? 0);
 
-        // 平台净资产：统一通过 LedgerContract 查询，不直接读 wallet 表
+        // 今日新增提现金额（单位：毫）
+        $todayWithdrawal = (int) (Withdrawal::query()
+            ->whereDate('created_at', today())
+            ->sum('amount') ?? 0);
+
+        // 今日订单分账总额（已支付订单金额，单位：毫）
+        $todayOrderSettlement = (int) (Order::query()
+            ->where('status', 'paid')
+            ->whereDate('paid_at', today())
+            ->sum('amount') ?? 0);
+
+        // 平台净资产：统一通过 LedgerContract 查询
         $netAsset = (int) ($this->ledger->balance('platform', 0, 'platform') ?? 0);
 
         // 待处理提现数量
@@ -44,23 +58,28 @@ final class AdminFinanceController extends Controller
             ->count() ?? 0);
 
         return view('admin.finance.index', [
-            'totalRecharge'      => $totalRecharge,
-            'todayRecharge'      => $todayRecharge,
-            'netAsset'           => $netAsset,
-            'pendingWithdrawals' => $pendingWithdrawals,
+            'totalRecharge'       => $totalRecharge,
+            'todayRecharge'       => $todayRecharge,
+            'todayWithdrawal'     => $todayWithdrawal,
+            'todayOrderSettlement' => $todayOrderSettlement,
+            'netAsset'            => $netAsset,
+            'pendingWithdrawals'  => $pendingWithdrawals,
         ]);
     }
 
     /**
-     * 充值流水（分页，预加载用户信息）。
+     * 充值流水（分页，预加载用户信息，支持日期筛选）。
      */
-    public function recharges(): View
+    public function recharges(Request $request): View
     {
         $transactions = WalletTransaction::query()
             ->with(['wallet.user' => fn ($q) => $q->select('id', 'name', 'email')])
             ->where('type', 'recharge')
+            ->when($request->filled('start_date'), fn ($q) => $q->whereDate('created_at', '>=', $request->query('start_date')))
+            ->when($request->filled('end_date'), fn ($q) => $q->whereDate('created_at', '<=', $request->query('end_date')))
             ->orderByDesc('id')
-            ->paginate(20);
+            ->paginate(20)
+            ->appends($request->only(['start_date', 'end_date']));
 
         $rows = $transactions->getCollection()->map(fn ($t): array => [
             $t->id,
@@ -79,14 +98,17 @@ final class AdminFinanceController extends Controller
     }
 
     /**
-     * 提现列表（分页，预加载用户信息）。
+     * 提现列表（分页，预加载用户信息，支持日期筛选）。
      */
-    public function withdrawals(): View
+    public function withdrawals(Request $request): View
     {
         $withdrawals = Withdrawal::query()
             ->with(['user' => fn ($q) => $q->select('id', 'name', 'email')])
+            ->when($request->filled('start_date'), fn ($q) => $q->whereDate('created_at', '>=', $request->query('start_date')))
+            ->when($request->filled('end_date'), fn ($q) => $q->whereDate('created_at', '<=', $request->query('end_date')))
             ->orderByDesc('id')
-            ->paginate(20);
+            ->paginate(20)
+            ->appends($request->only(['start_date', 'end_date']));
 
         $rows = $withdrawals->getCollection()->map(fn ($w): array => [
             $w->id,
@@ -105,15 +127,76 @@ final class AdminFinanceController extends Controller
     }
 
     /**
+     * 导出充值流水 CSV。
+     */
+    public function exportRecharges(Request $request): StreamedResponse
+    {
+        $fileName = 'recharges_' . now()->format('Ymd') . '.csv';
+
+        $transactions = WalletTransaction::query()
+            ->with(['wallet.user' => fn ($q) => $q->select('id', 'name', 'email')])
+            ->where('type', 'recharge')
+            ->when($request->filled('start_date'), fn ($q) => $q->whereDate('created_at', '>=', $request->query('start_date')))
+            ->when($request->filled('end_date'), fn ($q) => $q->whereDate('created_at', '<=', $request->query('end_date')))
+            ->orderByDesc('id')
+            ->get();
+
+        return response()->streamDownload(function () use ($transactions): void {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['时间', '用户邮箱', '交易号', '金额（元）', '类型']);
+
+            foreach ($transactions as $t) {
+                fputcsv($handle, [
+                    $t->created_at ?? '',
+                    $t->wallet->user->email ?? '',
+                    $t->out_trade_no ?? '',
+                    number_format($t->amount / 1000, 2),
+                    $t->type,
+                ]);
+            }
+
+            fclose($handle);
+        }, $fileName);
+    }
+
+    /**
+     * 导出提现流水 CSV。
+     */
+    public function exportWithdrawals(Request $request): StreamedResponse
+    {
+        $fileName = 'withdrawals_' . now()->format('Ymd') . '.csv';
+
+        $withdrawals = Withdrawal::query()
+            ->with(['user' => fn ($q) => $q->select('id', 'name', 'email')])
+            ->when($request->filled('start_date'), fn ($q) => $q->whereDate('created_at', '>=', $request->query('start_date')))
+            ->when($request->filled('end_date'), fn ($q) => $q->whereDate('created_at', '<=', $request->query('end_date')))
+            ->orderByDesc('id')
+            ->get();
+
+        return response()->streamDownload(function () use ($withdrawals): void {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['时间', '用户邮箱', '提现单号', '金额（元）', '状态']);
+
+            foreach ($withdrawals as $w) {
+                fputcsv($handle, [
+                    $w->created_at ?? '',
+                    $w->user->email ?? '',
+                    (string) $w->id,
+                    number_format($w->amount / 1000, 2),
+                    $w->status,
+                ]);
+            }
+
+            fclose($handle);
+        }, $fileName);
+    }
+
+    /**
      * 审核通过提现（第一步：核对通过，不扣冻结款）。
-     *
-     * 并发安全：事务 + lockForUpdate 行锁，且仅允许 pending 状态通过，
-     * 防止财务人员重复点击造成重复打款。
      */
     public function approveWithdrawal(int $id): RedirectResponse
     {
         $withdrawal = DB::transaction(function () use ($id): Withdrawal {
-            /** @var Withdrawal|null $locked */
             $locked = Withdrawal::query()
                 ->whereKey($id)
                 ->lockForUpdate()
@@ -144,19 +227,15 @@ final class AdminFinanceController extends Controller
 
         return redirect()
             ->route('admin.finance.withdrawals')
-            ->with('success', "提现单 #{$withdrawal->id} 已核对通过，请完成线下转账后点击『确认已转账』。");
+            ->with('success', "提现单 #{$withdrawal->id} 已核对通过，请完成线下转账后点击『确认已打款』。");
     }
 
     /**
-     * 确认已转账（第二步：真实打款完成，扣除用户冻结款）。
-     *
-     * 并发安全：事务 + lockForUpdate 行锁，且仅允许 approved 状态执行，
-     * 通过 LedgerContract 原子扣减用户 frozen 账户，防止重复扣款。
+     * 确认已打款（第二步：真实打款完成，扣除用户冻结款）。
      */
     public function markPaid(int $id): RedirectResponse
     {
         $withdrawal = DB::transaction(function () use ($id): Withdrawal {
-            /** @var Withdrawal|null $locked */
             $locked = Withdrawal::query()
                 ->whereKey($id)
                 ->lockForUpdate()
@@ -167,10 +246,9 @@ final class AdminFinanceController extends Controller
             }
 
             if ($locked->status !== Withdrawal::STATUS_APPROVED) {
-                throw new \RuntimeException("提现单 #{$id} 当前状态为 {$locked->status}，仅 approved 状态可确认已转账。");
+                throw new \RuntimeException("提现单 #{$id} 当前状态为 {$locked->status}，仅 approved 状态可确认已打款。");
             }
 
-            // 通过 LedgerContract 原子扣除用户冻结款（悲观锁 + 余额校验）
             $this->ledger->debit(
                 'user',
                 (int) $locked->user_id,
@@ -196,6 +274,6 @@ final class AdminFinanceController extends Controller
 
         return redirect()
             ->route('admin.finance.withdrawals')
-            ->with('success', "提现单 #{$withdrawal->id} 已确认转账并扣除冻结款。");
+            ->with('success', "提现单 #{$withdrawal->id} 已确认打款并扣除冻结款。");
     }
 }
