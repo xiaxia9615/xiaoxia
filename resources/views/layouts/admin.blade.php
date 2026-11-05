@@ -40,6 +40,14 @@
                               title="待实现">{{ $item['label'] }}</span>
                     @endif
                 @endforeach
+                @if(auth()->user() && (auth()->user()->is_super_admin || auth()->user()->is_finance))
+                    @if(Route::has('admin.finance.index'))
+                        <a href="{{ route('admin.finance.index') }}"
+                           class="flex items-center px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.finance.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-100' }}">
+                            财务中心
+                        </a>
+                    @endif
+                @endif
             </nav>
         </aside>
 

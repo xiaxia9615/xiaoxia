@@ -25,6 +25,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'is_finance' => 'boolean',
+            'is_super_admin' => 'boolean',
             'is_active' => 'boolean',
             'is_developer' => 'boolean',
             'developer_status' => DeveloperStatus::class,

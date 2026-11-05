@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureIsFinance;
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\ThrottleByUserOrIp;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
+            'finance' => EnsureIsFinance::class,
             'active' => EnsureUserIsActive::class,
             'throttle.user_or_ip' => ThrottleByUserOrIp::class,
         ]);

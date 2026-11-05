@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminAiProviderController;
 use App\Http\Controllers\Admin\AdminApiKeyController;
 use App\Http\Controllers\Admin\AdminDeveloperController;
+use App\Http\Controllers\Admin\AdminFinanceController;
 use App\Http\Controllers\Admin\AdminLedgerController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminProductController;
@@ -69,4 +70,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // 商品管理
     Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
     Route::post('/products/{id}/force-archive', [AdminProductController::class, 'forceArchive'])->whereNumber('id')->name('products.forceArchive');
+
+});
+
+// 财务中心（独立路由组：仅超级管理员与财务人员可访问，不经过 admin 中间件）
+Route::middleware(['auth', 'finance'])->prefix('admin/finance')->name('admin.finance.')->group(function (): void {
+    Route::get('/', [AdminFinanceController::class, 'index'])->name('index');
+    Route::get('/recharges', [AdminFinanceController::class, 'recharges'])->name('recharges');
+    Route::get('/withdrawals', [AdminFinanceController::class, 'withdrawals'])->name('withdrawals');
+    Route::post('/withdrawals/{id}/approve', [AdminFinanceController::class, 'approveWithdrawal'])
+        ->whereNumber('id')->name('withdrawals.approve');
+    Route::post('/withdrawals/{id}/mark-paid', [AdminFinanceController::class, 'markPaid'])
+        ->whereNumber('id')->name('withdrawals.mark-paid');
 });
