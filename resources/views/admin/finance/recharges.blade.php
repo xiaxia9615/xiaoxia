@@ -8,7 +8,6 @@
             <h2 class="text-lg font-semibold text-slate-900">充值流水</h2>
             <div class="flex items-center gap-3">
                 <a href="{{ route('admin.finance.index') }}" class="text-sm text-indigo-600 hover:text-indigo-800">财务中心</a>
-                <a href="{{ route('admin.finance.recharges.export', request()->only(['start_date', 'end_date'])) }}" class="text-sm text-emerald-600 hover:text-emerald-800">导出 CSV</a>
                 <span class="text-sm text-slate-500">共 {{ $transactions->total() }} 条</span>
             </div>
         </div>
@@ -20,7 +19,8 @@
             <label class="text-sm text-slate-500">结束日期</label>
             <input type="date" name="end_date" value="{{ request('end_date') }}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm">
             <button type="submit" class="rounded-md bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-700">筛选</button>
-            <a href="{{ route('admin.finance.recharges') }}" class="text-sm text-slate-500 hover:text-slate-700">重置</a>
+            <a href="{{ url()->current() }}" class="text-sm text-slate-500 hover:text-slate-700">重置</a>
+            <a href="{{ route('admin.finance.recharges.export', request()->only(['start_date', 'end_date'])) }}" class="ml-auto rounded-md bg-green-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-green-700">导出 CSV</a>
         </form>
 
         <x-table :headers="['ID', '交易号', '用户', '邮箱', '金额（元）', '类型', '时间']" :rows="$rows" empty="暂无充值记录" />

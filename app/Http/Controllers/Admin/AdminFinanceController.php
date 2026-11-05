@@ -79,7 +79,7 @@ final class AdminFinanceController extends Controller
             ->when($request->filled('end_date'), fn ($q) => $q->whereDate('created_at', '<=', $request->query('end_date')))
             ->orderByDesc('id')
             ->paginate(20)
-            ->appends($request->only(['start_date', 'end_date']));
+            ->appends($request->all());
 
         $rows = $transactions->getCollection()->map(fn ($t): array => [
             $t->id,
@@ -108,7 +108,7 @@ final class AdminFinanceController extends Controller
             ->when($request->filled('end_date'), fn ($q) => $q->whereDate('created_at', '<=', $request->query('end_date')))
             ->orderByDesc('id')
             ->paginate(20)
-            ->appends($request->only(['start_date', 'end_date']));
+            ->appends($request->all());
 
         $rows = $withdrawals->getCollection()->map(fn ($w): array => [
             $w->id,

@@ -8,7 +8,6 @@
             <h2 class="text-lg font-semibold text-slate-900">提现管理</h2>
             <div class="flex items-center gap-3">
                 <a href="{{ route('admin.finance.index') }}" class="text-sm text-indigo-600 hover:text-indigo-800">财务中心</a>
-                <a href="{{ route('admin.finance.withdrawals.export', request()->only(['start_date', 'end_date'])) }}" class="text-sm text-emerald-600 hover:text-emerald-800">导出 CSV</a>
                 <span class="text-sm text-slate-500">共 {{ $withdrawals->total() }} 条</span>
             </div>
         </div>
@@ -31,7 +30,8 @@
             <label class="text-sm text-slate-500">结束日期</label>
             <input type="date" name="end_date" value="{{ request('end_date') }}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm">
             <button type="submit" class="rounded-md bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-700">筛选</button>
-            <a href="{{ route('admin.finance.withdrawals') }}" class="text-sm text-slate-500 hover:text-slate-700">重置</a>
+            <a href="{{ url()->current() }}" class="text-sm text-slate-500 hover:text-slate-700">重置</a>
+            <a href="{{ route('admin.finance.withdrawals.export', request()->only(['start_date', 'end_date'])) }}" class="ml-auto rounded-md bg-green-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-green-700">导出 CSV</a>
         </form>
 
         <div class="bg-white rounded-lg border border-slate-200 overflow-x-auto">
