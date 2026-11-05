@@ -70,10 +70,17 @@
                             <td class="px-4 py-3 text-slate-500">{{ $w->created_at ?? '-' }}</td>
                             <td class="px-4 py-3">
                                 @if ($w->status === \App\Models\Withdrawal::STATUS_PENDING)
-                                    <form method="POST" action="{{ route('admin.finance.withdrawals.approve', $w->id) }}" onsubmit="return confirm('确认核对通过提现单 #{{ $w->id }}（¥ {{ number_format($w->amount / 1000, 2) }}）？此操作不会扣款。');">
-                                        @csrf
-                                        <button type="submit" class="text-sm text-indigo-600 hover:text-indigo-800">核对通过</button>
-                                    </form>
+                                    <div class="flex items-center gap-2">
+                                        <form method="POST" action="{{ route('admin.finance.withdrawals.approve', $w->id) }}" onsubmit="return confirm('确认核对通过提现单 #{{ $w->id }}（¥ {{ number_format($w->amount / 1000, 2) }}）？此操作不会扣款。');">
+                                            @csrf
+                                            <button type="submit" class="text-sm text-indigo-600 hover:text-indigo-800">核对通过</button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.finance.withdrawals.reject', $w->id) }}" class="inline flex items-center gap-1" onsubmit="return confirm('确认驳回该提现？将退回冻结金额。');">
+                                            @csrf
+                                            <input type="text" name="reject_reason" required placeholder="填驳回原因" class="text-xs border border-slate-300 rounded px-1 py-0.5">
+                                            <button type="submit" class="text-sm text-rose-600 hover:text-rose-800">驳回</button>
+                                        </form>
+                                    </div>
                                 @elseif($w->status === \App\Models\Withdrawal::STATUS_APPROVED)
                                     <form method="POST" action="{{ route('admin.finance.withdrawals.mark-paid', $w->id) }}" onsubmit="return confirm('⚠️ 确认已线下完成转账？点击后将实际扣除用户冻结款 ¥ {{ number_format($w->amount / 1000, 2) }}，请谨慎操作！');">
                                         @csrf
