@@ -9,10 +9,10 @@ use App\Models\Withdrawal;
 use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Order\Models\Order;
 use App\Modules\Wallet\Models\WalletTransaction;
+use App\Modules\Wallet\Services\WithdrawalService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -20,6 +20,7 @@ final class AdminFinanceController extends Controller
 {
     public function __construct(
         private readonly LedgerContract $ledger,
+        private readonly WithdrawalService $withdrawalService,
     ) {}
 
     /**
@@ -196,34 +197,7 @@ final class AdminFinanceController extends Controller
      */
     public function approveWithdrawal(int $id): RedirectResponse
     {
-        $withdrawal = DB::transaction(function () use ($id): Withdrawal {
-            $locked = Withdrawal::query()
-                ->whereKey($id)
-                ->lockForUpdate()
-                ->first();
-
-            if ($locked === null) {
-                abort(404, '提现记录不存在。');
-            }
-
-            if ($locked->status !== Withdrawal::STATUS_PENDING) {
-                throw new \RuntimeException("提现单 #{$id} 当前状态为 {$locked->status}，仅 pending 状态可核对通过。");
-            }
-
-            $locked->forceFill([
-                'status'     => Withdrawal::STATUS_APPROVED,
-                'audited_at' => now(),
-            ])->save();
-
-            return $locked;
-        });
-
-        Log::info('finance.withdrawal.approved', [
-            'withdrawal_id' => $withdrawal->id,
-            'user_id'       => $withdrawal->user_id,
-            'amount'        => $withdrawal->amount,
-            'auditor_id'    => auth()->id(),
-        ]);
+        $withdrawal = $this->withdrawalService->approve($id, (int) auth()->id());
 
         return redirect()
             ->route('admin.finance.withdrawals')
@@ -235,45 +209,30 @@ final class AdminFinanceController extends Controller
      */
     public function markPaid(int $id): RedirectResponse
     {
-        $withdrawal = DB::transaction(function () use ($id): Withdrawal {
-            $locked = Withdrawal::query()
-                ->whereKey($id)
-                ->lockForUpdate()
-                ->first();
-
-            if ($locked === null) {
-                abort(404, '提现记录不存在。');
-            }
-
-            if ($locked->status !== Withdrawal::STATUS_APPROVED) {
-                throw new \RuntimeException("提现单 #{$id} 当前状态为 {$locked->status}，仅 approved 状态可确认已打款。");
-            }
-
-            $this->ledger->debit(
-                'user',
-                (int) $locked->user_id,
-                'frozen',
-                (int) $locked->amount,
-                'withdrawal_paid',
-                (int) $locked->id,
-            );
-
-            $locked->forceFill([
-                'status' => Withdrawal::STATUS_PAID,
-            ])->save();
-
-            return $locked;
-        });
-
-        Log::info('finance.withdrawal.paid', [
-            'withdrawal_id' => $withdrawal->id,
-            'user_id'       => $withdrawal->user_id,
-            'amount'        => $withdrawal->amount,
-            'operator_id'   => auth()->id(),
-        ]);
+        $withdrawal = $this->withdrawalService->markPaid($id, (int) auth()->id());
 
         return redirect()
             ->route('admin.finance.withdrawals')
             ->with('success', "提现单 #{$withdrawal->id} 已确认打款并扣除冻结款。");
+    }
+
+    /**
+     * 驳回提现（退回冻结款到可用余额，状态置为 rejected）。
+     */
+    public function reject(Request $request, int $id): RedirectResponse
+    {
+        $validated = $request->validate([
+            'reject_reason' => ['required', 'string', 'max:255'],
+        ]);
+
+        $withdrawal = $this->withdrawalService->reject(
+            $id,
+            $validated['reject_reason'],
+            (int) auth()->id(),
+        );
+
+        return redirect()
+            ->route('admin.finance.withdrawals')
+            ->with('success', "提现单 #{$withdrawal->id} 已驳回，冻结款已退回可用余额。");
     }
 }

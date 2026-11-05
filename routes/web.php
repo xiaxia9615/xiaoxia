@@ -80,6 +80,8 @@ Route::middleware(['auth', 'finance'])->prefix('admin/finance')->name('admin.fin
         ->whereNumber('id')->name('withdrawals.approve');
     Route::post('/withdrawals/{id}/mark-paid', [AdminFinanceController::class, 'markPaid'])
         ->whereNumber('id')->name('withdrawals.mark-paid');
+    Route::post('/withdrawals/{id}/reject', [AdminFinanceController::class, 'reject'])
+        ->whereNumber('id')->name('withdrawals.reject');
     Route::get('/recharges/export', [AdminFinanceController::class, 'exportRecharges'])->name('recharges.export');
     Route::get('/withdrawals/export', [AdminFinanceController::class, 'exportWithdrawals'])->name('withdrawals.export');
 });
