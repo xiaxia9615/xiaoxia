@@ -15,12 +15,12 @@ Route::middleware('api')->prefix('api/v1/auth')->group(function (): void {
     });
 });
 
-// 开发者入驻：普通用户申请
-Route::middleware('api')->prefix('api/v1/developers')->group(function (): void {
-    Route::post('/apply', [DeveloperController::class, 'apply'])->middleware('auth:sanctum');
-});
+// 开发者API（自营模式暂时关闭）
+// Route::middleware('api')->prefix('api/v1/developers')->group(function (): void {
+//     Route::post('/apply', [DeveloperController::class, 'apply'])->middleware('auth:sanctum');
+// });
 
-// 开发者入驻：管理员审核（独立分组，仅管理员可访问）
-Route::middleware(['api', 'auth:sanctum', 'admin'])->prefix('api/v1/admin/developers')->group(function (): void {
-    Route::post('/{id}/audit', [DeveloperController::class, 'audit'])->whereNumber('id');
-});
+// 开发者API（自营模式暂时关闭）
+// Route::middleware(['api', 'auth:sanctum', 'admin'])->prefix('api/v1/admin/developers')->group(function (): void {
+//     Route::post('/{id}/audit', [DeveloperController::class, 'audit'])->whereNumber('id');
+// });
