@@ -152,4 +152,130 @@ final class AdminFinanceTest extends TestCase
 
         $this->actingAs($finance)->post("/admin/finance/withdrawals/{$withdrawal->id}/mark-paid");
     }
+
+    // ─── 驳回提现：财务人员成功驳回 pending 提现并退回冻结款 ───
+    public function test_finance_user_can_reject_pending_withdrawal_and_refund_balance(): void
+    {
+        $finance = $this->makeUser(['is_finance' => true]);
+        $applicant = $this->makeUser();
+
+        \App\Modules\Wallet\Models\Wallet::create([
+            'user_id' => $applicant->id,
+            'balance' => 0,
+            'frozen_balance' => 10000,
+        ]);
+
+        $withdrawal = Withdrawal::create([
+            'user_id' => $applicant->id,
+            'amount' => 10000,
+            'status' => Withdrawal::STATUS_PENDING,
+        ]);
+
+        $res = $this->actingAs($finance)->post("/admin/finance/withdrawals/{$withdrawal->id}/reject", [
+            'reject_reason' => '信息不完整，请补充',
+        ]);
+
+        $res->assertRedirect(route('admin.finance.withdrawals'));
+
+        $fresh = $withdrawal->fresh();
+        $this->assertSame(Withdrawal::STATUS_REJECTED, $fresh->status);
+        $this->assertSame('信息不完整，请补充', $fresh->reject_reason);
+        $this->assertNotNull($fresh->rejected_at);
+        $this->assertSame($finance->id, $fresh->rejected_by);
+
+        $wallet = \App\Modules\Wallet\Models\Wallet::where('user_id', $applicant->id)->first();
+        $this->assertSame(10000, (int) $wallet->balance);
+        $this->assertSame(0, (int) $wallet->frozen_balance);
+    }
+
+    // ─── 驳回非 pending 状态提现被拦截 ───
+    public function test_reject_non_pending_withdrawal_fails(): void
+    {
+        $finance = $this->makeUser(['is_finance' => true]);
+        $applicant = $this->makeUser();
+
+        \App\Modules\Wallet\Models\Wallet::create([
+            'user_id' => $applicant->id,
+            'balance' => 0,
+            'frozen_balance' => 10000,
+        ]);
+
+        $withdrawal = Withdrawal::create([
+            'user_id' => $applicant->id,
+            'amount' => 10000,
+            'status' => Withdrawal::STATUS_APPROVED,
+        ]);
+
+        $this->withoutExceptionHandling();
+        $this->expectException(\RuntimeException::class);
+
+        $this->actingAs($finance)->post("/admin/finance/withdrawals/{$withdrawal->id}/reject", [
+            'reject_reason' => '测试驳回',
+        ]);
+    }
+
+    // ─── 普通管理员（非 finance）驳回提现返回 403 ───
+    public function test_regular_admin_cannot_reject_withdrawal(): void
+    {
+        $admin = $this->makeUser(['is_admin' => true]);
+        $applicant = $this->makeUser();
+
+        $withdrawal = Withdrawal::create([
+            'user_id' => $applicant->id,
+            'amount' => 10000,
+            'status' => Withdrawal::STATUS_PENDING,
+        ]);
+
+        $res = $this->actingAs($admin)->post("/admin/finance/withdrawals/{$withdrawal->id}/reject", [
+            'reject_reason' => '测试驳回',
+        ]);
+
+        $res->assertStatus(403);
+
+        $this->assertSame(
+            Withdrawal::STATUS_PENDING,
+            $withdrawal->fresh()->status,
+        );
+    }
+
+    // ─── 驳回时退款失败则事务回滚（状态不变，资金不变） ───
+    public function test_reject_is_atomic_when_refund_fails(): void
+    {
+        $finance = $this->makeUser(['is_finance' => true]);
+        $applicant = $this->makeUser();
+
+        // 钱包冻结余额为 0，退款时会因『冻结余额不足』抛异常
+        \App\Modules\Wallet\Models\Wallet::create([
+            'user_id' => $applicant->id,
+            'balance' => 0,
+            'frozen_balance' => 0,
+        ]);
+
+        $withdrawal = Withdrawal::create([
+            'user_id' => $applicant->id,
+            'amount' => 10000,
+            'status' => Withdrawal::STATUS_PENDING,
+        ]);
+
+        try {
+            $this->withoutExceptionHandling()
+                ->actingAs($finance)
+                ->post("/admin/finance/withdrawals/{$withdrawal->id}/reject", [
+                    'reject_reason' => '测试驳回',
+                ]);
+        } catch (\RuntimeException $e) {
+            // 预期异常：退款失败
+        }
+
+        // 事务回滚：状态仍为 pending
+        $this->assertSame(
+            Withdrawal::STATUS_PENDING,
+            $withdrawal->fresh()->status,
+        );
+
+        // 资金不变
+        $wallet = \App\Modules\Wallet\Models\Wallet::where('user_id', $applicant->id)->first();
+        $this->assertSame(0, (int) $wallet->balance);
+        $this->assertSame(0, (int) $wallet->frozen_balance);
+    }
 }
