@@ -27,7 +27,7 @@
                 <p class="mt-1 text-xs text-slate-400">今日充值金额</p>
             </div>
 
-            {{-- 平台净资产（LedgerContract::balance，单位：元） --}}
+            {{-- 平台净资产（单位：元） --}}
             <div class="bg-white rounded-lg border border-slate-200 p-6">
                 <p class="text-sm font-medium text-slate-500">平台净资产</p>
                 <p class="mt-2 text-3xl font-bold text-indigo-600">¥ {{ number_format($netAsset / 1000, 2) }}</p>
@@ -39,6 +39,25 @@
                 <p class="text-sm font-medium text-slate-500">待处理提现</p>
                 <p class="mt-2 text-3xl font-bold {{ $pendingWithdrawals > 0 ? 'text-amber-600' : 'text-slate-900' }}">{{ number_format($pendingWithdrawals) }}</p>
                 <p class="mt-1 text-xs text-slate-400">笔待审核提现申请</p>
+            </div>
+        </div>
+
+        {{-- 今日数据简报 --}}
+        <div class="bg-white rounded-lg border border-slate-200 p-6">
+            <h3 class="text-base font-semibold text-slate-900 mb-4">今日数据简报</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="rounded-lg bg-emerald-50 border border-emerald-100 p-4">
+                    <p class="text-sm text-emerald-600">今日新增充值</p>
+                    <p class="mt-1 text-2xl font-bold text-emerald-700">¥ {{ number_format($todayRecharge / 1000, 2) }}</p>
+                </div>
+                <div class="rounded-lg bg-amber-50 border border-amber-100 p-4">
+                    <p class="text-sm text-amber-600">今日新增提现</p>
+                    <p class="mt-1 text-2xl font-bold text-amber-700">¥ {{ number_format($todayWithdrawal / 1000, 2) }}</p>
+                </div>
+                <div class="rounded-lg bg-sky-50 border border-sky-100 p-4">
+                    <p class="text-sm text-sky-600">今日订单分账总额</p>
+                    <p class="mt-1 text-2xl font-bold text-sky-700">¥ {{ number_format($todayOrderSettlement / 1000, 2) }}</p>
+                </div>
             </div>
         </div>
     </div>
