@@ -19,7 +19,7 @@ interface LedgerContract
     /**
      * 记录一笔复式记账交易（多条分录在同一事务内原子写入）。
      *
-     * @param array<int, array{owner_type:string, owner_id:int, account_type:string, direction:string, amount:int}> $splits
+     * @param  array<int, array{owner_type:string, owner_id:int, account_type:string, direction:string, amount:int}>  $splits
      * @return string 交易ID（UUID）
      */
     public function record(string $bizType, int $bizId, array $splits): string;
@@ -32,8 +32,9 @@ interface LedgerContract
     /**
      * 原子扣减账户余额：事务内悲观锁锁定账户行，重算余额并校验充足性。
      *
-     * @throws \RuntimeException 账户不存在、扣减金额非法或余额不足
      * @return string 交易ID（UUID）
+     *
+     * @throws \RuntimeException 账户不存在、扣减金额非法或余额不足
      */
     public function debit(string $ownerType, int $ownerId, string $accountType, int $amount, string $bizType, int $bizId): string;
 }

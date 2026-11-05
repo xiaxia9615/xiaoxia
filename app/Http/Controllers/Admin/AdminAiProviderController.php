@@ -36,7 +36,7 @@ final class AdminAiProviderController extends Controller
 
         return view('admin.ai-providers.index', [
             'providers' => $providers,
-            'rows'     => $rows,
+            'rows' => $rows,
         ]);
     }
 
@@ -58,8 +58,8 @@ final class AdminAiProviderController extends Controller
 
         return view('admin.ai-providers.models', [
             'providerId' => $providerId,
-            'models'     => $models,
-            'rows'      => $rows,
+            'models' => $models,
+            'rows' => $rows,
         ]);
     }
 }

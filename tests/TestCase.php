@@ -20,8 +20,8 @@ abstract class TestCase extends BaseTestCase
         $app['env'] = 'testing';
 
         config([
-            'app.env'                              => 'testing',
-            'database.default'                     => 'sqlite',
+            'app.env' => 'testing',
+            'database.default' => 'sqlite',
             'database.connections.sqlite.database' => ':memory:',
         ]);
 

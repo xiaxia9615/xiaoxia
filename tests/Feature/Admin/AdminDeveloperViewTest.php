@@ -26,8 +26,8 @@ final class AdminDeveloperViewTest extends TestCase
     private function pendingDeveloper(): User
     {
         return User::factory()->create([
-            'is_admin'         => false,
-            'is_developer'     => false,
+            'is_admin' => false,
+            'is_developer' => false,
             'developer_status' => DeveloperStatus::Pending,
         ]);
     }

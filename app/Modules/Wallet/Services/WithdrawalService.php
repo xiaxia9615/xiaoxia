@@ -37,7 +37,7 @@ final class WithdrawalService
             }
 
             $locked->forceFill([
-                'status'     => Withdrawal::STATUS_APPROVED,
+                'status' => Withdrawal::STATUS_APPROVED,
                 'audited_at' => now(),
             ])->save();
 
@@ -46,9 +46,9 @@ final class WithdrawalService
 
         Log::info('finance.withdrawal.approved', [
             'withdrawal_id' => $withdrawal->id,
-            'user_id'       => $withdrawal->user_id,
-            'amount'        => $withdrawal->amount,
-            'auditor_id'    => $adminId,
+            'user_id' => $withdrawal->user_id,
+            'amount' => $withdrawal->amount,
+            'auditor_id' => $adminId,
         ]);
 
         return $withdrawal;
@@ -91,9 +91,9 @@ final class WithdrawalService
 
         Log::info('finance.withdrawal.paid', [
             'withdrawal_id' => $withdrawal->id,
-            'user_id'       => $withdrawal->user_id,
-            'amount'        => $withdrawal->amount,
-            'operator_id'   => $adminId,
+            'user_id' => $withdrawal->user_id,
+            'amount' => $withdrawal->amount,
+            'operator_id' => $adminId,
         ]);
 
         return $withdrawal;
@@ -122,10 +122,10 @@ final class WithdrawalService
 
             // 先更新状态，再退款；若退款抛异常则整个事务回滚
             $locked->forceFill([
-                'status'        => Withdrawal::STATUS_REJECTED,
+                'status' => Withdrawal::STATUS_REJECTED,
                 'reject_reason' => $reason,
-                'rejected_by'   => $adminId,
-                'rejected_at'   => now(),
+                'rejected_by' => $adminId,
+                'rejected_at' => now(),
             ])->save();
 
             $user = User::findOrFail($locked->user_id);
@@ -136,10 +136,10 @@ final class WithdrawalService
 
         Log::info('finance.withdrawal.rejected', [
             'withdrawal_id' => $withdrawal->id,
-            'user_id'       => $withdrawal->user_id,
-            'amount'        => $withdrawal->amount,
+            'user_id' => $withdrawal->user_id,
+            'amount' => $withdrawal->amount,
             'reject_reason' => $reason,
-            'operator_id'   => $adminId,
+            'operator_id' => $adminId,
         ]);
 
         return $withdrawal;

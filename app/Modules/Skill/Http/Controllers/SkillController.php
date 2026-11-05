@@ -81,6 +81,7 @@ final class SkillController
      * @bodyParam api_key string optional 第三方 API Key。Example: sk-xxx
      * @bodyParam request_template object optional 请求模板。
 
+     *
      * @response {"code": 0, "data": {"id": 1, "status": "draft"}}
      * @response 400 {"code": 1, "message": "仅认证开发者可创建技能"}
      */
@@ -170,6 +171,7 @@ final class SkillController
      * @group 技能生命周期（管理员）
      *
      * @urlParam id integer required 技能 ID。Example: 1
+     *
      * @bodyParam approve boolean required 是否通过审核。Example: true
      * @bodyParam note string optional 审核备注，最长 255 字符。Example: 内容合规
      *

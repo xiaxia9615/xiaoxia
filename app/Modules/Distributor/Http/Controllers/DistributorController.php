@@ -9,7 +9,6 @@ use App\Modules\User\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 final class DistributorController
 {
@@ -17,7 +16,9 @@ final class DistributorController
      * 绑定上级达人（一个用户仅可绑定一次，重复绑定返回 400）
      *
      * @group 分销管理
+     *
      * @authenticated
+     *
      * @bodyParam distributor_id int required 达人用户ID Example: 2
      */
     public function bind(Request $request): JsonResponse
@@ -64,6 +65,7 @@ final class DistributorController
      * 查询我的上级达人
      *
      * @group 分销管理
+     *
      * @authenticated
      */
     public function show(Request $request): JsonResponse

@@ -24,13 +24,13 @@ final class AdminAiProviderTest extends TestCase
     private function makeProvider(): AiProvider
     {
         return AiProvider::create([
-            'name'              => 'test-provider',
-            'display_name'      => '测试供应商',
-            'base_url'          => 'https://api.example.com/v1',
-            'driver'            => 'openai',
-            'model_name'        => 'gpt-test',
-            'api_key'           => self::FULL_KEY,
-            'enabled'           => true,
+            'name' => 'test-provider',
+            'display_name' => '测试供应商',
+            'base_url' => 'https://api.example.com/v1',
+            'driver' => 'openai',
+            'model_name' => 'gpt-test',
+            'api_key' => self::FULL_KEY,
+            'enabled' => true,
             'cost_per_1k_input' => 1,
             'cost_per_1k_output' => 2,
         ]);
@@ -65,20 +65,20 @@ final class AdminAiProviderTest extends TestCase
         $provider = $this->makeProvider();
 
         DB::table('ai_models')->insert([
-            'provider_id'         => $provider->id,
-            'name'                => 'gpt-4o',
-            'display_name'        => 'GPT-4o',
-            'input_price_per_1k'  => 5,
+            'provider_id' => $provider->id,
+            'name' => 'gpt-4o',
+            'display_name' => 'GPT-4o',
+            'input_price_per_1k' => 5,
             'output_price_per_1k' => 15,
-            'enabled'             => 1,
-            'created_at'          => now(),
-            'updated_at'          => now(),
+            'enabled' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         $this->actingAs($this->admin())
-             ->get("/admin/ai-providers/{$provider->id}/models")
-             ->assertOk()
-             ->assertSee('GPT-4o');
+            ->get("/admin/ai-providers/{$provider->id}/models")
+            ->assertOk()
+            ->assertSee('GPT-4o');
     }
 
     public function test_non_admin_forbidden(): void

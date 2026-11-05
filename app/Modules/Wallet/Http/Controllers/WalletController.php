@@ -20,7 +20,9 @@ final class WalletController
      * 查询钱包余额
      *
      * @group 钱包管理
+     *
      * @authenticated
+     *
      * @response {
      *  "code": 0,
      *  "data": {
@@ -46,8 +48,11 @@ final class WalletController
      * 冻结资金
      *
      * @group 钱包管理
+     *
      * @authenticated
+     *
      * @bodyParam amount int required 冻结金额（分） Example: 3000
+     *
      * @response 200 {
      *  "code": 0,
      *  "data": {
@@ -87,8 +92,11 @@ final class WalletController
      * 模拟充值
      *
      * @group 钱包管理
+     *
      * @authenticated
+     *
      * @bodyParam amount int required 充值金额（分） Example: 5000
+     *
      * @response 200 {
      *  "code": 0,
      *  "data": {

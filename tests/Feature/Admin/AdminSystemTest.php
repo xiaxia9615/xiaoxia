@@ -15,6 +15,7 @@ class AdminSystemTest extends TestCase
     {
         $admin = User::factory()->create();
         $admin->forceFill(['is_admin' => true, 'is_active' => 1, 'status' => 1])->save();
+
         return $admin;
     }
 
@@ -28,15 +29,15 @@ class AdminSystemTest extends TestCase
     {
         Http::fake();
 
-        $logFile = storage_path('logs/laravel-' . now()->format('Y-m-d') . '.log');
+        $logFile = storage_path('logs/laravel-'.now()->format('Y-m-d').'.log');
         $originalContent = file_exists($logFile) ? file_get_contents($logFile) : '';
-        
+
         // 修复：将恶意日志追加到文件末尾，而不是开头，确保页面能读到
-        $maliciousLog = PHP_EOL . '[2026-11-02 21:00:00] testing.INFO: <script>alert("xss")</script>';
-        file_put_contents($logFile, $originalContent . $maliciousLog);
+        $maliciousLog = PHP_EOL.'[2026-11-02 21:00:00] testing.INFO: <script>alert("xss")</script>';
+        file_put_contents($logFile, $originalContent.$maliciousLog);
 
         $response = $this->actingAs($this->admin())->get('/admin/system/logs');
-        
+
         $response->assertOk();
         // 严格断言：HTML 中绝对不能出现未转义的 script 标签
         $response->assertDontSee('<script>alert("xss")</script>', false);

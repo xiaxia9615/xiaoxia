@@ -27,7 +27,7 @@ final class AdminSkillTest extends TestCase
 
         $skill = SkillDetail::factory()->create([
             'product_id' => $product->id,
-            'api_key'    => $apiKey,
+            'api_key' => $apiKey,
         ]);
 
         return $skill->id;

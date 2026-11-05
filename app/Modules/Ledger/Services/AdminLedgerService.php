@@ -54,8 +54,8 @@ final class AdminLedgerService
     public function stats(): array
     {
         return [
-            'accounts'      => DB::table('ledger_accounts')->count(),
-            'entries'       => DB::table('ledger_entries')->count(),
+            'accounts' => DB::table('ledger_accounts')->count(),
+            'entries' => DB::table('ledger_entries')->count(),
             'total_balance' => (int) (DB::table('ledger_entries')
                 ->selectRaw("COALESCE(SUM(CASE WHEN direction = 'credit' THEN amount ELSE -amount END), 0) as t")
                 ->value('t') ?? 0),

@@ -45,6 +45,7 @@ final class AdminSkillService
                 $skill->api_key ? Crypt::decryptString($skill->api_key) : null
             );
             unset($skill->api_key);
+
             return $skill;
         });
 
@@ -92,7 +93,7 @@ final class AdminSkillService
             ->where('sd.id', $id)
             ->first();
 
-        if (!$skill) {
+        if (! $skill) {
             return null;
         }
 
@@ -116,9 +117,9 @@ final class AdminSkillService
         $callStats = $this->apiCalls->callStats();
 
         return [
-            'skills'        => DB::table('skill_details')->count(),
-            'calls_total'   => $callStats['total'],
-            'calls_today'   => $callStats['today'],
+            'skills' => DB::table('skill_details')->count(),
+            'calls_total' => $callStats['total'],
+            'calls_today' => $callStats['today'],
             'calls_success' => $callStats['success'],
         ];
     }
@@ -131,6 +132,7 @@ final class AdminSkillService
         if (strlen($key) <= 8) {
             return '****';
         }
-        return substr($key, 0, 3) . '****' . substr($key, -4);
+
+        return substr($key, 0, 3).'****'.substr($key, -4);
     }
 }

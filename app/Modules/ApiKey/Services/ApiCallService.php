@@ -43,6 +43,7 @@ final class ApiCallService implements ApiCallContract
         if ($productIds === []) {
             return [];
         }
+
         return ApiCall::query()
             ->whereIn('product_id', $productIds)
             ->selectRaw('product_id, COUNT(*) as cnt')
@@ -60,14 +61,15 @@ final class ApiCallService implements ApiCallContract
         if ($statusCode !== null) {
             $query->where('status_code', $statusCode);
         }
+
         return $query->paginate($perPage);
     }
 
     public function callStats(): array
     {
         return [
-            'total'   => ApiCall::count(),
-            'today'   => ApiCall::query()->whereDate('created_at', today())->count(),
+            'total' => ApiCall::count(),
+            'today' => ApiCall::query()->whereDate('created_at', today())->count(),
             'success' => ApiCall::query()->where('status_code', 200)->count(),
         ];
     }

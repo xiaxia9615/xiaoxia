@@ -1,5 +1,7 @@
 <?php
+
 namespace Tests\Feature\Distributor;
+
 use App\Models\User;
 use App\Modules\Distributor\Models\DistributorRelation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,7 +21,7 @@ class DistributorTest extends TestCase
         $this->actingAs($user, 'sanctum')
             ->postJson('/api/v1/distributor/bind', ['distributor_id' => $distributor->id])
             ->assertOk();
-            
+
         $this->assertDatabaseHas('distributor_relations', ['user_id' => $user->id, 'distributor_id' => $distributor->id]);
     }
 

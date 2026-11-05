@@ -31,7 +31,7 @@ interface ApiCallContract
      * 按产品 ID 批量统计调用次数
      *
      * @param  array<int, int>  $productIds
-     * @return array<int, int>  product_id => 调用次数（无记录的产品不出现在结果中）
+     * @return array<int, int> product_id => 调用次数（无记录的产品不出现在结果中）
      */
     public function countsByProduct(array $productIds): array;
 

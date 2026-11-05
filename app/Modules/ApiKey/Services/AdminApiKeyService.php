@@ -23,7 +23,7 @@ final class AdminApiKeyService
 
         if ($affected) {
             Log::info('admin revoked api key', [
-                'key_id'     => $id,
+                'key_id' => $id,
                 'by_user_id' => auth()->id(),
             ]);
         }

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Modules\User\Services;
 
 use App\Models\User;
-use App\Modules\User\Dto\UserDto;
 use App\Modules\User\Contracts\Events\UserRegistered;
+use App\Modules\User\Dto\UserDto;
 use Illuminate\Support\Facades\Hash;
 use RuntimeException;
 

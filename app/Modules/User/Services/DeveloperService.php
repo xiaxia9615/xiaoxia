@@ -18,7 +18,7 @@ class DeveloperService
     /**
      * 用户申请成为开发者（状态变更为 PENDING）
      *
-     * @param array{reason?: string} $data
+     * @param  array{reason?: string}  $data
      * @return array{user_id: int, developer_status: string}
      */
     public function apply(User $user, array $data): array

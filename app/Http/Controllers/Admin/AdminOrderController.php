@@ -43,7 +43,7 @@ class AdminOrderController extends Controller
      */
     public function refund(Request $request, int $id)
     {
-        $refunded = DB::transaction(function () use ($request, $id): Order {
+        $refunded = DB::transaction(function () use ($id): Order {
             /** @var Order|null $order */
             $order = Order::query()
                 ->with('user')

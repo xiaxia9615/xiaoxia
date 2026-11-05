@@ -17,6 +17,7 @@ class DevelopmentSeeder extends Seeder
     {
         if (app()->environment('production')) {
             $this->command->warn('跳过: 生产环境不执行测试数据 seeder');
+
             return;
         }
 

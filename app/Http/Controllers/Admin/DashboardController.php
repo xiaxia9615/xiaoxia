@@ -22,9 +22,9 @@ class DashboardController extends Controller
         );
 
         return view('admin.dashboard', [
-            'health'       => $service->systemHealth(),
-            'counts'       => $service->tableCounts(),
-            'services'     => $service->serviceStatus(),
+            'health' => $service->systemHealth(),
+            'counts' => $service->tableCounts(),
+            'services' => $service->serviceStatus(),
             'activityRows' => $activityRows,
         ]);
     }

@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Modules\Wallet\Services;
 
-use App\Modules\User\Models\User;
 use App\Modules\Ledger\Contracts\LedgerContract;
+use App\Modules\User\Models\User;
 use App\Modules\Wallet\Models\Wallet;
 use App\Modules\Wallet\Models\WalletTransaction;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -31,7 +32,7 @@ final class WalletService
                     'amount' => $amount,
                     'description' => '余额充值',
                 ]);
-            } catch (\Illuminate\Database\QueryException $e) {
+            } catch (QueryException $e) {
                 if ($e->getCode() === '23000') {
                     return ['status' => 'already_processed', 'message' => '订单已处理'];
                 }
@@ -66,7 +67,7 @@ final class WalletService
                     'amount' => $amount,
                     'description' => '余额扣除',
                 ]);
-            } catch (\Illuminate\Database\QueryException $e) {
+            } catch (QueryException $e) {
                 if ($e->getCode() === '23000') {
                     return ['status' => 'already_processed', 'message' => '订单已处理'];
                 }

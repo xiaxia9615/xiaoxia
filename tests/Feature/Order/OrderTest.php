@@ -3,10 +3,10 @@
 namespace Tests\Feature\Order;
 
 use App\Models\User;
-use App\Modules\Order\Models\Order;
-use App\Modules\Order\Enums\OrderStatus;
-use App\Modules\Product\Models\Product;
 use App\Modules\Ledger\Contracts\LedgerContract;
+use App\Modules\Order\Enums\OrderStatus;
+use App\Modules\Order\Models\Order;
+use App\Modules\Product\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -47,8 +47,8 @@ class OrderTest extends TestCase
         $product->update(['status' => 0]);
 
         $this->actingAs($buyer, 'sanctum')
-             ->postJson('/api/v1/orders', ['product_id' => $product->id])
-             ->assertStatus(400);
+            ->postJson('/api/v1/orders', ['product_id' => $product->id])
+            ->assertStatus(400);
     }
 
     public function test_create_order_success(): void
@@ -59,7 +59,7 @@ class OrderTest extends TestCase
         $product = $this->product($seller);
 
         $res = $this->actingAs($buyer, 'sanctum')
-             ->postJson('/api/v1/orders', ['product_id' => $product->id]);
+            ->postJson('/api/v1/orders', ['product_id' => $product->id]);
 
         $res->assertOk();
         $this->assertDatabaseHas('orders', [
@@ -86,8 +86,8 @@ class OrderTest extends TestCase
         ]);
 
         $this->actingAs($buyer, 'sanctum')
-             ->postJson("/api/v1/orders/{$order->id}/pay")
-             ->assertOk();
+            ->postJson("/api/v1/orders/{$order->id}/pay")
+            ->assertOk();
 
         $this->assertEquals(OrderStatus::Paid, $order->fresh()->status);
     }
@@ -107,8 +107,8 @@ class OrderTest extends TestCase
         ]);
 
         $this->actingAs($buyer, 'sanctum')
-             ->postJson("/api/v1/orders/{$order->id}/pay")
-             ->assertStatus(400);
+            ->postJson("/api/v1/orders/{$order->id}/pay")
+            ->assertStatus(400);
     }
 
     public function test_pay_order_idempotent(): void

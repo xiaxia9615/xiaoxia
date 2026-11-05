@@ -6,6 +6,8 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Models\Withdrawal;
+use App\Modules\Ledger\Contracts\LedgerContract;
+use App\Modules\Wallet\Models\Wallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -122,7 +124,7 @@ final class AdminFinanceTest extends TestCase
         ]);
 
         // 预置用户 frozen 账户余额（通过 LedgerContract 记账）
-        app(\App\Modules\Ledger\Contracts\LedgerContract::class)->record('test_setup', 0, [
+        app(LedgerContract::class)->record('test_setup', 0, [
             ['owner_type' => 'user', 'owner_id' => $applicant->id, 'account_type' => 'frozen', 'direction' => 'credit', 'amount' => 10000],
         ]);
 
@@ -132,7 +134,7 @@ final class AdminFinanceTest extends TestCase
         $this->assertSame(Withdrawal::STATUS_PAID, $withdrawal->fresh()->status);
 
         // 冻结款已被扣除，余额归零
-        $balance = app(\App\Modules\Ledger\Contracts\LedgerContract::class)->balance('user', $applicant->id, 'frozen');
+        $balance = app(LedgerContract::class)->balance('user', $applicant->id, 'frozen');
         $this->assertSame(0, $balance);
     }
 
@@ -159,7 +161,7 @@ final class AdminFinanceTest extends TestCase
         $finance = $this->makeUser(['is_finance' => true]);
         $applicant = $this->makeUser();
 
-        \App\Modules\Wallet\Models\Wallet::create([
+        Wallet::create([
             'user_id' => $applicant->id,
             'balance' => 0,
             'frozen_balance' => 10000,
@@ -183,7 +185,7 @@ final class AdminFinanceTest extends TestCase
         $this->assertNotNull($fresh->rejected_at);
         $this->assertSame($finance->id, $fresh->rejected_by);
 
-        $wallet = \App\Modules\Wallet\Models\Wallet::where('user_id', $applicant->id)->first();
+        $wallet = Wallet::where('user_id', $applicant->id)->first();
         $this->assertSame(10000, (int) $wallet->balance);
         $this->assertSame(0, (int) $wallet->frozen_balance);
     }
@@ -194,7 +196,7 @@ final class AdminFinanceTest extends TestCase
         $finance = $this->makeUser(['is_finance' => true]);
         $applicant = $this->makeUser();
 
-        \App\Modules\Wallet\Models\Wallet::create([
+        Wallet::create([
             'user_id' => $applicant->id,
             'balance' => 0,
             'frozen_balance' => 10000,
@@ -245,7 +247,7 @@ final class AdminFinanceTest extends TestCase
         $applicant = $this->makeUser();
 
         // 钱包冻结余额为 0，退款时会因『冻结余额不足』抛异常
-        \App\Modules\Wallet\Models\Wallet::create([
+        Wallet::create([
             'user_id' => $applicant->id,
             'balance' => 0,
             'frozen_balance' => 0,
@@ -274,7 +276,7 @@ final class AdminFinanceTest extends TestCase
         );
 
         // 资金不变
-        $wallet = \App\Modules\Wallet\Models\Wallet::where('user_id', $applicant->id)->first();
+        $wallet = Wallet::where('user_id', $applicant->id)->first();
         $this->assertSame(0, (int) $wallet->balance);
         $this->assertSame(0, (int) $wallet->frozen_balance);
     }
