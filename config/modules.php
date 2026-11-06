@@ -28,7 +28,7 @@ return [
         'Skill' => ['User', 'Product', 'ApiKey', 'Ledger', 'AiProvider'],
         'Team' => ['User', 'Ledger'],
         'System' => ['User', 'Product', 'ApiKey', 'Skill'],
-        'Wallet' => ['User', 'Ledger'],
+        'Wallet' => ['User', 'Ledger', 'Payment'],
         'Payment' => [],
         'Order' => ['User', 'Product', 'Ledger', 'Distributor'],
         'Distributor' => ['User'],

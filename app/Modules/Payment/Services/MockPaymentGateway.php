@@ -18,4 +18,32 @@ final class MockPaymentGateway implements PaymentGatewayInterface
 
         return true;
     }
+
+    public function createPayment(string $orderNo, int $amountInCents, string $subject): array
+    {
+        Log::info('MockPaymentGateway createPayment', [
+            'order_no' => $orderNo,
+            'amount_in_cents' => $amountInCents,
+            'subject' => $subject,
+        ]);
+
+        return [
+            'pay_url' => 'https://mock.example.com/pay/'.$orderNo,
+            'order_no' => $orderNo,
+            'amount_in_cents' => $amountInCents,
+        ];
+    }
+
+    public function verifyNotify(array $payload): array
+    {
+        Log::info('MockPaymentGateway verifyNotify', [
+            'payload' => $payload,
+        ]);
+
+        return [
+            'verified' => true,
+            'order_no' => $payload['order_no'] ?? '',
+            'amount_in_cents' => $payload['amount_in_cents'] ?? 6,
+        ];
+    }
 }

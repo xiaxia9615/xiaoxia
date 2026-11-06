@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Modules\Wallet\Http\Controllers;
 
+use App\Modules\Payment\Contracts\PaymentGatewayInterface;
+use App\Modules\Payment\Models\PaymentOrder;
 use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use RuntimeException;
 
 final class WalletController
@@ -89,7 +90,7 @@ final class WalletController
     }
 
     /**
-     * 模拟充值
+     * 创建充值订单
      *
      * @group 钱包管理
      *
@@ -100,8 +101,8 @@ final class WalletController
      * @response 200 {
      *  "code": 0,
      *  "data": {
-     *    "balance": 5000,
-     *    "frozen_balance": 0
+     *    "order_no": "PAY20261106...",
+     *    "pay_params": {}
      *  }
      * }
      */
@@ -111,19 +112,27 @@ final class WalletController
             'amount' => 'required|integer|min:1',
         ]);
 
-        try {
-            $this->service->deposit($request->user(), (int) $data['amount'], Str::uuid()->toString());
-        } catch (RuntimeException $e) {
-            return response()->json(['code' => 1, 'message' => $e->getMessage()], 422);
-        }
+        $amount = (int) $data['amount'];
+        $orderNo = 'PAY'.date('YmdHis').uniqid();
+        $gateway = app(PaymentGatewayInterface::class);
 
-        $balance = $this->service->getBalance($request->user());
+        $order = PaymentOrder::create([
+            'user_id' => $request->user()->id,
+            'order_no' => $orderNo,
+            'amount_in_cents' => $amount,
+            'gateway' => config('payment.default'),
+            'status' => 'pending',
+        ]);
+
+        $payParams = $gateway->createPayment($orderNo, $amount, '钱包充值');
+
+        $order->update(['gateway_payload' => $payParams]);
 
         return response()->json([
             'code' => 0,
             'data' => [
-                'balance' => $balance['balance'],
-                'frozen_balance' => $balance['frozen_balance'],
+                'order_no' => $orderNo,
+                'pay_params' => $payParams,
             ],
         ]);
     }

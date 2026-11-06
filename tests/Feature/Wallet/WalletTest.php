@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Wallet;
 
+use App\Models\PaymentOrder;
 use App\Models\User;
 use App\Modules\Wallet\Models\Wallet;
 use App\Modules\Wallet\Services\WalletService;
@@ -175,9 +176,65 @@ final class WalletTest extends TestCase
     {
         $user = $this->makeUser();
 
-        $this->actingAs($user, 'sanctum')
+        $response = $this->actingAs($user, 'sanctum')
             ->postJson('/api/v1/wallet/deposit', ['amount' => 5000])
             ->assertOk()
-            ->assertJsonPath('data.balance', 5000);
+            ->assertJsonStructure(['data' => ['order_no', 'pay_params']]);
+
+        $orderNo = $response->json('data.order_no');
+
+        // 余额未变
+        $this->assertSame(0, $this->balance($user)['balance']);
+
+        // 模拟回调
+        $this->postJson('/api/v1/payment/notify/mock', [
+            'order_no' => $orderNo,
+            'amount_in_cents' => 5000,
+        ])
+            ->assertOk()
+            ->assertJsonPath('code', 'SUCCESS');
+
+        $this->assertSame(5000, $this->balance($user)['balance']);
+    }
+
+    public function test_duplicate_notify_is_idempotent(): void
+    {
+        $user = $this->makeUser();
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/wallet/deposit', ['amount' => 3000])
+            ->assertOk();
+
+        $orderNo = $response->json('data.order_no');
+
+        $payload = ['order_no' => $orderNo, 'amount_in_cents' => 3000];
+
+        $this->postJson('/api/v1/payment/notify/mock', $payload)->assertOk();
+        $this->postJson('/api/v1/payment/notify/mock', $payload)->assertOk();
+
+        $this->assertSame(3000, $this->balance($user)['balance']);
+    }
+
+    public function test_notify_with_mismatched_amount_does_not_credit_balance(): void
+    {
+        $user = $this->makeUser();
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/wallet/deposit', ['amount' => 100])
+            ->assertOk();
+
+        $orderNo = $response->json('data.order_no');
+
+        $this->postJson('/api/v1/payment/notify/mock', [
+            'order_no' => $orderNo,
+            'amount_in_cents' => 10000,
+        ])
+            ->assertOk()
+            ->assertJsonPath('code', 'FAIL');
+
+        $this->assertSame(0, $this->balance($user)['balance']);
+
+        $order = PaymentOrder::query()->where('order_no', $orderNo)->first();
+        $this->assertSame('pending', $order->status);
     }
 }
