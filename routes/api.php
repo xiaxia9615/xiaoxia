@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\PaymentNotifyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -21,3 +22,12 @@ Route::get('/health', function () {
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+Route::prefix('v1/payment/notify')->group(function (): void {
+    Route::post('/wechat', [PaymentNotifyController::class, 'wechat']);
+    Route::post('/alipay', [PaymentNotifyController::class, 'alipay']);
+
+    if (! app()->environment('production')) {
+        Route::post('/mock', [PaymentNotifyController::class, 'mock']);
+    }
+});
