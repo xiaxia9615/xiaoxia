@@ -16,13 +16,14 @@ final class LedgerIdorTest extends TestCase
 
     private function makeUser(string $email): User
     {
-        return User::create([
+        $user = User::create([
             'name' => 'test',
             'email' => $email,
             'password' => bcrypt('password123'),
-            'status' => 1,
-            'is_active' => true,
         ]);
+        $user->forceFill(['status' => 1, 'is_active' => true])->save();
+
+        return $user;
     }
 
     private function credit(LedgerService $ledger, int $userId, int $amount, int $bizId): void

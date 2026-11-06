@@ -14,19 +14,20 @@ final class AdminAccessTest extends TestCase
 
     private function makeUser(string $email): User
     {
-        return User::create([
+        $user = User::create([
             'name' => 'admin-access',
             'email' => $email,
             'password' => bcrypt('password123'),
-            'status' => 1,
-            'is_admin' => false,
         ]);
+        $user->forceFill(['status' => 1, 'is_admin' => false])->save();
+
+        return $user;
     }
 
     private function makeAdmin(string $email): User
     {
         $admin = $this->makeUser($email);
-        $admin->update(['is_admin' => true]);
+        $admin->forceFill(['is_admin' => true])->save();
 
         return $admin;
     }

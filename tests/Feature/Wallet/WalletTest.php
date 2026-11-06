@@ -27,13 +27,14 @@ final class WalletTest extends TestCase
 
     private function makeUser(): User
     {
-        return User::create([
+        $user = User::create([
             'name' => 'wallet-user',
             'email' => 'wallet-'.Str::uuid().'@example.com',
             'password' => bcrypt('password123'),
-            'status' => 1,
-            'is_active' => true,
         ]);
+        $user->forceFill(['status' => 1, 'is_active' => true])->save();
+
+        return $user;
     }
 
     /**

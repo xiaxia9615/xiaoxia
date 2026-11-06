@@ -28,9 +28,8 @@ final class RateLimitTest extends TestCase
             'name' => 'ratelimit',
             'email' => $email,
             'password' => bcrypt('password123'),
-            'status' => 1,
-            'is_admin' => false,
         ]);
+        $user->forceFill(['status' => 1, 'is_admin' => false])->save();
         $plain = 'sk_'.uniqid();
         ApiKey::create([
             'user_id' => $user->id,

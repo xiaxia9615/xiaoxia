@@ -19,10 +19,13 @@ final class SkillCallBalanceTest extends TestCase
 
     private function makeUser(string $email): User
     {
-        return User::create([
+        $user = User::create([
             'name' => 'test', 'email' => $email,
-            'password' => bcrypt('password123'), 'status' => 1,
+            'password' => bcrypt('password123'),
         ]);
+        $user->forceFill(['status' => 1])->save();
+
+        return $user;
     }
 
     private function makeUserWithToken(string $email): array

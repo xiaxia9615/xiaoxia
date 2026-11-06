@@ -17,15 +17,24 @@ final class AdminFinanceTest extends TestCase
 
     private function makeUser(array $attrs = []): User
     {
-        return User::create(array_merge([
+        $sensitiveKeys = ['is_admin', 'is_finance', 'is_super_admin', 'is_developer', 'is_active', 'status', 'balance'];
+        $sensitive = array_intersect_key($attrs, array_flip($sensitiveKeys));
+        $normal = array_diff_key($attrs, array_flip($sensitiveKeys));
+
+        $user = User::create(array_merge([
             'name' => 'finance-test',
             'email' => uniqid('finance-', true).'@test.com',
             'password' => bcrypt('password123'),
+        ], $normal));
+
+        $user->forceFill(array_merge([
             'status' => 1,
             'is_admin' => false,
             'is_finance' => false,
             'is_super_admin' => false,
-        ], $attrs));
+        ], $sensitive))->save();
+
+        return $user;
     }
 
     // ─── 测试 1：普通管理员（is_admin=1, is_super_admin=0, is_finance=0）访问 GET /admin/finance，403 ───
