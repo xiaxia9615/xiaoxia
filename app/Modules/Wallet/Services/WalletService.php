@@ -205,7 +205,8 @@ final class WalletService
      */
     public function getBalance(User $user): array
     {
-        $wallet = Wallet::firstOrCreate(['user_id' => $user->id]);
+        $wallet = Wallet::where('user_id', $user->id)->first()
+            ?? new Wallet(['user_id' => $user->id, 'balance' => 0, 'frozen_balance' => 0]);
 
         return [
             'balance' => (int) $wallet->balance,

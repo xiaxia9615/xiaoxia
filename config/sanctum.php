@@ -54,6 +54,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Last Used At Tracking
+    |--------------------------------------------------------------------------
+    |
+    | This value controls whether Sanctum will update the last_used_at
+    | column on the personal_access_tokens table for each authenticated
+    | request. Disable to avoid write side-effects on GET endpoints.
+    |
+    */
+    'last_used_at' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Token Prefix
     |--------------------------------------------------------------------------
     |
