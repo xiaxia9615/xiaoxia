@@ -19,12 +19,14 @@ final class SmartRoutingGatewayTest extends TestCase
 
     private function makeUser(string $email): User
     {
-        return User::create([
+        $user = User::create([
             'name' => 'test',
             'email' => $email,
             'password' => bcrypt('password123'),
-            'status' => 1,
         ]);
+        $user->forceFill(['status' => 1])->save();
+
+        return $user;
     }
 
     private function makeProvider(array $overrides = []): AiProvider

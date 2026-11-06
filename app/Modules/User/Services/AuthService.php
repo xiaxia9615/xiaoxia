@@ -18,8 +18,10 @@ final class AuthService
             'name' => $name,
             'email' => $email,
             'password' => $password,
-            'status' => 1,
         ]);
+
+        $user->status = 1;
+        $user->save();
 
         event(new UserRegistered(UserDto::fromModel($user)));
 

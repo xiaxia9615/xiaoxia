@@ -14,15 +14,24 @@ final class LoginTest extends TestCase
 
     private function makeUser(array $attrs = []): User
     {
-        return User::create(array_merge([
+        $sensitiveKeys = ['is_admin', 'is_finance', 'is_super_admin', 'is_developer', 'is_active', 'status', 'balance'];
+        $sensitive = array_intersect_key($attrs, array_flip($sensitiveKeys));
+        $normal = array_diff_key($attrs, array_flip($sensitiveKeys));
+
+        $user = User::create(array_merge([
             'name' => 'login-test',
             'email' => uniqid('login-', true).'@test.com',
             'password' => bcrypt('password'),
+        ], $normal));
+
+        $user->forceFill(array_merge([
             'status' => 1,
             'is_admin' => false,
             'is_finance' => false,
             'is_super_admin' => false,
-        ], $attrs));
+        ], $sensitive))->save();
+
+        return $user;
     }
 
     // ─── ① 纯财务人员能登录成功 ───

@@ -15,7 +15,16 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, HasRoles, Notifiable;
 
-    protected $guarded = []; // 解除所有赋值限制
+    // 敏感字段禁止批量赋值，需直接赋值或 forceFill
+    protected $guarded = [
+        'is_admin',
+        'is_finance',
+        'is_super_admin',
+        'is_developer',
+        'is_active',
+        'status',
+        'balance',
+    ];
 
     protected $hidden = ['password', 'remember_token'];
 
