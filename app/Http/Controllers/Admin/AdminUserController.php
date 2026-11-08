@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Modules\ApiKey\Models\ApiCall;
 use App\Modules\ApiKey\Models\ApiKey;
+use App\Modules\System\Services\AuditService;
 use App\Modules\User\Services\AdminUserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -34,7 +35,7 @@ class AdminUserController extends Controller
         ]);
     }
 
-    public function updateRole(Request $request, AdminUserService $service, int $id)
+    public function updateRole(Request $request, AdminUserService $service, AuditService $auditService, int $id)
     {
         $data = $request->validate([
             'role' => ['required', 'in:admin,user'],
@@ -53,10 +54,18 @@ class AdminUserController extends Controller
             'ip' => $request->ip(),
         ]);
 
+        $auditService->log(
+            (int) $request->user()->id,
+            'admin.update_role',
+            'user',
+            $id,
+            ['role' => $data['role']],
+        );
+
         return back()->with('status', '角色已更新');
     }
 
-    public function toggle(Request $request, AdminUserService $service, int $id)
+    public function toggle(Request $request, AdminUserService $service, AuditService $auditService, int $id)
     {
         try {
             $active = $service->toggleActive((int) $request->user()->id, $id);
@@ -70,6 +79,14 @@ class AdminUserController extends Controller
             'active' => $active,
             'ip' => $request->ip(),
         ]);
+
+        $auditService->log(
+            (int) $request->user()->id,
+            'admin.toggle_active',
+            'user',
+            $id,
+            ['active' => $active],
+        );
 
         return back()->with('status', $active ? '已启用' : '已禁用');
     }

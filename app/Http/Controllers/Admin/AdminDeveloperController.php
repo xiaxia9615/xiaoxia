@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Modules\System\Services\AuditService;
 use App\Modules\User\Services\DeveloperService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -15,6 +16,7 @@ final class AdminDeveloperController extends Controller
 {
     public function __construct(
         private readonly DeveloperService $developerService,
+        private readonly AuditService $auditService,
     ) {}
 
     public function index(): View
@@ -57,6 +59,14 @@ final class AdminDeveloperController extends Controller
             'approve' => $approve,
             'ip' => $request->ip(),
         ]);
+
+        $this->auditService->log(
+            (int) $request->user()->id,
+            'admin.audit_developer',
+            'user',
+            $id,
+            ['approve' => $approve],
+        );
 
         return back()->with('status', $approve ? '开发者已通过审核' : '开发者申请已驳回');
     }

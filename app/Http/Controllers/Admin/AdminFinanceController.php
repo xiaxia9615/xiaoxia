@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Withdrawal;
 use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Order\Models\Order;
+use App\Modules\System\Services\AuditService;
 use App\Modules\Wallet\Models\WalletTransaction;
 use App\Modules\Wallet\Services\WithdrawalService;
 use Illuminate\Contracts\View\View;
@@ -20,6 +21,7 @@ final class AdminFinanceController extends Controller
     public function __construct(
         private readonly LedgerContract $ledger,
         private readonly WithdrawalService $withdrawalService,
+        private readonly AuditService $auditService,
     ) {}
 
     /**
@@ -198,6 +200,14 @@ final class AdminFinanceController extends Controller
     {
         $withdrawal = $this->withdrawalService->approve($id, (int) auth()->id());
 
+        $this->auditService->log(
+            (int) auth()->id(),
+            'admin.withdrawal.approve',
+            'withdrawal',
+            $withdrawal->id,
+            ['amount' => $withdrawal->amount],
+        );
+
         return redirect()
             ->route('admin.finance.withdrawals')
             ->with('success', "提现单 #{$withdrawal->id} 已核对通过，请完成线下转账后点击『确认已打款』。");
@@ -209,6 +219,14 @@ final class AdminFinanceController extends Controller
     public function markPaid(int $id): RedirectResponse
     {
         $withdrawal = $this->withdrawalService->markPaid($id, (int) auth()->id());
+
+        $this->auditService->log(
+            (int) auth()->id(),
+            'admin.withdrawal.mark_paid',
+            'withdrawal',
+            $withdrawal->id,
+            ['amount' => $withdrawal->amount],
+        );
 
         return redirect()
             ->route('admin.finance.withdrawals')
@@ -228,6 +246,14 @@ final class AdminFinanceController extends Controller
             $id,
             $validated['reject_reason'],
             (int) auth()->id(),
+        );
+
+        $this->auditService->log(
+            (int) auth()->id(),
+            'admin.withdrawal.reject',
+            'withdrawal',
+            $withdrawal->id,
+            ['reject_reason' => $validated['reject_reason']],
         );
 
         return redirect()

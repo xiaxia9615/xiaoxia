@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Product\Models\Product;
+use App\Modules\System\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
@@ -33,7 +34,7 @@ class AdminProductController extends Controller
     /**
      * 强制下架：管理员特权操作，不校验商品归属，直接将状态置为 2（下架）
      */
-    public function forceArchive(Request $request, int $id)
+    public function forceArchive(Request $request, AuditService $auditService, int $id)
     {
         $product = Product::query()->find($id);
 
@@ -50,6 +51,14 @@ class AdminProductController extends Controller
             'seller_id' => $product->user_id,
             'ip' => $request->ip(),
         ]);
+
+        $auditService->log(
+            (int) $request->user()->id,
+            'admin.product_force_archived',
+            'product',
+            $product->id,
+            ['seller_id' => $product->user_id, 'name' => $product->name],
+        );
 
         return back()->with('status', "商品 {$product->name} 已强制下架");
     }

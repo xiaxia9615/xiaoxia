@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Models\Order;
+use App\Modules\System\Services\AuditService;
 use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,7 @@ class AdminOrderController extends Controller
     public function __construct(
         private readonly LedgerContract $ledger,
         private readonly WalletService $wallet,
+        private readonly AuditService $auditService,
     ) {}
 
     /**
@@ -131,6 +133,14 @@ class AdminOrderController extends Controller
             'amount' => $refunded->amount,
             'ip' => $request->ip(),
         ]);
+
+        $this->auditService->log(
+            (int) $request->user()->id,
+            'admin.order_refunded',
+            'order',
+            $refunded->id,
+            ['order_no' => $refunded->order_no, 'amount' => $refunded->amount],
+        );
 
         return back()->with('status', "订单 {$refunded->order_no} 已退款");
     }

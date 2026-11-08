@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Modules\Skill\Actions\AuditSkillAction;
 use App\Modules\Skill\Services\AdminSkillService;
+use App\Modules\System\Services\AuditService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,6 +18,7 @@ final class AdminSkillPendingController extends Controller
     public function __construct(
         private readonly AdminSkillService $skillService,
         private readonly AuditSkillAction $auditSkill,
+        private readonly AuditService $auditService,
     ) {}
 
     public function index(): View
@@ -60,6 +62,14 @@ final class AdminSkillPendingController extends Controller
             'approve' => $approve,
             'ip' => $request->ip(),
         ]);
+
+        $this->auditService->log(
+            (int) $request->user()->id,
+            'admin.audit_skill',
+            'skill',
+            $id,
+            ['approve' => $approve],
+        );
 
         return back()->with('status', $approve ? '技能已通过审核' : '技能已驳回');
     }

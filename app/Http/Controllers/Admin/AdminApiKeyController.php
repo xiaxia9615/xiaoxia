@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Modules\ApiKey\Services\AdminApiKeyService;
+use App\Modules\System\Services\AuditService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 
@@ -13,6 +14,7 @@ final class AdminApiKeyController extends Controller
 {
     public function __construct(
         private readonly AdminApiKeyService $service,
+        private readonly AuditService $auditService,
     ) {}
 
     public function index(): View
@@ -53,6 +55,15 @@ final class AdminApiKeyController extends Controller
     public function revoke(int $id): RedirectResponse
     {
         $ok = $this->service->revoke($id);
+
+        if ($ok) {
+            $this->auditService->log(
+                (int) auth()->id(),
+                'admin.apikey.revoke',
+                'api_key',
+                $id,
+            );
+        }
 
         return redirect()
             ->route('admin.api-keys.index')
