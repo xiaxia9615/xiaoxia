@@ -26,7 +26,7 @@ User（用户） / Product（商品） / Order（订单） / Payment（支付）
 已实现 24 个页面（含订单管理、商品管理、财务中心、钱包流水、提现审批等）。
 
 ## 测试与质量
-**当前基线**：`148 passed / 4 skipped`（505 个断言）。
+**当前基线**：`152 passed / 4 skipped`（511 个断言）。
 CI：GitHub Actions 自动跑全量测试 + 12 项架构守卫。静态分析：Larastan + Pint。
 
 ## 许可与联系
