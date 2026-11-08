@@ -1,6 +1,6 @@
 # 技术债记录
 
-> 最后更新：2026-10-29
+> 最后更新：2026-11-08
 > 关联文档：`docs/progress.md`（D1–D4 改造进度）
 
 ## 已修复
@@ -95,3 +95,41 @@
 
 - [ ] **管理操作无结构化审计日志**：吊销 API Key 等操作只 `Log::info`，
       无 `audit_logs` 表。当前无合规压力，暂缓；有多人操作后台时再做。
+
+## 未修复 · 资金安全类（2026-11-08 新增）
+
+### P0 · Mock 支付网关可被用于伪造充值
+
+**问题**：`config/payment.php` 默认 `PAYMENT_GATEWAY=mock`，当前 `.env` 未配置任何真实渠道。`MockPaymentGateway::verifyNotify` 无条件返回 `verified=true`。
+
+**攻击路径**：
+1. 用户正常创建充值订单 `POST /api/v1/wallet/deposit`，获得 `order_no`
+2. 用户直接 POST `/api/v1/payment/notify/alipay`，body 带自己的 `order_no` 和 `amount_in_cents`
+3. 回调进入 `PaymentNotifyController`，Mock 网关验签通过
+4. 订单置 `paid`，`WalletService::deposit` 到账
+
+用户未付一分钱即可充值。
+
+**修复方案（二选一）**：
+- `PaymentGatewayFactory::make()` 加环境守卫：`mock` 只允许 `local`/`testing`，否则抛异常
+- 或真实渠道接入前，`payment/notify/*` 路由在非 `local`/`testing` 环境不注册
+
+### P1 · 资金变动绕过 WalletService 导致 wallet 缓存漂移
+
+`wallets.balance` 是 Ledger 的视图缓存，`WalletService` 是唯一同步入口。以下调用点直接操作 Ledger，不同步 `wallet.balance`：
+
+- [ ] `OrderService.php:101` — 支付扣 Ledger，`wallet.balance` 不变
+- [ ] `AdminOrderController.php:118` — 退款加 Ledger，`wallet.balance` 不变
+- [ ] `WithdrawalService.php:76` — 提现扣 Ledger，`wallet.balance` 不变
+- [ ] `DeductBalanceOnAiUsage.php:45` — AI 用量扣费，`wallet.balance` 不变
+
+**后果**：用户界面余额与 Ledger 实际余额漂移。支付后退款，用户看到"退款成功但余额没回来"。
+
+### P1 · 资金回调与提现零测试
+
+- `PaymentNotifyController` 无测试：签名验证、幂等、金额校验均无回归保护
+- `WithdrawalService` 无测试：apply / approve / reject / mark-paid 四个状态 + 原子退款无保护
+
+### P1 · 架构守卫缺口
+
+无守卫阻止绕过 `WalletService` 直接调 `ledger->debit/record` 改 user balance。
