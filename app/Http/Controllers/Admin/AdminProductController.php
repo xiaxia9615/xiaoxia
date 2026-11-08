@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Product\Models\Product;
+use App\Modules\Product\Services\AdminProductService;
 use App\Modules\System\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -61,5 +62,84 @@ class AdminProductController extends Controller
         );
 
         return back()->with('status', "商品 {$product->name} 已强制下架");
+    }
+
+    /**
+     * 新建商品表单
+     */
+    public function create()
+    {
+        return view('admin.products.create');
+    }
+
+    /**
+     * 保存新商品
+     */
+    public function store(Request $request, AdminProductService $service, AuditService $auditService)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|integer|min:1',
+            'type' => 'required|integer|in:1,2',
+            'status' => 'required|integer|in:0,1',
+        ]);
+
+        $product = $service->create($data);
+
+        $auditService->log(
+            (int) $request->user()->id,
+            'admin.product.create',
+            'product',
+            $product->id,
+            ['name' => $product->name, 'type' => $product->type, 'price' => $product->price, 'status' => $product->status],
+        );
+
+        return redirect()->route('admin.products.index')->with('status', "商品 {$product->name} 已创建");
+    }
+
+    /**
+     * 编辑商品表单
+     */
+    public function edit(int $id)
+    {
+        $product = Product::findOrFail($id);
+        return view('admin.products.edit', ['product' => $product]);
+    }
+
+    /**
+     * 更新商品
+     */
+    public function update(Request $request, AdminProductService $service, AuditService $auditService, int $id)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|integer|min:1',
+            'type' => 'required|integer|in:1,2',
+        ]);
+
+        $product = $service->update($id, $data);
+
+        $auditService->log(
+            (int) $request->user()->id,
+            'admin.product.update',
+            'product',
+            $product->id,
+            ['name' => $product->name, 'type' => $product->type, 'price' => $product->price],
+        );
+
+        return redirect()->route('admin.products.index')->with('status', "商品 {$product->name} 已更新");
+    }
+
+    /**
+     * 切换商品上下架状态
+     */
+    public function toggleStatus(Request $request, AdminProductService $service, int $id)
+    {
+        $product = $service->toggleStatus($id);
+
+        $label = $product->status === 1 ? '上架' : '下架';
+        return back()->with('status', "商品 {$product->name} 已{$label}");
     }
 }

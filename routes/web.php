@@ -68,6 +68,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // 商品管理
     Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
+    Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
+    Route::post('/products', [AdminProductController::class, 'store'])->name('products.store');
+    Route::get('/products/{id}/edit', [AdminProductController::class, 'edit'])->whereNumber('id')->name('products.edit');
+    Route::put('/products/{id}', [AdminProductController::class, 'update'])->whereNumber('id')->name('products.update');
+    Route::patch('/products/{id}/status', [AdminProductController::class, 'toggleStatus'])->whereNumber('id')->name('products.toggleStatus');
     Route::post('/products/{id}/force-archive', [AdminProductController::class, 'forceArchive'])->whereNumber('id')->name('products.forceArchive');
 
     // 审计日志
