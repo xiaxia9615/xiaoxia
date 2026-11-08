@@ -7,6 +7,7 @@ namespace App\Modules\Order\Services;
 use App\Modules\Distributor\Models\DistributorRelation;
 use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Order\Enums\OrderStatus;
+use App\Modules\Wallet\Services\WalletService;
 use App\Modules\Order\Models\Order;
 use App\Modules\Product\Models\Product;
 use Illuminate\Database\QueryException;
@@ -23,6 +24,7 @@ final class OrderService
 
     public function __construct(
         private readonly LedgerContract $ledger,
+        private readonly WalletService $wallet,
     ) {}
 
     /**
@@ -97,8 +99,11 @@ final class OrderService
                 throw new RuntimeException('买家不存在');
             }
 
-            // 按订单价格快照从账本原子扣款（悲观锁 + 余额校验），重复支付由上方订单状态幂等拦截
-            $this->ledger->debit('user', $buyer->id, 'balance', $order->amount, 'order_pay', $order->id);
+            // 扣款走 WalletService：同事务内同步 wallets.balance 与 Ledger，
+            // 避免 payOrder 只扣 Ledger 造成 wallet 缓存漂移。
+            // biz_type 从 'order_pay' 变为 WalletService 内部的 'wallet_deduct'，
+            // settleCommission 只依赖 'order_commission'，不受影响。
+            $this->wallet->deduct($buyer, (int) $order->amount, 'order_'.$order->id);
 
             $order->status = OrderStatus::Paid;
             $order->paid_at = now();
