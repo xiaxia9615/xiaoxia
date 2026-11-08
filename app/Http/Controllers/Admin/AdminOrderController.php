@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Models\Order;
+use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -15,6 +16,7 @@ class AdminOrderController extends Controller
 {
     public function __construct(
         private readonly LedgerContract $ledger,
+        private readonly WalletService $wallet,
     ) {}
 
     /**
@@ -74,17 +76,12 @@ class AdminOrderController extends Controller
 
             $amount = (int) $order->amount;
 
-            // 原路退回买家余额
-            $splits = [
-                [
-                    'owner_type' => 'user',
-                    'owner_id' => (int) $buyer->id,
-                    'account_type' => 'balance',
-                    'direction' => 'credit',
-                    'amount' => $amount,
-                ],
-            ];
+            // 分账回滚 splits（买家退款单独走 WalletService，不在此处）
+            $splits = [];
 
+            // 注意：开发者/达人的 wallets.balance 未同步，仅 Ledger 扣回。
+            // 自营模式无真实开发者，暂不触发。待开放开发者入驻后，需确认
+            // 『余额不足时是否允许透支为负』的业务规则，另开任务修。
             // 反向回滚分账：按 order_commission 实际分账流水的 credit 分录原额反向扣回
             // （开发者 80%、达人 10%、平台 10%/20%）；record() 不校验余额，达人余额不足时允许透支为负
             $commissionCredits = DB::table('ledger_entries as e')
@@ -116,6 +113,10 @@ class AdminOrderController extends Controller
             }
 
             $this->ledger->record('order_refund', $order->id, $splits);
+
+            // 买家退款走 WalletService：同事务内同步 wallets.balance 与 Ledger，
+            // 避免 refund 只写 Ledger 造成 wallet 缓存漂移。
+            $this->wallet->deposit($buyer, $amount, 'refund_'.$order->id);
 
             $order->status = OrderStatus::Refunded;
             $order->save();
