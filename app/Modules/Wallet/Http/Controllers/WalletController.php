@@ -112,6 +112,15 @@ final class WalletController
             'amount' => 'required|integer|min:1',
         ]);
 
+        if (config('app.env') === 'production'
+            && config('payment.default') === 'mock'
+            && ! config('payment.allow_mock')) {
+            return response()->json([
+                'code' => 1,
+                'message' => '充值通道未配置，请联系管理员',
+            ], 503);
+        }
+
         $amount = (int) $data['amount'];
         $orderNo = 'PAY'.date('YmdHis').uniqid();
         $gateway = app(PaymentGatewayInterface::class);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 return [
     'default' => env('PAYMENT_GATEWAY', 'mock'),
+    'allow_mock' => env('ALLOW_MOCK_PAYMENT', false),
     'wechat' => [
         'app_id' => env('WECHAT_PAY_APP_ID'),
         'mch_id' => env('WECHAT_PAY_MCH_ID'),
