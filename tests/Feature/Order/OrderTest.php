@@ -7,6 +7,7 @@ use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Models\Order;
 use App\Modules\Product\Models\Product;
+use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -32,10 +33,7 @@ class OrderTest extends TestCase
 
     private function giveBalance(User $user, int $amount): void
     {
-        app(LedgerContract::class)->record('wallet_recharge', mt_rand(1000, 999999), [
-            ['owner_type' => 'user', 'owner_id' => $user->id, 'account_type' => 'balance', 'direction' => 'credit', 'amount' => $amount],
-            ['owner_type' => 'platform', 'owner_id' => 0, 'account_type' => 'platform', 'direction' => 'debit', 'amount' => $amount],
-        ]);
+        app(WalletService::class)->deposit($user, $amount, 'test_balance_'.mt_rand(1000, 999999));
     }
 
     public function test_create_order_requires_published_product(): void
