@@ -11,20 +11,23 @@
 Laravel 13 · PHP 8.5 · MySQL 8 · Redis · Nginx
 
 ## 核心模块
-User（用户） / Product（商品） / Order（订单） / Wallet（钱包） / Ledger（复式记账） / Skill（技能） / ApiKey（鉴权） / AiProvider（AI路由） / Distributor（单级分销） / System（后台）
+User（用户） / Product（商品） / Order（订单） / Payment（支付） / Wallet（钱包） / Ledger（复式记账） / Skill（技能） / ApiKey（鉴权） / AiProvider（AI路由） / Distributor（单级分销） / Team（团队计费） / System（后台）
 
 ## 核心能力
 - **电商交易闭环**：商品管理 ➡️ 创建订单 ➡️ 支付 ➡️ 退款回滚。
+- **支付网关**：接口契约、订单创建、回调处理、幂等与金额校验已完成，Mock 网关可跑通全流程；支付宝 / 微信渠道实现待接入。
+- **提现审批流**：申请 → 审批 → 打款 / 拒绝（含原子退款）。
 - **单级达人分销**：绑定关系、自动按比例计算达人佣金。
 - **金融级复式记账**：底层 BigInt（毫）精度，悲观锁防超扣。
 - **多 AI 供应商路由**：17 个供应商，14 个模型入库，支持熔断。
 
 ## 管理后台
 入口：https://xiaoxia.ren/login
-已实现 11 个页面（含订单管理、商品管理、钱包流水等）。
+已实现 24 个页面（含订单管理、商品管理、财务中心、钱包流水、提现审批等）。
 
 ## 测试与质量
-**当前基线**：`126 passed / 4 skipped`（442 个断言）。
+**当前基线**：`148 passed / 4 skipped`（505 个断言）。
+CI：GitHub Actions 自动跑全量测试 + 12 项架构守卫。静态分析：Larastan + Pint。
 
 ## 许可与联系
 AGPL-3.0 + 商业许可 双轨模式。
