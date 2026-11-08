@@ -27,7 +27,7 @@
             </div>
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <div class="text-sm text-slate-500 mb-2">Queue Worker</div>
-                <x-status-badge :status="$health['worker'] ? 'ok' : 'down'" />
+                <x-status-badge :status="$health['worker']" />
             </div>
         </div>
     </div>

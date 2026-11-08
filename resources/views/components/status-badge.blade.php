@@ -3,6 +3,7 @@
 @php
     $map = [
         'ok'      => ['color' => 'bg-emerald-500',  'text' => $label ?? '正常'],
+        'sync'    => ['color' => 'bg-emerald-500',  'text' => $label ?? '正常（同步模式）'],
         'warn'    => ['color' => 'bg-amber-500',    'text' => $label ?? '关注'],
         'down'    => ['color' => 'bg-red-500',       'text' => $label ?? '异常'],
         'unknown' => ['color' => 'bg-slate-300',    'text' => $label ?? '未知'],

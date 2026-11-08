@@ -16,8 +16,17 @@ final class AdminSystemService
             'cache' => rescue(fn () => Cache::put('probe', 1, 5) !== false, false),
             'nginx' => $this->isServiceActive('nginx'),
             'php-fpm' => $this->isServiceActive('php8.5-fpm'),
-            'worker' => $this->isServiceActive('supervisor'),
+            'worker' => $this->workerStatus(),
         ];
+    }
+
+    private function workerStatus(): string
+    {
+        if (config('queue.default') === 'sync') {
+            return 'sync';
+        }
+
+        return $this->isServiceActive('supervisor') ? 'ok' : 'down';
     }
 
     private function isServiceActive(string $service): bool
