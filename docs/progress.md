@@ -6,7 +6,7 @@
 
 | 维度 | 状态 | 说明 |
 |---|---|---|
-| 测试基线 | **152 passed / 4 skipped / 511 断言** | 全绿，4 skip 为开发者模块休眠 |
+| 测试基线 | **170 passed / 4 skipped / 585 断言** | 全绿，4 skip 为开发者模块休眠 |
 | CI/CD | 已上线 | GitHub Actions |
 | 架构守卫 | 12 项全绿 | 模块边界 + 防裸查 |
 | 静态分析 | Larastan + Pint | 已接入 |
@@ -38,6 +38,10 @@
 - 技能全生命周期（草稿→提审→审核→上架→调用）
 - API 文档（Scribe）
 
+### 审计与运维
+- 管理操作审计日志（`audit_logs` 表 + `/admin/audit-logs` 页面，10 个写操作全覆盖，f9cfe49 + 3f3a206）
+- Queue Worker 健康检查支持 sync 模式，消除误报（770f6a5）
+
 ## 🚧 进行中 / 待办
 
 ### P0 · 资金安全（最高优先级）
@@ -45,16 +49,15 @@
 - [ ] 真实支付宝 / 微信渠道接入
 
 ### P1 · 账务一致性
-- [ ] `OrderService::payOrder` 改走 `WalletService::deduct`
-- [ ] `AdminOrderController::refund` 同步 `wallet.balance`
+- [x] `OrderService::payOrder` 改走 `WalletService::deduct`（2026-11-08，eae1c1e）
+- [x] `AdminOrderController::refund` 买家退款同步 `wallet.balance`（2026-11-08，7263353；分账回滚仍待开发者模块开放）
 - [ ] `WithdrawalService` 同步 `wallet.balance`
 - [ ] `DeductBalanceOnAiUsage` 同步 `wallet.balance`
 
 ### P1 · 测试补强
-- [ ] `PaymentNotifyController` 测试（签名、幂等、金额校验）
+- [x] `PaymentNotifyController` 测试（签名、幂等、金额校验）（2026-11-08，feb5810）
 - [ ] `WithdrawalService` 测试（状态流转、原子退款）
 
 ## 📋 未来规划
-- 管理操作结构化审计日志（`audit_logs` 表）
 - 30 处模块内裸表收敛到 `*QueryService`
 - 模块边界白名单改为命名空间级
