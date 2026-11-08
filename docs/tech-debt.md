@@ -98,7 +98,18 @@
 
 ## 未修复 · 资金安全类（2026-11-08 新增）
 
-### P0 · Mock 支付网关可被用于伪造充值
+### ~~P0 · Mock 支付网关可被用于伪造充值~~ ✅ 2026-11-08 已修复
+
+**修复状态**：2026-11-08 已修复，commit `f758698`。
+
+实际采用的方案（与下方历史方案不同）：
+
+- `routes/api.php`：production 环境不注册 `payment/notify/*` 任何路由（alipay/wechat），mock 路由仅 testing 注册
+- `WalletController::deposit`：production + mock 网关返回 503，不创建垃圾 pending 订单
+- 紧急开关：`.env` 设 `ALLOW_MOCK_PAYMENT=true` 可临时回退
+- 守卫用 `config('app.env')` 而非 `env('APP_ENV')`，测试可驱动
+
+**⚠️ 下方「修复方案（二选一）」是历史记录，已否决，请勿执行**：在 `PaymentGatewayFactory::make()` 加守卫会在 `.env` 为 `APP_ENV=production` 时引发全线 500（所有 `app(PaymentGatewayInterface::class)` 调用抛异常）。
 
 **问题**：`config/payment.php` 默认 `PAYMENT_GATEWAY=mock`，当前 `.env` 未配置任何真实渠道。`MockPaymentGateway::verifyNotify` 无条件返回 `verified=true`。
 
@@ -110,20 +121,15 @@
 
 用户未付一分钱即可充值。
 
-**修复方案（二选一）**：
-- `PaymentGatewayFactory::make()` 加环境守卫：`mock` 只允许 `local`/`testing`，否则抛异常
-- 或真实渠道接入前，`payment/notify/*` 路由在非 `local`/`testing` 环境不注册
-
 ### P1 · 资金变动绕过 WalletService 导致 wallet 缓存漂移
 
 `wallets.balance` 是 Ledger 的视图缓存，`WalletService` 是唯一同步入口。以下调用点直接操作 Ledger，不同步 `wallet.balance`：
-
 - [ ] `OrderService.php:101` — 支付扣 Ledger，`wallet.balance` 不变
 - [ ] `AdminOrderController.php:118` — 退款加 Ledger，`wallet.balance` 不变
 - [ ] `WithdrawalService.php:76` — 提现扣 Ledger，`wallet.balance` 不变
 - [ ] `DeductBalanceOnAiUsage.php:45` — AI 用量扣费，`wallet.balance` 不变
 
-**后果**：用户界面余额与 Ledger 实际余额漂移。支付后退款，用户看到"退款成功但余额没回来"。
+**后果**：用户界面余额与 Ledger 实际余额漂移。支付后退款，用户看到『退款成功但余额没回来』。
 
 ### P1 · 资金回调与提现零测试
 
