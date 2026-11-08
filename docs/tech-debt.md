@@ -125,7 +125,7 @@
 
 `wallets.balance` 是 Ledger 的视图缓存，`WalletService` 是唯一同步入口。以下调用点直接操作 Ledger，不同步 `wallet.balance`：
 - [x] `OrderService.php:101` — 2026-11-08 已修复，改走 `WalletService::deduct`
-- [ ] `AdminOrderController.php:118` — 仍绕过，支付修复后单独排期
+- [x] `AdminOrderController.php:118` — 2026-11-08 买家退款已修复，分账回滚仍绕过（自营无开发者，暂不触发）
 - [ ] `WithdrawalService.php:76` — 仍绕过
 - [ ] `DeductBalanceOnAiUsage.php:45` — 仍绕过
 
