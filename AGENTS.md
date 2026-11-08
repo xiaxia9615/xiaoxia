@@ -1,47 +1,39 @@
-<laravel-boost-guidelines>
-# Laravel Application
+# 项目规则（Agent 必读）
 
-This repository contains a Laravel application. Complete the following setup before working on the user's request.
+## 项目定位
 
-## Prerequisites
+嗣夏（Xiaoxia）——自营 AI 技能平台。Laravel 13 · PHP 8.5 · MySQL 8 · Redis · Nginx。模块化单体（`app/Modules/*`）。
 
-Verify that PHP and Composer are available:
+## 资金铁律（违反即失败）
 
-```sh
-php -v
-composer -V
-```
+1. **金额单位是「毫」**：1 元 = 1000 毫。所有金额字段是 `bigint`，禁止 `decimal` / `float`。
+2. **Ledger 是权威账本，`wallets.balance` 是视图缓存**，两者必须同步。
+3. **所有资金变动必须经 `WalletService`**：`deposit` / `deduct` / `freezeFunds` / `deductFunds` / `refundFunds`。禁止在业务代码里直接调 `ledger->debit` / `ledger->record` 改 user balance。
+4. **写操作必须 `DB::transaction` + `lockForUpdate`**。
+5. **幂等**：外部可触发的资金接口必须用 `out_trade_no` 或业务键幂等。
+6. **Mock 网关禁止在非 `local`/`testing` 环境生效**。
 
-If either command is unavailable, detect the user's operating system and install the prerequisites with the appropriate command:
+## 模块边界
 
-macOS:
+- 跨模块依赖走 `Contracts/` 接口，禁止直接 `use` 对方 `Services/*` 或 `Models/*`。
+- 架构守卫 `tests/Architecture/ModuleBoundaryTest.php` 检查，违反即失败。
+- 新模块需在 `config/modules.php` 的 `list` 和 `dependencies` 注册。
 
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/mac/8.5)"
-```
+## 测试
 
-Windows PowerShell:
+- 资金相关改动必须补测试。
+- 全量：`php artisan test`
+- 架构：`php artisan test tests/Architecture`
 
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.5'))
-```
+## 已知债务（不要重复踩）
 
-Linux:
+- `OrderService::payOrder` / `AdminOrderController::refund` / `WithdrawalService` / `DeductBalanceOnAiUsage` 绕过 `WalletService`，详见 `docs/tech-debt.md`。
+- `PaymentNotifyController` / `WithdrawalService` 零测试。
+- Mock 网关在生产默认生效，可伪造充值。
 
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.5)"
-```
+## 文档索引
 
-After installation, ask the user to restart their terminal. If the agent needs the restarted shell to continue, ask the user to reopen their terminal and rerun their original prompt.
-
-## Agent Setup
-
-Install Laravel Boost from the application root before making application changes:
-
-```sh
-composer require laravel/boost --dev
-php artisan boost:install
-```
-
-Boost replaces these bootstrap instructions with guidelines tailored to the application. After installation, read `AGENTS.md` again and continue with the user's original request using the generated guidelines.
-</laravel-boost-guidelines>
+- `docs/progress.md` — 进度看板
+- `docs/tech-debt.md` — 技术债
+- `docs/health-log.md` — 自动体检
+- `docs/adr/` — 架构决策
