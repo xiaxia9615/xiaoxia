@@ -124,12 +124,16 @@
 ### P1 · 资金变动绕过 WalletService 导致 wallet 缓存漂移
 
 `wallets.balance` 是 Ledger 的视图缓存，`WalletService` 是唯一同步入口。以下调用点直接操作 Ledger，不同步 `wallet.balance`：
-- [ ] `OrderService.php:101` — 支付扣 Ledger，`wallet.balance` 不变
-- [ ] `AdminOrderController.php:118` — 退款加 Ledger，`wallet.balance` 不变
-- [ ] `WithdrawalService.php:76` — 提现扣 Ledger，`wallet.balance` 不变
-- [ ] `DeductBalanceOnAiUsage.php:45` — AI 用量扣费，`wallet.balance` 不变
+- [x] `OrderService.php:101` — 2026-11-08 已修复，改走 `WalletService::deduct`
+- [ ] `AdminOrderController.php:118` — 仍绕过，支付修复后单独排期
+- [ ] `WithdrawalService.php:76` — 仍绕过
+- [ ] `DeductBalanceOnAiUsage.php:45` — 仍绕过
 
 **后果**：用户界面余额与 Ledger 实际余额漂移。支付后退款，用户看到『退款成功但余额没回来』。
+
+> 2026-11-08 更新：支付链路已修复并测试覆盖。退款、提现、AI 用量三处
+> 仍在绕过 WalletService，会产生新的漂移。退款修复需等支付稳定后单独
+> 排期，因为涉及分账反向回滚，比支付复杂。
 
 ### P1 · 资金回调与提现零测试
 
