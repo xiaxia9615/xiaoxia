@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $amount
+ * @property string $type
  */
 class WalletTransaction extends Model
 {
