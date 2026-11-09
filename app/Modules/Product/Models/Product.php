@@ -17,6 +17,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $status
  * @property int $sales_count
  * @property int $view_count
+ * @property string $name
+ * @property int $user_id
+ * @property string|null $description
  */
 class Product extends Model
 {
