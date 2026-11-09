@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Crypt;
  * @property string $base_url
  * @property float $cost_per_1k_input
  * @property float $cost_per_1k_output
+ * @property string|null $api_key
  * @property string|null $driver
  * @property string|null $model_name
  */
