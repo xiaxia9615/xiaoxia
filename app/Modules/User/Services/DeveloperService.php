@@ -11,9 +11,6 @@ use RuntimeException;
 
 class DeveloperService
 {
-    public function __construct(
-        private readonly UserService $users,
-    ) {}
 
     /**
      * 用户申请成为开发者（状态变更为 PENDING）

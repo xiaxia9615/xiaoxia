@@ -8,6 +8,12 @@ use App\Modules\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $amount
+ * @property \Illuminate\Support\Carbon|null $audited_at
+ * @property \Illuminate\Support\Carbon|null $rejected_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ */
 class Withdrawal extends Model
 {
     public const STATUS_PENDING = 'pending';

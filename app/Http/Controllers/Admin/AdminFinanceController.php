@@ -32,32 +32,32 @@ final class AdminFinanceController extends Controller
         // 平台总充值额（单位：毫）
         $totalRecharge = (int) (WalletTransaction::query()
             ->where('type', 'recharge')
-            ->sum('amount') ?? 0);
+            ->sum('amount'));
 
         // 今日新增充值金额（单位：毫）
         $todayRecharge = (int) (WalletTransaction::query()
             ->where('type', 'recharge')
             ->whereDate('created_at', today())
-            ->sum('amount') ?? 0);
+            ->sum('amount'));
 
         // 今日新增提现金额（单位：毫）
         $todayWithdrawal = (int) (Withdrawal::query()
             ->whereDate('created_at', today())
-            ->sum('amount') ?? 0);
+            ->sum('amount'));
 
         // 今日订单分账总额（已支付订单金额，单位：毫）
         $todayOrderSettlement = (int) (Order::query()
             ->where('status', 'paid')
             ->whereDate('paid_at', today())
-            ->sum('amount') ?? 0);
+            ->sum('amount'));
 
         // 平台净资产：统一通过 LedgerContract 查询
-        $netAsset = (int) ($this->ledger->balance('platform', 0, 'platform') ?? 0);
+        $netAsset = (int) ($this->ledger->balance('platform', 0, 'platform'));
 
         // 待处理提现数量
         $pendingWithdrawals = (int) (Withdrawal::query()
             ->where('status', Withdrawal::STATUS_PENDING)
-            ->count() ?? 0);
+            ->count());
 
         return view('admin.finance.index', [
             'totalRecharge' => $totalRecharge,
@@ -116,7 +116,7 @@ final class AdminFinanceController extends Controller
             $w->id,
             e((string) ($w->user->name ?? '-')),
             e((string) ($w->user->email ?? '-')),
-            number_format($w->amount / 1000, 2),
+            number_format((float) $w->amount / 1000, 2),
             e((string) $w->status),
             e($w->audited_at?->format('Y-m-d H:i:s') ?? '-'),
             e($w->created_at?->format('Y-m-d H:i:s') ?? '-'),
@@ -184,7 +184,7 @@ final class AdminFinanceController extends Controller
                     $w->created_at ?? '',
                     $w->user->email ?? '',
                     (string) $w->id,
-                    number_format($w->amount / 1000, 2),
+                    number_format((float) $w->amount / 1000, 2),
                     $w->status,
                 ]);
             }

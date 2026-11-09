@@ -20,7 +20,7 @@ final class AdminLedgerController extends Controller
         $accounts = $this->service->paginateAccounts();
 
         // Controller 层整形行数组（x-table 组件只渲染 :rows，不输出插槽）
-        $rows = $accounts->getCollection()->map(static fn ($a): array => [
+        $rows = collect($accounts->items())->map(static fn ($a): array => [
             $a->id,
             e((string) $a->owner_type),
             $a->owner_id,
@@ -48,7 +48,7 @@ final class AdminLedgerController extends Controller
     {
         $entries = $this->service->paginateEntries($accountId);
 
-        $rows = $entries->getCollection()->map(static fn ($e): array => [
+        $rows = collect($entries->items())->map(static fn ($e): array => [
             e((string) $e->created_at),
             e((string) $e->transaction_id),
             e((string) $e->direction),

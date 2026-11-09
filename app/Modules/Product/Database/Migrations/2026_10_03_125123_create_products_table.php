@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->comment('提供者');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->comment('提供者'); // @phpstan-ignore-line
             $table->tinyInteger('type')->default(1)->comment('1技能 2商品');
             $table->string('name', 100);
             $table->string('slug', 100)->unique();

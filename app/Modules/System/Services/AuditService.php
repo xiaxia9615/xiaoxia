@@ -23,8 +23,8 @@ final class AuditService
                 'target_type' => $targetType,
                 'target_id' => $targetId,
                 'payload' => json_encode($payload),
-                'ip' => request()?->ip(),
-                'user_agent' => request()?->userAgent(),
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

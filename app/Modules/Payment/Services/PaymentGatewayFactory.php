@@ -13,8 +13,8 @@ final class PaymentGatewayFactory
     {
         return match (config('payment.default')) {
             'mock' => new MockPaymentGateway,
-            'wechat' => new WechatPayGateway(config('payment.wechat')),
-            'alipay' => new AlipayGateway(config('payment.alipay')),
+            'wechat' => new WechatPayGateway,
+            'alipay' => new AlipayGateway,
             default => throw new InvalidArgumentException('Unknown payment gateway: '.config('payment.default')),
         };
     }

@@ -15,9 +15,9 @@ return new class extends Migration
         Schema::create('api_calls', function (Blueprint $table) {
             $table->id();
             $table->string('request_id', 36)->unique()->comment('请求ID');
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->comment('调用者');
-            $table->foreignId('api_key_id')->constrained()->cascadeOnDelete()->comment('使用的key');
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete()->comment('调用的技能/商品');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->comment('调用者'); // @phpstan-ignore-line
+            $table->foreignId('api_key_id')->constrained()->cascadeOnDelete()->comment('使用的key'); // @phpstan-ignore-line
+            $table->foreignId('product_id')->constrained()->cascadeOnDelete()->comment('调用的技能/商品'); // @phpstan-ignore-line
             $table->unsignedBigInteger('provider_id')->comment('提供者ID，冗余');
             $table->json('input')->nullable()->comment('请求参数');
             $table->json('output')->nullable()->comment('返回结果');

@@ -53,7 +53,7 @@ final class AuthController
 
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()?->delete();
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json(['code' => 0, 'message' => 'ok']);
     }

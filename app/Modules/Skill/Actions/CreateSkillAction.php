@@ -8,14 +8,12 @@ use App\Models\User;
 use App\Modules\Product\Contracts\SkillProductContract;
 use App\Modules\Skill\Enums\SkillStatus;
 use App\Modules\Skill\Models\SkillDetail;
-use App\Modules\User\Contracts\UserContract;
 use RuntimeException;
 
 final class CreateSkillAction
 {
     public function __construct(
         private readonly SkillProductContract $products,
-        private readonly UserContract $users,
     ) {}
 
     /**

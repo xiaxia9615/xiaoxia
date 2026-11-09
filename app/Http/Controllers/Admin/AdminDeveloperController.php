@@ -23,7 +23,7 @@ final class AdminDeveloperController extends Controller
     {
         $developers = $this->developerService->paginatePendingDevelopers();
 
-        $rows = $developers->getCollection()->map(fn ($u): array => [
+        $rows = collect($developers->items())->map(fn ($u): array => [
             $u->id,
             e((string) $u->name),
             e((string) $u->email),

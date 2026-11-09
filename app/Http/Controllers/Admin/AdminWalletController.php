@@ -18,7 +18,7 @@ final class AdminWalletController extends Controller
     {
         $wallets = $this->walletService->paginateWallets();
 
-        $rows = $wallets->getCollection()->map(fn ($w): array => [
+        $rows = collect($wallets->items())->map(fn ($w): array => [
             $w->id,
             $w->user_id,
             e((string) ($w->user->name ?? '-')),
@@ -38,7 +38,7 @@ final class AdminWalletController extends Controller
     {
         $transactions = $this->walletService->paginateRecharges();
 
-        $rows = $transactions->getCollection()->map(fn ($t): array => [
+        $rows = collect($transactions->items())->map(fn ($t): array => [
             $t->id,
             e((string) ($t->out_trade_no ?? '-')),
             e((string) ($t->wallet->user->name ?? '-')),

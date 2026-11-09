@@ -9,13 +9,6 @@ use RuntimeException;
 
 final class WechatPayGateway implements PaymentGatewayInterface
 {
-    /**
-     * @param  array{app_id: ?string, mch_id: ?string, key: ?string, notify_url: ?string}  $config
-     */
-    public function __construct(
-        private readonly array $config = [],
-    ) {}
-
     public function transfer(string $account, int $amountInCents): bool
     {
         throw new RuntimeException('WechatPayGateway::transfer not implemented');

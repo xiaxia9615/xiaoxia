@@ -9,13 +9,6 @@ use RuntimeException;
 
 final class AlipayGateway implements PaymentGatewayInterface
 {
-    /**
-     * @param  array{app_id: ?string, private_key: ?string, public_key: ?string, notify_url: ?string}  $config
-     */
-    public function __construct(
-        private readonly array $config = [],
-    ) {}
-
     public function transfer(string $account, int $amountInCents): bool
     {
         throw new RuntimeException('AlipayGateway::transfer not implemented');

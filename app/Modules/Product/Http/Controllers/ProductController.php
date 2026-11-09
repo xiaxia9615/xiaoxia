@@ -25,4 +25,14 @@ final class ProductController
 
         return response()->json(['code' => 0, 'data' => $product]);
     }
+
+    /**
+     * 商品分类列表
+     *
+     * @group 商品管理
+     */
+    public function categories(): JsonResponse
+    {
+        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => []]);
+    }
 }

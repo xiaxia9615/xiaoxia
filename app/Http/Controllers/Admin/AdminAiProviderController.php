@@ -22,7 +22,7 @@ final class AdminAiProviderController extends Controller
         $providers = $this->service->paginateProviders();
 
         // Controller 层整形行数组，api_key 一律脱敏，绝不输出完整 key
-        $rows = $providers->getCollection()->map(fn ($p): array => [
+        $rows = collect($providers->items())->map(fn ($p): array => [
             $p->id,
             e((string) $p->name),
             e((string) ($p->display_name ?? '-')),
@@ -47,7 +47,7 @@ final class AdminAiProviderController extends Controller
     {
         $models = $this->service->paginateModels($providerId);
 
-        $rows = $models->getCollection()->map(fn ($m): array => [
+        $rows = collect($models->items())->map(fn ($m): array => [
             $m->id,
             e((string) $m->name),
             e((string) ($m->display_name ?? '-')),

@@ -25,7 +25,7 @@ final class AdminSkillPendingController extends Controller
     {
         $skills = $this->skillService->paginatePendingSkills();
 
-        $rows = $skills->getCollection()->map(fn ($s): array => [
+        $rows = collect($skills->items())->map(fn ($s): array => [
             $s->id,
             $s->product_id,
             e((string) ($s->product->name ?? '-')),

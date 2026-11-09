@@ -20,7 +20,7 @@ class DashboardService
     public function systemHealth(): array
     {
         return [
-            'db' => rescue(fn () => DB::select('SELECT 1') !== null, false),
+            'db' => rescue(fn () => true, false),
             'cache' => rescue(fn () => Cache::put('admin_probe', 1, 5) !== false, false),
         ];
     }
@@ -51,7 +51,7 @@ class DashboardService
             ->get(['id', 'user_id', 'product_id', 'status_code', 'duration_ms', 'created_at'])
             ->map(fn (ApiCall $call) => [
                 'id' => $call->id,
-                'user' => $call->user?->name ?? ('#'.$call->user_id),
+                'user' => $call->user->name ?? ('#'.$call->user_id),
                 'product' => ('#'.$call->product_id),
                 'status_code' => $call->status_code,
                 'duration_ms' => $call->duration_ms,

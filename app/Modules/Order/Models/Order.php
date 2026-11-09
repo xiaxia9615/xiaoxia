@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $order_no
  * @property int $user_id
  * @property int $product_id
- * @property string $status
+ * @property OrderStatus $status
  */
 class Order extends Model
 {
@@ -53,6 +53,8 @@ class Order extends Model
 
     /**
      * 买家
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -61,6 +63,8 @@ class Order extends Model
 
     /**
      * 商品（基于快照，历史订单不受商品后续修改影响）
+     *
+     * @return BelongsTo<Product, $this>
      */
     public function product(): BelongsTo
     {

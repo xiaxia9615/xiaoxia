@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Order\Http\Controllers;
 
+use App\Modules\Order\Models\Order;
 use App\Modules\Order\Services\OrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -77,5 +78,47 @@ final class OrderController
         }
 
         return response()->json(['code' => 0, 'data' => $order]);
+    }
+
+    /**
+     * 订单列表（分页）
+     *
+     * @group 订单管理
+     *
+     * @authenticated
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $orders = Order::where('user_id', $request->user()->id)->paginate(10);
+
+        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => $orders]);
+    }
+
+    /**
+     * 订单详情
+     *
+     * @group 订单管理
+     *
+     * @authenticated
+     */
+    public function show(Request $request, int $id): JsonResponse
+    {
+        $order = Order::where('user_id', $request->user()->id)->findOrFail($id);
+
+        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => $order]);
+    }
+
+    /**
+     * 查询订单状态
+     *
+     * @group 订单管理
+     *
+     * @authenticated
+     */
+    public function status(Request $request, int $id): JsonResponse
+    {
+        $order = Order::where('user_id', $request->user()->id)->findOrFail($id);
+
+        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => ['status' => $order->status]]);
     }
 }

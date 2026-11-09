@@ -45,8 +45,34 @@ export async function request<T>(
     auth?: boolean;
   } = {},
 ): Promise<T> {
-  const V1_PATHS = new Set(["/login", "/register", "/orders"]);
-  const url = new URL(API_BASE + (V1_PATHS.has(path) ? `/v1${path}` : path));
+  const PATH_MAP: Record<string, string> = {
+    "/login": "/v1/auth/login",
+    "/register": "/v1/auth/register",
+    "/orders": "/v1/orders",
+    "/order/index": "/v1/orders",
+    "/order/detail": "/v1/orders",
+    "/order/cancel": "/v1/orders",
+    "/pay/submit": "/v1/orders",
+    "/goods/index": "/v1/products",
+    "/goods/detail": "/v1/products",
+  };
+
+  let finalPath = PATH_MAP[path] ?? path;
+  if (path === "/goods/detail" && init.params?.id) {
+    finalPath = `/v1/products/${init.params.id}`;
+    delete init.params.id;
+  }
+  if (path === "/order/detail" && init.params?.id) {
+    finalPath = `/v1/orders/${init.params.id}`;
+    delete init.params.id;
+  }
+  if (path === "/order/cancel" && init.body && typeof init.body === "object" && "order_id" in init.body) {
+    finalPath = `/v1/orders/${(init.body as Record<string, unknown>).order_id}/cancel`;
+  }
+  if (path === "/pay/submit" && init.body && typeof init.body === "object" && "order_id" in init.body) {
+    finalPath = `/v1/orders/${(init.body as Record<string, unknown>).order_id}/pay`;
+  }
+  const url = new URL(API_BASE + finalPath);
   if (init.params) {
     Object.entries(init.params).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== "") {

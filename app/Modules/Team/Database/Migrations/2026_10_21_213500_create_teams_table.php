@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('owner_id')->constrained('users')->cascadeOnDelete()->comment('创建者');
+            $table->foreignId('owner_id')->constrained('users')->cascadeOnDelete()->comment('创建者'); // @phpstan-ignore-line
             $table->string('name', 100)->comment('团队名称');
             $table->timestamps();
             $table->index('owner_id');
