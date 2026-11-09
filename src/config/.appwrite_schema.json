@@ -1,0 +1,40 @@
+{
+  "databaseId": "qmuse-app-db",
+  "projectAlias": "default",
+  "tables": [
+    {
+      "tableId": "activity_participants",
+      "name": "ActivityParticipants",
+      "columns": [
+        {
+          "key": "name",
+          "type": "string",
+          "size": 255,
+          "comment": "参与者称呼",
+          "required": true
+        },
+        {
+          "key": "note",
+          "type": "string",
+          "size": 500,
+          "comment": "参与留言",
+          "required": false
+        },
+        {
+          "key": "count",
+          "type": "integer",
+          "comment": "助力次数",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "indexes": [
+        {
+          "key": "idx_name",
+          "type": "key",
+          "attributes": ["name"]
+        }
+      ]
+    }
+  ]
+}

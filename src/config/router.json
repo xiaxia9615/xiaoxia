@@ -1,0 +1,108 @@
+{
+  "Index": {
+    "path": "/",
+    "name": "Index",
+    "title": "首页",
+    "isDefault": true
+  },
+  "Products": {
+    "path": "/products",
+    "name": "Products",
+    "title": "全部好物"
+  },
+  "ProductDetail": {
+    "path": "/products/$productId",
+    "name": "ProductDetail",
+    "title": "商品详情"
+  },
+  "Assistant": {
+    "path": "/assistant",
+    "name": "Assistant",
+    "title": "AI 导购助手"
+  },
+  "Cart": {
+    "path": "/cart",
+    "name": "Cart",
+    "title": "购物车"
+  },
+  "Login": {
+    "path": "/login",
+    "name": "Login",
+    "title": "登录"
+  },
+  "Contribute": {
+    "path": "/contribute",
+    "name": "Contribute",
+    "title": "开放参与"
+  },
+  "Address": {
+    "path": "/address",
+    "name": "Address",
+    "title": "收货地址"
+  },
+  "Orders": {
+    "path": "/orders",
+    "name": "Orders",
+    "title": "我的订单"
+  },
+  "Profile": {
+    "path": "/profile",
+    "name": "Profile",
+    "title": "个人资料"
+  },
+  "Articles": {
+    "path": "/articles",
+    "name": "Articles",
+    "title": "小夏生活志"
+  },
+  "ArticleDetail": {
+    "path": "/articles/$articleId",
+    "name": "ArticleDetail",
+    "title": "文章详情"
+  },
+  "Favorites": {
+    "path": "/favorites",
+    "name": "Favorites",
+    "title": "我的收藏"
+  },
+  "Messages": {
+    "path": "/messages",
+    "name": "Messages",
+    "title": "消息中心"
+  },
+  "OrderDetail": {
+    "path": "/orders/$orderId",
+    "name": "OrderDetail",
+    "title": "订单详情"
+  },
+  "Checkout": {
+    "path": "/checkout",
+    "name": "Checkout",
+    "title": "确认订单"
+  },
+  "Aftersales": {
+    "path": "/aftersales",
+    "name": "Aftersales",
+    "title": "售后服务"
+  },
+  "BrowseHistory": {
+    "path": "/browse-history",
+    "name": "BrowseHistory",
+    "title": "浏览记录"
+  },
+  "Integral": {
+    "path": "/integral",
+    "name": "Integral",
+    "title": "我的积分"
+  },
+  "PaySelfCheck": {
+    "path": "/pay-self-check",
+    "name": "PaySelfCheck",
+    "title": "支付自检终端"
+  },
+  "SourceExport": {
+    "path": "/source-export",
+    "name": "SourceExport",
+    "title": "源码导出"
+  }
+}
