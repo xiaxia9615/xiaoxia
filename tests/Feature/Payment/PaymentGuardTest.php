@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Payment;
 
-use App\Modules\Payment\Models\PaymentOrder;
 use App\Models\User;
+use App\Modules\Payment\Models\PaymentOrder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

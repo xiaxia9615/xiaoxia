@@ -104,6 +104,7 @@ class AdminProductController extends Controller
     public function edit(int $id)
     {
         $product = Product::findOrFail($id);
+
         return view('admin.products.edit', ['product' => $product]);
     }
 
@@ -140,6 +141,7 @@ class AdminProductController extends Controller
         $product = $service->toggleStatus($id);
 
         $label = $product->status === 1 ? '上架' : '下架';
+
         return back()->with('status', "商品 {$product->name} 已{$label}");
     }
 }

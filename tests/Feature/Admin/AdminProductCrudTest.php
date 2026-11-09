@@ -22,6 +22,7 @@ final class AdminProductCrudTest extends TestCase
             'password' => bcrypt('password123'),
         ]);
         $user->forceFill(['status' => 1, 'is_admin' => true])->save();
+
         return $user;
     }
 
@@ -33,6 +34,7 @@ final class AdminProductCrudTest extends TestCase
             'password' => bcrypt('password123'),
         ]);
         $user->forceFill(['status' => 1, 'is_admin' => false])->save();
+
         return $user;
     }
 
@@ -79,7 +81,7 @@ final class AdminProductCrudTest extends TestCase
             'user_id' => $admin->id,
             'type' => 1,
             'name' => '旧名称',
-            'slug' => Str::slug('旧名称') . '-' . uniqid(),
+            'slug' => Str::slug('旧名称').'-'.uniqid(),
             'description' => '旧描述',
             'price' => 1000,
             'status' => 1,
@@ -110,7 +112,7 @@ final class AdminProductCrudTest extends TestCase
             'user_id' => $admin->id,
             'type' => 1,
             'name' => '切换测试',
-            'slug' => Str::slug('切换测试') . '-' . uniqid(),
+            'slug' => Str::slug('切换测试').'-'.uniqid(),
             'description' => null,
             'price' => 1000,
             'status' => 1,

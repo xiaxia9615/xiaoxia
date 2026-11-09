@@ -17,7 +17,7 @@ final class AdminProductService
                 'user_id' => auth()->id(),
                 'type' => (int) $data['type'],
                 'name' => $data['name'],
-                'slug' => Str::slug($data['name']) . '-' . uniqid(),
+                'slug' => Str::slug($data['name']).'-'.uniqid(),
                 'description' => $data['description'] ?? null,
                 'price' => (int) $data['price'],
                 'status' => (int) $data['status'],
@@ -35,6 +35,7 @@ final class AdminProductService
                 'price' => (int) $data['price'],
                 'type' => (int) $data['type'],
             ]);
+
             return $product;
         });
     }
@@ -44,6 +45,7 @@ final class AdminProductService
         return DB::transaction(function () use ($id) {
             $product = Product::findOrFail($id);
             $product->update(['status' => $product->status === 1 ? 0 : 1]);
+
             return $product;
         });
     }

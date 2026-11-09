@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +29,7 @@ final class AdminAuditLogController extends Controller
             e((string) ($log->target_id ?? '-')),
             e((string) ($log->operator_id ?? '-')),
             '<code class="text-xs text-slate-500">'.e((string) ($log->ip ?? '-')).'</code>',
-            e($log->created_at ? \Carbon\Carbon::parse($log->created_at)->format('Y-m-d H:i:s') : '-'),
+            e($log->created_at ? Carbon::parse($log->created_at)->format('Y-m-d H:i:s') : '-'),
         ])->all();
 
         return view('admin.audit-logs.index', [

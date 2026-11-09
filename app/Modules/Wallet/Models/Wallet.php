@@ -7,7 +7,16 @@ namespace App\Modules\Wallet\Models;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int $balance
+ * @property int $frozen_balance
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ */
 class Wallet extends Model
 {
     protected $guarded = [];

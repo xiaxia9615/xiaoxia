@@ -9,7 +9,6 @@ use App\Models\User;
 use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Payment\Contracts\PaymentGatewayInterface;
 use App\Modules\Wallet\Models\Wallet;
-use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

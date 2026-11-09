@@ -11,7 +11,6 @@ use App\Modules\Product\Models\Product;
 use App\Modules\Wallet\Models\Wallet;
 use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class AdminRefundWalletSyncTest extends TestCase
