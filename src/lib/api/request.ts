@@ -45,7 +45,8 @@ export async function request<T>(
     auth?: boolean;
   } = {},
 ): Promise<T> {
-  const url = new URL(API_BASE + path);
+  const V1_PATHS = new Set(["/login", "/register", "/orders"]);
+  const url = new URL(API_BASE + (V1_PATHS.has(path) ? `/v1${path}` : path));
   if (init.params) {
     Object.entries(init.params).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== "") {
