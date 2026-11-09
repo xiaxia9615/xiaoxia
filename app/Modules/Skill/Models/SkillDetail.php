@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Crypt;
  * @property int $free_quota
  * @property array|null $config
  * @property array|null $request_template
+ * @property string $endpoint
+ * @property string $method
  */
 class SkillDetail extends Model
 {
