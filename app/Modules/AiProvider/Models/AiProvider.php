@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\Crypt;
 
 /**
  * @property bool $enabled
+ * @property string $name
+ * @property string $display_name
+ * @property string $base_url
+ * @property float $cost_per_1k_input
+ * @property float $cost_per_1k_output
+ * @property string|null $driver
+ * @property string|null $model_name
  */
 class AiProvider extends Model
 {
