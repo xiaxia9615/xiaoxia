@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
  * @property int $status
  * @property \Illuminate\Support\Carbon|null $last_used_at
  * @property \Illuminate\Support\Carbon|null $expires_at
+ * @property int $user_id
  */
 class ApiKey extends Model
 {
