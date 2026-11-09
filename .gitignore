@@ -37,3 +37,4 @@ Thumbs.db
 reports/
 .env.backup-*
 env.bak
+docs/health-log.md
