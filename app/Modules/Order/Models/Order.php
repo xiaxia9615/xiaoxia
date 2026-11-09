@@ -16,6 +16,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $amount
  * @property array|null $product_snapshot
  * @property \Illuminate\Support\Carbon|null $paid_at
+ * @property string $order_no
+ * @property int $user_id
+ * @property int $product_id
+ * @property string $status
  */
 class Order extends Model
 {
