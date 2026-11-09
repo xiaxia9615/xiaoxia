@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $platform_income
  * @property int $influencer_income
  * @property int $donation_amount
+ * @property \Illuminate\Support\Carbon|null $created_at
  */
 class ApiCall extends Model
 {
