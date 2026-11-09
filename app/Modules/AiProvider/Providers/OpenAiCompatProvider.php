@@ -17,6 +17,12 @@ final class OpenAiCompatProvider implements ChatProviderInterface
     {
         $provider = $model->provider;
 
+        if (empty($provider->api_key)) {
+            throw new RuntimeException(
+                "AI provider [{$provider->name}] has no API key configured."
+            );
+        }
+
         $temperature = $options['temperature'] ?? 0.7;
 
         $payload = [
