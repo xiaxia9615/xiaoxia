@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $input_price_per_1k
  * @property int $output_price_per_1k
  * @property bool $enabled
+ * @property string $name
  */
 class AiModel extends Model
 {
