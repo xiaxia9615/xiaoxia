@@ -38,3 +38,5 @@ reports/
 .env.backup-*
 env.bak
 docs/health-log.md
+.archive/
+export/
