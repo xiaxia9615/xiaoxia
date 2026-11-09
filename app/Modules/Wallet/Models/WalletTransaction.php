@@ -7,6 +7,9 @@ namespace App\Modules\Wallet\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $amount
+ */
 class WalletTransaction extends Model
 {
     protected $guarded = [];

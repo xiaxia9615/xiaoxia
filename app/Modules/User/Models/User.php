@@ -11,6 +11,14 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property bool $is_admin
+ * @property bool $is_finance
+ * @property bool $is_super_admin
+ * @property bool $is_active
+ * @property bool $is_developer
+ */
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, HasRoles, Notifiable;

@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Crypt;
 
+/**
+ * @property bool $enabled
+ */
 class AiProvider extends Model
 {
     protected $table = 'ai_providers';

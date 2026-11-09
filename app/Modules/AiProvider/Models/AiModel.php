@@ -7,6 +7,12 @@ namespace App\Modules\AiProvider\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $provider_id
+ * @property int $input_price_per_1k
+ * @property int $output_price_per_1k
+ * @property bool $enabled
+ */
 class AiModel extends Model
 {
     protected $table = 'ai_models';

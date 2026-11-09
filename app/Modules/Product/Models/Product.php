@@ -11,6 +11,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $type
+ * @property int $price
+ * @property int $status
+ * @property int $sales_count
+ * @property int $view_count
+ */
 class Product extends Model
 {
     use HasFactory;

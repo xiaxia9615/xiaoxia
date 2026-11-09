@@ -12,6 +12,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Crypt;
 
+/**
+ * @property int $product_id
+ * @property int $pricing_type
+ * @property int $provider_share
+ * @property int $platform_share
+ * @property int $influencer_share
+ * @property int $donation_share
+ * @property int $free_quota
+ * @property array|null $config
+ * @property array|null $request_template
+ */
 class SkillDetail extends Model
 {
     use HasFactory;

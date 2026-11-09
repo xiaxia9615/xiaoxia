@@ -11,6 +11,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $user_id
+ * @property int $api_key_id
+ * @property int $product_id
+ * @property int $provider_id
+ * @property array|null $input
+ * @property array|null $output
+ * @property int $status_code
+ * @property int $duration_ms
+ * @property int $cost
+ * @property int $provider_income
+ * @property int $platform_income
+ * @property int $influencer_income
+ * @property int $donation_amount
+ */
 class ApiCall extends Model
 {
     use HasFactory;

@@ -12,6 +12,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $amount
+ * @property array|null $product_snapshot
+ * @property \Illuminate\Support\Carbon|null $paid_at
+ */
 class Order extends Model
 {
     use HasFactory;
