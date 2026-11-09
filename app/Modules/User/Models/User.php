@@ -18,6 +18,10 @@ use Spatie\Permission\Traits\HasRoles;
  * @property bool $is_super_admin
  * @property bool $is_active
  * @property bool $is_developer
+ * @property string $name
+ * @property string $email
+ * @property int $status
+ * @property string $developer_status
  */
 class User extends Authenticatable
 {
