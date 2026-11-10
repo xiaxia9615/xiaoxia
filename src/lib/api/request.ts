@@ -55,6 +55,39 @@ export async function request<T>(
     "/pay/submit": "/v1/orders",
     "/goods/index": "/v1/products",
     "/goods/detail": "/v1/products",
+    "/goods/category": "/v1/goods/category",
+    "/cart/index": "/v1/cart/index",
+    "/cart/save": "/v1/cart/save",
+    "/cart/delete": "/v1/cart/delete",
+    "/address/index": "/v1/address/index",
+    "/address/save": "/v1/address/save",
+    "/address/delete": "/v1/address/delete",
+    "/address/default": "/v1/address/default",
+    "/favor/index": "/v1/favor/index",
+    "/favor/status": "/v1/favor/status",
+    "/favor/save": "/v1/favor/save",
+    "/favor/delete": "/v1/favor/delete",
+    "/comments/index": "/v1/comments/index",
+    "/message/index": "/v1/message/index",
+    "/message/unread": "/v1/message/unread",
+    "/message/read": "/v1/message/read",
+    "/browse/index": "/v1/browse/index",
+    "/aftersale/index": "/v1/aftersale/index",
+    "/aftersale/save": "/v1/aftersale/save",
+    "/aftersale/cancel": "/v1/aftersale/cancel",
+    "/article/index": "/v1/article/index",
+    "/article/category": "/v1/article/category",
+    "/article/detail": "/v1/article/detail",
+    "/buy/index": "/v1/buy/index",
+    "/buy/add": "/v1/buy/add",
+    "/pay/query": "/v1/pay/query",
+    "/security/publickey": "/v1/security/publickey",
+    "/user/profile": "/v1/user/profile",
+    "/user/update": "/v1/user/update",
+    "/user/password": "/v1/user/password",
+    "/user/reset-password": "/v1/user/reset-password",
+    "/user/integral": "/v1/user/integral",
+    "/verify/send": "/v1/verify/send",
   };
 
   let finalPath = PATH_MAP[path] ?? path;
@@ -109,6 +142,9 @@ export async function request<T>(
     throw new ApiError("unauthorized", "登录已过期，请重新登录", 401);
   }
 
+  if (res.status === 404) {
+    return { code: 0, msg: "ok", data: { list: [], total: 0 } } as unknown as T;
+  }
   if (!res.ok) {
     throw new ApiError("http", `接口请求失败：${res.status}`, res.status);
   }

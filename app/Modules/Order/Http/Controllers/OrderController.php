@@ -121,4 +121,28 @@ final class OrderController
 
         return response()->json(['code' => 0, 'msg' => 'ok', 'data' => ['status' => $order->status]]);
     }
+
+    /** @group 订单管理 */
+    public function orderIndex(Request $request): JsonResponse
+    {
+        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => ['list' => [], 'total' => 0]]);
+    }
+
+    /** @group 订单管理 */
+    public function orderDetail(Request $request): JsonResponse
+    {
+        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => null]);
+    }
+
+    /** @group 订单管理 */
+    public function orderCancel(Request $request): JsonResponse
+    {
+        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => []]);
+    }
+
+    /** @group 订单管理 */
+    public function orderDelete(Request $request): JsonResponse
+    {
+        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => []]);
+    }
 }
