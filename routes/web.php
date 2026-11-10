@@ -17,7 +17,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => redirect()->route('login'));
+Route::get('/', fn () => view('spa'));
 
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
@@ -95,7 +95,7 @@ Route::middleware(['auth', 'finance'])->prefix('admin/finance')->name('admin.fin
     Route::get('/withdrawals/export', [AdminFinanceController::class, 'exportWithdrawals'])->name('withdrawals.export');
 });
 
-// 前端 React 单页应用入口
-Route::get('/app/{any?}', function () {
+// SPA 兜底路由：拦截所有非 api、非 admin 的 GET 请求，防止前端页面刷新 404
+Route::get('/{any}', function () {
     return view('spa');
-})->where('any', '.*');
+})->where('any', '^(?!api|admin).*$');

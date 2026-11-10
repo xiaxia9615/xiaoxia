@@ -32,7 +32,7 @@ Route::get('/health', function () {
 
 Route::get('/user', function (Request $request) {
     return $request->user();
-})->middleware('auth:***');
+})->middleware('auth:sanctum');
 
 if (config('app.env') !== 'production') {
     Route::prefix('v1/payment/notify')->group(function (): void {
@@ -74,7 +74,7 @@ Route::prefix('v1')->group(function (): void {
 
 // ===== 需登录路由 =====
 
-Route::middleware('auth:***')->prefix('v1')->group(function (): void {
+Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
     // Cart（购物车）
     Route::get('cart/index', [CartController::class, 'index']);
     Route::post('cart/save', [CartController::class, 'save']);

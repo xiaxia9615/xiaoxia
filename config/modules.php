@@ -15,6 +15,8 @@ return [
         'Payment',
         'Order',
         'Distributor',
+        'Address',
+        'Cart',
     ],
 
     'provider_pattern' => 'App\\Modules\\%s\\Providers\\%sServiceProvider',
@@ -32,5 +34,7 @@ return [
         'Payment' => [],
         'Order' => ['User', 'Product', 'Ledger', 'Distributor', 'Wallet'],
         'Distributor' => ['User'],
+        'Address' => ['User'],
+        'Cart' => ['User', 'Product'],
     ],
 ];
