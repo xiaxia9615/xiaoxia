@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Modules\System\Services;
 
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 final class AdminSystemService
 {

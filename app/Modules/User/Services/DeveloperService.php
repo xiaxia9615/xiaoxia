@@ -11,7 +11,6 @@ use RuntimeException;
 
 class DeveloperService
 {
-
     /**
      * 用户申请成为开发者（状态变更为 PENDING）
      *
