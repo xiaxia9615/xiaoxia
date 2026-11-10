@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAiProviderController;
-use App\Http\Controllers\Admin\AdminAuditLogController;
 use App\Http\Controllers\Admin\AdminApiKeyController;
+use App\Http\Controllers\Admin\AdminAuditLogController;
 use App\Http\Controllers\Admin\AdminDeveloperController;
 use App\Http\Controllers\Admin\AdminFinanceController;
 use App\Http\Controllers\Admin\AdminLedgerController;
@@ -94,3 +94,8 @@ Route::middleware(['auth', 'finance'])->prefix('admin/finance')->name('admin.fin
     Route::get('/recharges/export', [AdminFinanceController::class, 'exportRecharges'])->name('recharges.export');
     Route::get('/withdrawals/export', [AdminFinanceController::class, 'exportWithdrawals'])->name('withdrawals.export');
 });
+
+// 前端 React 单页应用入口
+Route::get('/app/{any?}', function () {
+    return view('spa');
+})->where('any', '.*');
