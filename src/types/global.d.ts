@@ -29,6 +29,8 @@ declare module "*?raw" {
   export default content;
 }
 
+declare module "*.css";
+
 interface Window {
   __MUSE__: {
     appId: string;
