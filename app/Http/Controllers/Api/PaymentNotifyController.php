@@ -33,6 +33,14 @@ final class PaymentNotifyController
 
     private function handleNotify(array $payload, string $successResponse): JsonResponse
     {
+        if (config('app.env') === 'production'
+            && config('payment.default') === 'mock'
+            && ! config('payment.allow_mock')) {
+            Log::error('payment notify rejected: mock gateway in production');
+
+            return response()->json(['code' => 'FAIL'], 200);
+        }
+
         $gateway = app(PaymentGatewayInterface::class);
         $result = $gateway->verifyNotify($payload);
 

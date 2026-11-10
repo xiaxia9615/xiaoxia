@@ -35,5 +35,7 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="PAYMENT_GATEWAY" value="mock"/>
+        <env name="ALLOW_MOCK_PAYMENT" value="true"/>
     </php>
 </phpunit>

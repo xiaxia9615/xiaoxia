@@ -40,10 +40,18 @@ final class MockPaymentGateway implements PaymentGatewayInterface
             'payload' => $payload,
         ]);
 
+        if (! isset($payload['order_no'], $payload['amount_in_cents'])) {
+            return [
+                'verified' => false,
+                'order_no' => $payload['order_no'] ?? '',
+                'amount_in_cents' => 0,
+            ];
+        }
+
         return [
             'verified' => true,
-            'order_no' => $payload['order_no'] ?? '',
-            'amount_in_cents' => $payload['amount_in_cents'] ?? 6,
+            'order_no' => $payload['order_no'],
+            'amount_in_cents' => (int) $payload['amount_in_cents'],
         ];
     }
 }
