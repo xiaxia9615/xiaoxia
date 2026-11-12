@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\AiProvider\Providers;
 
 use App\Modules\AiProvider\Contracts\ChatProviderInterface;
-use App\Modules\AiProvider\Dto\ChatResult;
+use App\Modules\AiProvider\DTOs\ChatResult;
 use App\Modules\AiProvider\Models\AiModel;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;

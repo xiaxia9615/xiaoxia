@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Modules\AiProvider\Clients\GlmClient;
-use App\Modules\AiProvider\Dto\ChatResult;
 use App\Modules\AiProvider\DTOs\AiResponseDTO;
+use App\Modules\AiProvider\DTOs\ChatResult;
 use App\Modules\AiProvider\Models\AiModel;
 use App\Modules\AiProvider\Models\AiProvider;
 use App\Modules\AiProvider\Services\ChatRouter;

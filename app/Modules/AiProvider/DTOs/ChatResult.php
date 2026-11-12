@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\AiProvider\Dto;
+namespace App\Modules\AiProvider\DTOs;
 
 final class ChatResult
 {
