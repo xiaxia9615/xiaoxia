@@ -296,7 +296,8 @@ final class ModuleBoundaryTest extends TestCase
     {
         $content = file_get_contents(base_path($relativePath));
         $modules = [];
-        if (preg_match_all('/^use\s+App\\\\Modules\\\\([A-Za-z]+)\\\\/m', $content, $m)) {
+        // 仅检查非 Contracts 的跨模块引用；Contracts\* 是公共接口，任何模块均可引用
+        if (preg_match_all('/^use\s+App\\\\Modules\\\\([A-Za-z]+)\\\\(?!Contracts\\\\)/m', $content, $m)) {
             foreach ($m[1] as $mod) {
                 $modules[] = $mod;
             }

@@ -21,6 +21,7 @@ return [
         'Browse',
         'Comment',
         'Message',
+        'System',
     ],
 
     'provider_pattern' => 'App\\Modules\\%s\\Providers\\%sServiceProvider',
