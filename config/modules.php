@@ -17,6 +17,10 @@ return [
         'Distributor',
         'Address',
         'Cart',
+        'Article',
+        'Browse',
+        'Comment',
+        'Message',
     ],
 
     'provider_pattern' => 'App\\Modules\\%s\\Providers\\%sServiceProvider',
@@ -36,5 +40,9 @@ return [
         'Distributor' => ['User'],
         'Address' => ['User'],
         'Cart' => ['User', 'Product'],
+        'Article' => [],
+        'Browse' => ['User', 'Product'],
+        'Comment' => ['User', 'Product'],
+        'Message' => ['User'],
     ],
 ];

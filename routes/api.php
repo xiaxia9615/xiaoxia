@@ -60,9 +60,6 @@ Route::prefix('v1')->group(function (): void {
     Route::get('goods/category', [GoodsController::class, 'category']);
     Route::get('goods/detail', [GoodsController::class, 'detail']);
 
-    // Comment（评论）
-    Route::get('comments/index', [CommentController::class, 'index']);
-
     // Security
     Route::get('security/publickey', function () {
         return response()->json(['code' => 0, 'msg' => 'ok', 'data' => []]);
@@ -77,6 +74,9 @@ Route::prefix('v1')->group(function (): void {
 // ===== 需登录路由 =====
 
 Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
+    // Comment（评论）
+    Route::get('comments/index', [CommentController::class, 'index']);
+
     // Cart（购物车）
     Route::get('cart/index', [CartController::class, 'index']);
     Route::post('cart/save', [CartController::class, 'save']);
