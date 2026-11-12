@@ -45,6 +45,8 @@ function layerOf(rel) {
   if (p.startsWith("src/services/")) return "services";
   if (p.startsWith("src/components/ui/")) return "ui";
   if (p.startsWith("src/components/")) return "components";
+  if (p.startsWith("src/config/components/ui/")) return "ui";
+  if (p.startsWith("src/config/components/")) return "components";
   return "shared"; // data / i18n / types / utils 等
 }
 
