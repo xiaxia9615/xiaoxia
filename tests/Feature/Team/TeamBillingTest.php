@@ -10,6 +10,7 @@ use App\Modules\Ledger\Services\LedgerService;
 use App\Modules\Team\Dto\BillingContext;
 use App\Modules\Team\Models\Team;
 use App\Modules\Team\Services\TeamBillingService;
+use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -74,6 +75,8 @@ final class TeamBillingTest extends TestCase
 
     private function topUp(User $user, int $amount): void
     {
+        app(WalletService::class)->deposit($user, $amount, 'topup_'.uniqid());
+        /*
         $this->ledger->record('topup', $user->id, [
             [
                 'owner_type' => 'platform',
@@ -90,6 +93,7 @@ final class TeamBillingTest extends TestCase
                 'amount' => $amount,
             ],
         ]);
+        */
     }
 
     private function makeContext(Team $team, User $actor, int $apiKeyId, string $requestId): BillingContext

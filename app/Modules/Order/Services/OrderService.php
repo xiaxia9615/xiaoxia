@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Modules\Order\Services;
 
 use App\Modules\Distributor\Models\DistributorRelation;
-use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Models\Order;
 use App\Modules\Product\Models\Product;
@@ -23,7 +22,6 @@ final class OrderService
     private const ORDER_NO_MAX_ATTEMPTS = 5;
 
     public function __construct(
-        private readonly LedgerContract $ledger,
         private readonly WalletService $wallet,
     ) {}
 
@@ -201,7 +199,7 @@ final class OrderService
         // 平台分成 = 总额 - 开发者 - 达人，舍入误差自然归入平台
         $splits[] = ['owner_type' => 'platform', 'owner_id' => 0, 'account_type' => 'platform', 'direction' => 'credit', 'amount' => $amount - $paidOut];
 
-        $this->ledger->record('order_commission', $order->id, $splits);
+        $this->wallet->record('order_commission', $order->id, $splits);
     }
 
     /**

@@ -10,6 +10,7 @@ use App\Modules\ApiKey\Models\ApiKey;
 use App\Modules\Ledger\Services\LedgerService;
 use App\Modules\Product\Models\Product;
 use App\Modules\Skill\Models\SkillDetail;
+use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -71,6 +72,8 @@ final class SkillCallIdempotentTest extends TestCase
 
     private function topUp(User $user, int $amount): void
     {
+        app(WalletService::class)->deposit($user, $amount, 'topup_'.uniqid());
+        /*
         app(LedgerService::class)->record('topup', $user->id, [
             [
                 'owner_type' => 'platform',
@@ -87,6 +90,7 @@ final class SkillCallIdempotentTest extends TestCase
                 'amount' => $amount,
             ],
         ]);
+        */
     }
 
     // ─── 场景 1：同一 request_id 调用两次 → 幂等 ───

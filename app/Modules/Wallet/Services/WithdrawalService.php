@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Modules\Wallet\Services;
 
 use App\Models\User;
-use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Wallet\Models\Withdrawal;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +12,6 @@ use Illuminate\Support\Facades\Log;
 final class WithdrawalService
 {
     public function __construct(
-        private readonly LedgerContract $ledger,
         private readonly WalletService $walletService,
     ) {}
 
@@ -73,14 +71,8 @@ final class WithdrawalService
                 throw new \RuntimeException("提现单 #{$id} 当前状态为 {$locked->status}，仅 approved 状态可确认已打款。");
             }
 
-            $this->ledger->debit(
-                'user',
-                (int) $locked->user_id,
-                'frozen',
-                (int) $locked->amount,
-                'withdrawal_paid',
-                (int) $locked->id,
-            );
+            $user = User::findOrFail($locked->user_id);
+            $this->walletService->deductFunds($user, (int) $locked->amount);
 
             $locked->forceFill([
                 'status' => Withdrawal::STATUS_PAID,

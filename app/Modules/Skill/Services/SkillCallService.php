@@ -7,9 +7,9 @@ namespace App\Modules\Skill\Services;
 use App\Models\User;
 use App\Modules\ApiKey\Contracts\ApiCallContract;
 use App\Modules\ApiKey\Contracts\ApiKeyContract;
-use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Product\Contracts\SkillProductContract;
 use App\Modules\Skill\Models\SkillDetail;
+use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
@@ -20,7 +20,7 @@ use RuntimeException;
 final class SkillCallService
 {
     public function __construct(
-        private readonly LedgerContract $ledger,
+        private readonly WalletService $wallet,
         private readonly SkillProductContract $products,
         private readonly ApiKeyContract $apiKeys,
         private readonly ApiCallContract $apiCalls,
@@ -57,7 +57,7 @@ final class SkillCallService
             throw new RuntimeException('no api key for this user');
         }
         $cost = (int) $product['price'];
-        $balance = $this->ledger->balance('user', $caller->id, 'balance');
+        $balance = $this->wallet->getBalance($caller)['balance'];
         if ($balance < $cost) {
             throw new RuntimeException("余额不足：当前 {$balance} 分，需要 {$cost} 分");
         }
@@ -130,12 +130,17 @@ final class SkillCallService
             }
             throw $e;
         }
-        $this->ledger->record('api_call', $callId, [
+        // 先经 WalletService::deduct 扣减用户余额（同步 wallets.balance + Ledger），
+        // 再用 wallet->record 记录剩余分账（provider 信用、平台信用等）。
+        // 平台 debit $cost 用于抵消 deduct() 中平台多出的 credit，保持账目平衡。
+        $this->wallet->deduct($caller, $cost, 'skill_call_'.$callId);
+
+        $this->wallet->record('api_call', $callId, [
             ['owner_type' => 'user',     'owner_id' => $caller->id, 'account_type' => 'provider',   'direction' => 'credit', 'amount' => $provider],
+            ['owner_type' => 'platform', 'owner_id' => 0,           'account_type' => 'platform',   'direction' => 'debit',  'amount' => $cost],
             ['owner_type' => 'platform', 'owner_id' => 0,           'account_type' => 'platform',   'direction' => 'credit', 'amount' => $platform],
             ['owner_type' => 'platform', 'owner_id' => 0,           'account_type' => 'influencer', 'direction' => 'credit', 'amount' => $influencer],
             ['owner_type' => 'platform', 'owner_id' => 0,           'account_type' => 'donation',   'direction' => 'credit', 'amount' => $donation],
-            ['owner_type' => 'user',     'owner_id' => $caller->id, 'account_type' => 'balance',    'direction' => 'debit',  'amount' => $cost],
         ]);
 
         return [

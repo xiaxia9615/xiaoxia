@@ -264,6 +264,34 @@ final class ModuleBoundaryTest extends TestCase
         $this->assertSame([], $violations, "未声明的跨模块表访问：\n".implode("\n", $violations));
     }
 
+    public function test_business_code_does_not_bypass_walletservice_for_ledger_operations(): void
+    {
+        $violations = [];
+        foreach ($this->moduleFiles() as $file) {
+            $current = $this->moduleOf($file);
+            if ($current === '' || $current === 'Wallet' || $current === 'Ledger') {
+                continue;
+            }
+            $content = file_get_contents(base_path($file));
+            // 仅检查注入了 LedgerContract/LedgerService 的文件
+            if (! preg_match('/use\s+App\\\\Modules\\\\Ledger\\\\(?:Contracts\\\\LedgerContract|Services\\\\LedgerService)/', $content)) {
+                continue;
+            }
+            // 逐行检查 ->debit( 或 ->record( 调用，跳过注释
+            $lines = explode("\n", $content);
+            foreach ($lines as $i => $line) {
+                $trimmed = ltrim($line);
+                if (str_starts_with($trimmed, '//') || str_starts_with($trimmed, '*') || str_starts_with($trimmed, '/*')) {
+                    continue;
+                }
+                if (preg_match('/->(?:debit|record)\s*\(/', $line)) {
+                    $violations[] = "{$file}:".($i + 1).' 业务代码绕过 WalletService 直接调用 Ledger debit/record';
+                }
+            }
+        }
+        $this->assertSame([], $violations, "业务代码绕过 WalletService 直接操作 Ledger：\n".implode("\n", $violations));
+    }
+
     private function usedModules(string $relativePath): array
     {
         $content = file_get_contents(base_path($relativePath));

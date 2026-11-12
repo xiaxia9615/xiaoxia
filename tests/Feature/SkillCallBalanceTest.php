@@ -9,6 +9,7 @@ use App\Modules\ApiKey\Models\ApiKey;
 use App\Modules\Ledger\Services\LedgerService;
 use App\Modules\Product\Models\Product;
 use App\Modules\Skill\Models\SkillDetail;
+use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -92,10 +93,7 @@ final class SkillCallBalanceTest extends TestCase
         $provider = $this->makeUser('p@test.com');
         $skill = $this->makeSkill(1000, $provider->id);
 
-        app(LedgerService::class)->record('topup', $caller->id, [
-            ['owner_type' => 'platform', 'owner_id' => 0, 'account_type' => 'platform', 'direction' => 'debit', 'amount' => 5000],
-            ['owner_type' => 'user', 'owner_id' => $caller->id, 'account_type' => 'balance', 'direction' => 'credit', 'amount' => 5000],
-        ]);
+        app(WalletService::class)->deposit($caller, 5000, 'topup_'.uniqid());
 
         $this->postJson("/api/v1/skills/{$skill->id}/call", ['input' => 'hi'], [
             'Authorization' => "Bearer {$token}",

@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Team\Services;
 
-use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Team\Dto\BillingContext;
+use App\Modules\User\Models\User;
+use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\DB;
  */
 final class TeamBillingService
 {
-    public function __construct(private readonly LedgerContract $ledger) {}
+    public function __construct(private readonly WalletService $walletService) {}
 
     /**
      * 团队计费：扣 billing_owner_id 的 balance 账户，记录 actor_user_id。
@@ -49,15 +50,19 @@ final class TeamBillingService
                     throw new \RuntimeException('非团队成员，拒绝扣费: team='.$ctx->teamId.' actor='.$ctx->actorUserId);
                 }
 
-                // 扣团队 owner 公户：余额不足时 debit() 抛 RuntimeException 令事务回滚
-                $transactionId = $this->ledger->debit(
-                    'user',
-                    $ctx->billingOwnerId,
-                    'balance',
+                // 扣团队 owner 公户：经 WalletService::deduct（悲观锁 + 余额校验 + 幂等）
+                $result = $this->walletService->deduct(
+                    User::findOrFail($ctx->billingOwnerId),
                     $amount,
-                    'team_api_call',
-                    $ctx->teamId,
+                    'team_billing_'.$ctx->requestId,
                 );
+                $transactionId = $result['ledger_transaction_id'] ?? '';
+                if ($result['status'] === 'already_processed') {
+                    $existing = $this->findByRequestId($ctx->requestId);
+                    if ($existing !== null) {
+                        return $existing;
+                    }
+                }
 
                 // 审计落库：与扣费同事务，插入失败则整体回滚
                 DB::table('team_billing_records')->insert([

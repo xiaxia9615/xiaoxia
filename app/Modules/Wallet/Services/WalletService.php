@@ -74,14 +74,14 @@ final class WalletService
                 throw $e;
             }
 
-            $this->ledger->record('wallet_deduct', $transaction->id, [
+            $txId = $this->ledger->record('wallet_deduct', $transaction->id, [
                 ['owner_type' => 'user', 'owner_id' => $user->id, 'account_type' => 'balance', 'direction' => 'debit', 'amount' => $amount],
                 ['owner_type' => 'platform', 'owner_id' => 0, 'account_type' => 'platform', 'direction' => 'credit', 'amount' => $amount],
             ]);
 
             $wallet->decrement('balance', $amount);
 
-            return ['status' => 'success', 'amount' => $amount];
+            return ['status' => 'success', 'amount' => $amount, 'ledger_transaction_id' => $txId];
         });
     }
 
@@ -169,6 +169,16 @@ final class WalletService
                 ['owner_type' => 'user', 'owner_id' => $user->id, 'account_type' => 'balance', 'direction' => 'credit', 'amount' => $amount],
             ]);
         });
+    }
+
+    /**
+     * 透传 Ledger 复式记账（供需要多分录拆分的业务场景使用）。
+     *
+     * 单分录的余额增减应使用 deposit/deduct/freezeFunds/deductFunds/refundFunds。
+     */
+    public function record(string $bizType, int $bizId, array $splits): string
+    {
+        return $this->ledger->record($bizType, $bizId, $splits);
     }
 
     /**

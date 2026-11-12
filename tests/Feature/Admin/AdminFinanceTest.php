@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Withdrawal;
 use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Wallet\Models\Wallet;
+use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -132,10 +133,10 @@ final class AdminFinanceTest extends TestCase
             'status' => Withdrawal::STATUS_APPROVED,
         ]);
 
-        // 预置用户 frozen 账户余额（通过 LedgerContract 记账）
-        app(LedgerContract::class)->record('test_setup', 0, [
-            ['owner_type' => 'user', 'owner_id' => $applicant->id, 'account_type' => 'frozen', 'direction' => 'credit', 'amount' => 10000],
-        ]);
+        // 预置用户冻结余额：先充值再冻结（经 WalletService 同步 wallets + Ledger）
+        $walletService = app(WalletService::class);
+        $walletService->deposit($applicant, 10000, 'test_deposit_'.uniqid());
+        $walletService->freezeFunds($applicant, 10000);
 
         $res = $this->actingAs($finance)->post("/admin/finance/withdrawals/{$withdrawal->id}/mark-paid");
         $res->assertRedirect(route('admin.finance.withdrawals'));

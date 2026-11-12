@@ -7,6 +7,7 @@ namespace Tests\Feature\Skill;
 use App\Models\User;
 use App\Modules\AiProvider\Models\AiProvider;
 use App\Modules\Ledger\Services\LedgerService;
+use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -45,10 +46,8 @@ final class SmartRoutingGatewayTest extends TestCase
      */
     private function topUp(LedgerService $ledger, int $userId, int $millis): int
     {
-        $ledger->record('topup', $userId, [
-            ['owner_type' => 'platform', 'owner_id' => 0,          'account_type' => 'platform', 'direction' => 'debit',  'amount' => $millis],
-            ['owner_type' => 'user',     'owner_id' => $userId,    'account_type' => 'balance', 'direction' => 'credit', 'amount' => $millis],
-        ]);
+        $user = User::find($userId);
+        app(WalletService::class)->deposit($user, $millis, 'topup_'.uniqid());
 
         return $ledger->balance('user', $userId, 'balance');
     }
@@ -124,8 +123,8 @@ final class SmartRoutingGatewayTest extends TestCase
             $finalBalance,
             "真实余额应从 {$initialBalance} 毫扣减 3 毫（0.003 元）至 ".($initialBalance - 3).' 毫，实际为 '.$finalBalance.' 毫'
         );
-        // 账本中应存在本次 AI 用量的 debit 分录（biz_type = ai_usage）
-        $this->assertSame(1, DB::table('ledger_entries')->where('biz_type', 'ai_usage')->where('direction', 'debit')->count());
+        // 账本中应存在本次 AI 用量的 debit 分录（经 WalletService::deduct 记录，biz_type = wallet_deduct）
+        $this->assertSame(1, DB::table('ledger_entries')->where('biz_type', 'wallet_deduct')->where('direction', 'debit')->count());
     }
 
     public function test_gateway_rejects_when_balance_insufficient_and_writes_nothing(): void
