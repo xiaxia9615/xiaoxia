@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Api\PaymentNotifyController;
 use App\Modules\Address\Http\Controllers\AddressController;
 use App\Modules\Aftersale\Http\Controllers\AftersaleController;
@@ -147,6 +149,10 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
     Route::get('orders/{id}', [OrderController::class, 'show'])->whereNumber('id');
     Route::get('orders/{id}/status', [OrderController::class, 'status'])->whereNumber('id');
     Route::get('products/categories', [ProductController::class, 'categories']);
+
+    // Admin（管理员接口）
+    Route::get('admin/orders', [AdminOrderController::class, 'apiIndex']);
+    Route::get('admin/users', [AdminUserController::class, 'apiIndex']);
 });
 
 if (config('app.env') !== 'production') {

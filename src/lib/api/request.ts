@@ -88,6 +88,8 @@ export async function request<T>(
     "/user/reset-password": "/v1/user/reset-password",
     "/user/integral": "/v1/user/integral",
     "/verify/send": "/v1/verify/send",
+    "/admin/orders": "/v1/admin/orders",
+    "/admin/users": "/v1/admin/users",
   };
 
   let finalPath = PATH_MAP[path] ?? path;

@@ -21,6 +21,7 @@ use Illuminate\Support\Carbon;
  * @property int $user_id
  * @property int $product_id
  * @property OrderStatus $status
+ * @property Carbon|null $created_at
  */
 class Order extends Model
 {

@@ -36,6 +36,41 @@ class AdminOrderController extends Controller
     }
 
     /**
+     * API 订单列表：返回 JSON 分页数据，供前端后台使用。
+     */
+    public function apiIndex(Request $request)
+    {
+        $orders = Order::query()
+            ->with(['user:id,name,email', 'product:id,name,cover,price'])
+            ->orderByDesc('created_at')
+            ->paginate(20)
+            ->withQueryString();
+
+        $list = $orders->getCollection()->map(fn ($order): array => [
+            'id' => $order->id,
+            'order_no' => $order->order_no,
+            'amount' => $order->amount,
+            'status' => $order->status->value,
+            'product_name' => $order->product?->name,
+            'user_name' => $order->user?->name,
+            'user_email' => $order->user?->email,
+            'created_at' => $order->created_at?->toDateTimeString(),
+        ])->all();
+
+        return response()->json([
+            'code' => 0,
+            'msg' => 'ok',
+            'data' => [
+                'list' => $list,
+                'total' => $orders->total(),
+                'current_page' => $orders->currentPage(),
+                'last_page' => $orders->lastPage(),
+                'per_page' => $orders->perPage(),
+            ],
+        ]);
+    }
+
+    /**
      * 订单退款：仅已支付订单可退款。
      *
      * 事务内通过 LedgerContract 复式记账：

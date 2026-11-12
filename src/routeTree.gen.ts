@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AddressRouteImport } from './routes/address'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AftersalesRouteImport } from './routes/aftersales'
 import { Route as ArticlesRouteImport } from './routes/articles'
 import { Route as AssistantRouteImport } from './routes/assistant'
@@ -39,6 +40,11 @@ const IndexRoute = IndexRouteImport.update({
 const AddressRoute = AddressRouteImport.update({
   id: '/address',
   path: '/address',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AftersalesRoute = AftersalesRouteImport.update({
@@ -140,6 +146,7 @@ const ProductsProductIdRoute = ProductsProductIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/address': typeof AddressRoute
+  '/admin': typeof AdminRoute
   '/aftersales': typeof AftersalesRoute
   '/articles': typeof ArticlesRoute
   '/assistant': typeof AssistantRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/address': typeof AddressRoute
+  '/admin': typeof AdminRoute
   '/aftersales': typeof AftersalesRoute
   '/articles': typeof ArticlesRoute
   '/assistant': typeof AssistantRoute
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/address': typeof AddressRoute
+  '/admin': typeof AdminRoute
   '/aftersales': typeof AftersalesRoute
   '/articles': typeof ArticlesRoute
   '/assistant': typeof AssistantRoute
@@ -212,6 +221,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/address'
+    | '/admin'
     | '/aftersales'
     | '/articles'
     | '/assistant'
@@ -235,6 +245,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/address'
+    | '/admin'
     | '/aftersales'
     | '/articles'
     | '/assistant'
@@ -258,6 +269,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/address'
+    | '/admin'
     | '/aftersales'
     | '/articles'
     | '/assistant'
@@ -282,6 +294,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AddressRoute: typeof AddressRoute
+  AdminRoute: typeof AdminRoute
   AftersalesRoute: typeof AftersalesRoute
   ArticlesRoute: typeof ArticlesRoute
   AssistantRoute: typeof AssistantRoute
@@ -317,6 +330,13 @@ declare module '@tanstack/react-router' {
       path: '/address'
       fullPath: '/address'
       preLoaderRoute: typeof AddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/aftersales': {
@@ -458,6 +478,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AddressRoute: AddressRoute,
+  AdminRoute: AdminRoute,
   AftersalesRoute: AftersalesRoute,
   ArticlesRoute: ArticlesRoute,
   AssistantRoute: AssistantRoute,

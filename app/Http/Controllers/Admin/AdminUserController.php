@@ -19,6 +19,35 @@ class AdminUserController extends Controller
         return view('admin.users.index', ['users' => $users]);
     }
 
+    /**
+     * API 用户列表：返回 JSON 分页数据，供前端后台使用。
+     */
+    public function apiIndex(AdminUserService $service)
+    {
+        $users = $service->paginateUsers();
+
+        $list = collect($users->items())->map(fn ($user): array => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'is_admin' => (bool) $user->is_admin,
+            'is_active' => (bool) $user->is_active,
+            'created_at' => $user->created_at?->toDateTimeString(),
+        ])->all();
+
+        return response()->json([
+            'code' => 0,
+            'msg' => 'ok',
+            'data' => [
+                'list' => $list,
+                'total' => $users->total(),
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'per_page' => $users->perPage(),
+            ],
+        ]);
+    }
+
     public function show(AdminUserService $service, int $id)
     {
         $user = $service->findUser($id);

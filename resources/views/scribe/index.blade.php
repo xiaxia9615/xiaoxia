@@ -149,6 +149,12 @@
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-POSTapi-v1-user-reset-password">
                                 <a href="#endpoints-POSTapi-v1-user-reset-password">POST api/v1/user/reset-password</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-GETapi-v1-admin-orders">
+                                <a href="#endpoints-GETapi-v1-admin-orders">API 订单列表：返回 JSON 分页数据，供前端后台使用。</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-GETapi-v1-admin-users">
+                                <a href="#endpoints-GETapi-v1-admin-users">API 用户列表：返回 JSON 分页数据，供前端后台使用。</a>
+                            </li>
                                                                         </ul>
                             </ul>
                     <ul id="tocify-header-" class="tocify-header">
@@ -263,16 +269,16 @@
                 </li>
                                     <ul id="tocify-subheader-" class="tocify-subheader">
                                                     <li class="tocify-item level-2" data-unique="-GETapi-v1-address-index">
-                                <a href="#-GETapi-v1-address-index">GET api/v1/address/index</a>
+                                <a href="#-GETapi-v1-address-index">地址列表（默认地址排最前）。</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="-POSTapi-v1-address-save">
-                                <a href="#-POSTapi-v1-address-save">POST api/v1/address/save</a>
+                                <a href="#-POSTapi-v1-address-save">新增 / 更新地址（带 id 为更新，不带 id 为新增）。</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="-POSTapi-v1-address-delete">
-                                <a href="#-POSTapi-v1-address-delete">POST api/v1/address/delete</a>
+                                <a href="#-POSTapi-v1-address-delete">删除地址。</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="-POSTapi-v1-address-default">
-                                <a href="#-POSTapi-v1-address-default">POST api/v1/address/default</a>
+                                <a href="#-POSTapi-v1-address-default">设置默认地址：事务内先清空该用户所有默认标记，再标记目标地址。</a>
                             </li>
                                                                         </ul>
                             </ul>
@@ -371,13 +377,13 @@
                 </li>
                                     <ul id="tocify-subheader-" class="tocify-subheader">
                                                     <li class="tocify-item level-2" data-unique="-GETapi-v1-cart-index">
-                                <a href="#-GETapi-v1-cart-index">GET api/v1/cart/index</a>
+                                <a href="#-GETapi-v1-cart-index">购物车列表：with 预加载商品关联，避免 N+1。</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="-POSTapi-v1-cart-save">
-                                <a href="#-POSTapi-v1-cart-save">POST api/v1/cart/save</a>
+                                <a href="#-POSTapi-v1-cart-save">加入购物车 / 修改数量。</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="-POSTapi-v1-cart-delete">
-                                <a href="#-POSTapi-v1-cart-delete">POST api/v1/cart/delete</a>
+                                <a href="#-POSTapi-v1-cart-delete">删除购物车项。</a>
                             </li>
                                                                         </ul>
                             </ul>
@@ -406,7 +412,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: November 10, 2026</li>
+        <li>Last updated: November 11, 2026</li>
     </ul>
 </div>
 
@@ -1030,20 +1036,20 @@ access-control-allow-origin: *
         &quot;current_page&quot;: 1,
         &quot;data&quot;: [
             {
-                &quot;id&quot;: 6,
+                &quot;id&quot;: 88,
                 &quot;user_id&quot;: 1,
                 &quot;type&quot;: 2,
-                &quot;name&quot;: &quot;possimus aut技能&quot;,
-                &quot;slug&quot;: &quot;possimus-aut-549&quot;,
-                &quot;description&quot;: &quot;Temporibus earum ut sint saepe aliquid autem. Recusandae ea voluptas voluptatem consequuntur. Explicabo sint facilis incidunt et ea nesciunt.&quot;,
+                &quot;name&quot;: &quot;竹纤维毛巾套装&quot;,
+                &quot;slug&quot;: &quot;-KsKIpn&quot;,
+                &quot;description&quot;: &quot;竹纤维毛巾套装 &mdash;&mdash; 精选好物，品质之选。&quot;,
                 &quot;cover&quot;: null,
-                &quot;price&quot;: 52651,
+                &quot;price&quot;: 3900,
                 &quot;status&quot;: 1,
                 &quot;audit_note&quot;: null,
                 &quot;sales_count&quot;: 0,
                 &quot;view_count&quot;: 0,
-                &quot;created_at&quot;: &quot;2026-10-15T15:55:38.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2026-10-15T15:55:38.000000Z&quot;,
+                &quot;created_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
                 &quot;deleted_at&quot;: null,
                 &quot;provider&quot;: {
                     &quot;id&quot;: 1,
@@ -1051,20 +1057,20 @@ access-control-allow-origin: *
                 }
             },
             {
-                &quot;id&quot;: 5,
+                &quot;id&quot;: 87,
                 &quot;user_id&quot;: 1,
                 &quot;type&quot;: 2,
-                &quot;name&quot;: &quot;natus beatae技能&quot;,
-                &quot;slug&quot;: &quot;natus-beatae-237&quot;,
-                &quot;description&quot;: &quot;Impedit vitae corporis asperiores quam et unde. Delectus amet consequatur praesentium tempora velit id eaque. Temporibus voluptatem et fugit eius qui et. Quod et ad possimus sint rerum voluptatem deserunt accusamus.&quot;,
+                &quot;name&quot;: &quot;玻璃密封茶仓&quot;,
+                &quot;slug&quot;: &quot;-9aZswi&quot;,
+                &quot;description&quot;: &quot;玻璃密封茶仓 &mdash;&mdash; 精选好物，品质之选。&quot;,
                 &quot;cover&quot;: null,
-                &quot;price&quot;: 59533,
+                &quot;price&quot;: 5600,
                 &quot;status&quot;: 1,
                 &quot;audit_note&quot;: null,
                 &quot;sales_count&quot;: 0,
                 &quot;view_count&quot;: 0,
-                &quot;created_at&quot;: &quot;2026-10-15T15:55:38.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2026-10-15T15:55:38.000000Z&quot;,
+                &quot;created_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
                 &quot;deleted_at&quot;: null,
                 &quot;provider&quot;: {
                     &quot;id&quot;: 1,
@@ -1072,20 +1078,167 @@ access-control-allow-origin: *
                 }
             },
             {
-                &quot;id&quot;: 4,
+                &quot;id&quot;: 86,
                 &quot;user_id&quot;: 1,
                 &quot;type&quot;: 2,
-                &quot;name&quot;: &quot;est sunt商品&quot;,
-                &quot;slug&quot;: &quot;est-sunt-905&quot;,
-                &quot;description&quot;: &quot;Culpa quos asperiores et eaque. Et aperiam eveniet voluptate harum qui error. Incidunt enim facilis omnis corrupti numquam. Laboriosam eligendi magni dolorum autem. Natus incidunt dolorum minima modi.&quot;,
+                &quot;name&quot;: &quot;天然椰棕地垫&quot;,
+                &quot;slug&quot;: &quot;-6Gv22v&quot;,
+                &quot;description&quot;: &quot;天然椰棕地垫 &mdash;&mdash; 精选好物，品质之选。&quot;,
                 &quot;cover&quot;: null,
-                &quot;price&quot;: 42590,
+                &quot;price&quot;: 18900,
                 &quot;status&quot;: 1,
                 &quot;audit_note&quot;: null,
                 &quot;sales_count&quot;: 0,
                 &quot;view_count&quot;: 0,
-                &quot;created_at&quot;: &quot;2026-10-15T15:55:38.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2026-10-15T15:55:38.000000Z&quot;,
+                &quot;created_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;deleted_at&quot;: null,
+                &quot;provider&quot;: {
+                    &quot;id&quot;: 1,
+                    &quot;name&quot;: &quot;超级管理员&quot;
+                }
+            },
+            {
+                &quot;id&quot;: 85,
+                &quot;user_id&quot;: 1,
+                &quot;type&quot;: 2,
+                &quot;name&quot;: &quot;手作皮革笔记本&quot;,
+                &quot;slug&quot;: &quot;-Fj36b4&quot;,
+                &quot;description&quot;: &quot;手作皮革笔记本 &mdash;&mdash; 精选好物，品质之选。&quot;,
+                &quot;cover&quot;: null,
+                &quot;price&quot;: 7800,
+                &quot;status&quot;: 1,
+                &quot;audit_note&quot;: null,
+                &quot;sales_count&quot;: 0,
+                &quot;view_count&quot;: 0,
+                &quot;created_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;deleted_at&quot;: null,
+                &quot;provider&quot;: {
+                    &quot;id&quot;: 1,
+                    &quot;name&quot;: &quot;超级管理员&quot;
+                }
+            },
+            {
+                &quot;id&quot;: 84,
+                &quot;user_id&quot;: 1,
+                &quot;type&quot;: 2,
+                &quot;name&quot;: &quot;黄铜烛台&quot;,
+                &quot;slug&quot;: &quot;-gX3VtX&quot;,
+                &quot;description&quot;: &quot;黄铜烛台 &mdash;&mdash; 精选好物，品质之选。&quot;,
+                &quot;cover&quot;: null,
+                &quot;price&quot;: 15600,
+                &quot;status&quot;: 1,
+                &quot;audit_note&quot;: null,
+                &quot;sales_count&quot;: 0,
+                &quot;view_count&quot;: 0,
+                &quot;created_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;deleted_at&quot;: null,
+                &quot;provider&quot;: {
+                    &quot;id&quot;: 1,
+                    &quot;name&quot;: &quot;超级管理员&quot;
+                }
+            },
+            {
+                &quot;id&quot;: 83,
+                &quot;user_id&quot;: 1,
+                &quot;type&quot;: 2,
+                &quot;name&quot;: &quot;亚麻棉麻桌布&quot;,
+                &quot;slug&quot;: &quot;-RsU1jR&quot;,
+                &quot;description&quot;: &quot;亚麻棉麻桌布 &mdash;&mdash; 精选好物，品质之选。&quot;,
+                &quot;cover&quot;: null,
+                &quot;price&quot;: 9900,
+                &quot;status&quot;: 1,
+                &quot;audit_note&quot;: null,
+                &quot;sales_count&quot;: 0,
+                &quot;view_count&quot;: 0,
+                &quot;created_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;deleted_at&quot;: null,
+                &quot;provider&quot;: {
+                    &quot;id&quot;: 1,
+                    &quot;name&quot;: &quot;超级管理员&quot;
+                }
+            },
+            {
+                &quot;id&quot;: 82,
+                &quot;user_id&quot;: 1,
+                &quot;type&quot;: 2,
+                &quot;name&quot;: &quot;陶瓷釉下彩碗&quot;,
+                &quot;slug&quot;: &quot;-KFNQbC&quot;,
+                &quot;description&quot;: &quot;陶瓷釉下彩碗 &mdash;&mdash; 精选好物，品质之选。&quot;,
+                &quot;cover&quot;: null,
+                &quot;price&quot;: 4500,
+                &quot;status&quot;: 1,
+                &quot;audit_note&quot;: null,
+                &quot;sales_count&quot;: 0,
+                &quot;view_count&quot;: 0,
+                &quot;created_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;deleted_at&quot;: null,
+                &quot;provider&quot;: {
+                    &quot;id&quot;: 1,
+                    &quot;name&quot;: &quot;超级管理员&quot;
+                }
+            },
+            {
+                &quot;id&quot;: 81,
+                &quot;user_id&quot;: 1,
+                &quot;type&quot;: 2,
+                &quot;name&quot;: &quot;手工编织收纳篮&quot;,
+                &quot;slug&quot;: &quot;-v7dKDq&quot;,
+                &quot;description&quot;: &quot;手工编织收纳篮 &mdash;&mdash; 精选好物，品质之选。&quot;,
+                &quot;cover&quot;: null,
+                &quot;price&quot;: 6800,
+                &quot;status&quot;: 1,
+                &quot;audit_note&quot;: null,
+                &quot;sales_count&quot;: 0,
+                &quot;view_count&quot;: 0,
+                &quot;created_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;deleted_at&quot;: null,
+                &quot;provider&quot;: {
+                    &quot;id&quot;: 1,
+                    &quot;name&quot;: &quot;超级管理员&quot;
+                }
+            },
+            {
+                &quot;id&quot;: 80,
+                &quot;user_id&quot;: 1,
+                &quot;type&quot;: 2,
+                &quot;name&quot;: &quot;原木香薰扩香&quot;,
+                &quot;slug&quot;: &quot;-5GA9vy&quot;,
+                &quot;description&quot;: &quot;原木香薰扩香 &mdash;&mdash; 精选好物，品质之选。&quot;,
+                &quot;cover&quot;: null,
+                &quot;price&quot;: 8900,
+                &quot;status&quot;: 1,
+                &quot;audit_note&quot;: null,
+                &quot;sales_count&quot;: 0,
+                &quot;view_count&quot;: 0,
+                &quot;created_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;deleted_at&quot;: null,
+                &quot;provider&quot;: {
+                    &quot;id&quot;: 1,
+                    &quot;name&quot;: &quot;超级管理员&quot;
+                }
+            },
+            {
+                &quot;id&quot;: 79,
+                &quot;user_id&quot;: 1,
+                &quot;type&quot;: 2,
+                &quot;name&quot;: &quot;禅意手作茶杯&quot;,
+                &quot;slug&quot;: &quot;-gI9Kpt&quot;,
+                &quot;description&quot;: &quot;禅意手作茶杯 &mdash;&mdash; 精选好物，品质之选。&quot;,
+                &quot;cover&quot;: null,
+                &quot;price&quot;: 12900,
+                &quot;status&quot;: 1,
+                &quot;audit_note&quot;: null,
+                &quot;sales_count&quot;: 0,
+                &quot;view_count&quot;: 0,
+                &quot;created_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-11-10T11:21:19.000000Z&quot;,
                 &quot;deleted_at&quot;: null,
                 &quot;provider&quot;: {
                     &quot;id&quot;: 1,
@@ -1121,8 +1274,8 @@ access-control-allow-origin: *
         &quot;path&quot;: &quot;https://xiaoxia.ren/api/v1/products&quot;,
         &quot;per_page&quot;: 20,
         &quot;prev_page_url&quot;: null,
-        &quot;to&quot;: 3,
-        &quot;total&quot;: 3
+        &quot;to&quot;: 10,
+        &quot;total&quot;: 10
     }
 }</code>
  </pre>
@@ -2382,7 +2535,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-user">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -2394,7 +2547,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -3082,7 +3235,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-pay-query">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -3094,7 +3247,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -3209,7 +3362,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-user-profile">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -3221,7 +3374,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -3558,7 +3711,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-user-integral">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -3570,7 +3723,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -3751,6 +3904,260 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="Accept"                data-endpoint="POSTapi-v1-user-reset-password"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                    <h2 id="endpoints-GETapi-v1-admin-orders">API 订单列表：返回 JSON 分页数据，供前端后台使用。</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-GETapi-v1-admin-orders">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "https://xiaoxia.ren/api/v1/admin/orders" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "https://xiaoxia.ren/api/v1/admin/orders"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-admin-orders">
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">cache-control: no-cache, private
+content-type: application/json
+access-control-allow-origin: *
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-admin-orders" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-admin-orders"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-admin-orders"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-admin-orders" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-admin-orders">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-admin-orders" data-method="GET"
+      data-path="api/v1/admin/orders"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-admin-orders', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-admin-orders"
+                    onclick="tryItOut('GETapi-v1-admin-orders');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-admin-orders"
+                    onclick="cancelTryOut('GETapi-v1-admin-orders');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-admin-orders"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/admin/orders</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-admin-orders"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-admin-orders"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                    <h2 id="endpoints-GETapi-v1-admin-users">API 用户列表：返回 JSON 分页数据，供前端后台使用。</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-GETapi-v1-admin-users">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "https://xiaoxia.ren/api/v1/admin/users" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "https://xiaoxia.ren/api/v1/admin/users"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-admin-users">
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">cache-control: no-cache, private
+content-type: application/json
+access-control-allow-origin: *
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-admin-users" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-admin-users"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-admin-users"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-admin-users" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-admin-users">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-admin-users" data-method="GET"
+      data-path="api/v1/admin/users"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-admin-users', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-admin-users"
+                    onclick="tryItOut('GETapi-v1-admin-users');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-admin-users"
+                    onclick="cancelTryOut('GETapi-v1-admin-users');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-admin-users"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/admin/users</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-admin-users"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-admin-users"
                value="application/json"
                data-component="header">
     <br>
@@ -4093,7 +4500,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-aftersale-index">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -4105,7 +4512,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -4836,7 +5243,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-products-categories">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -4848,7 +5255,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -6021,7 +6428,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-favor-index">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -6033,7 +6440,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -6148,7 +6555,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-favor-status">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -6160,7 +6567,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -6463,7 +6870,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
     
 
-                                <h2 id="-GETapi-v1-address-index">GET api/v1/address/index</h2>
+                                <h2 id="-GETapi-v1-address-index">地址列表（默认地址排最前）。</h2>
 
 <p>
 </p>
@@ -6501,7 +6908,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-address-index">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -6513,7 +6920,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -6590,7 +6997,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                         </form>
 
-                    <h2 id="-POSTapi-v1-address-save">POST api/v1/address/save</h2>
+                    <h2 id="-POSTapi-v1-address-save">新增 / 更新地址（带 id 为更新，不带 id 为新增）。</h2>
 
 <p>
 </p>
@@ -6605,7 +7012,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <pre><code class="language-bash">curl --request POST \
     "https://xiaoxia.ren/api/v1/address/save" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"id\": 16,
+    \"name\": \"n\",
+    \"phone\": \"gzmiyvdljnikhway\",
+    \"province\": \"k\",
+    \"city\": \"c\",
+    \"district\": \"m\",
+    \"detail\": \"y\",
+    \"is_default\": false
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -6618,10 +7036,21 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "id": 16,
+    "name": "n",
+    "phone": "gzmiyvdljnikhway",
+    "province": "k",
+    "city": "c",
+    "district": "m",
+    "detail": "y",
+    "is_default": false
+};
 
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
@@ -6699,9 +7128,116 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="POSTapi-v1-address-save"
+               value="16"
+               data-component="body">
+    <br>
+<p>Example: <code>16</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="POSTapi-v1-address-save"
+               value="n"
+               data-component="body">
+    <br>
+<p>Must not be greater than 50 characters. Example: <code>n</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>phone</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="phone"                data-endpoint="POSTapi-v1-address-save"
+               value="gzmiyvdljnikhway"
+               data-component="body">
+    <br>
+<p>Must not be greater than 20 characters. Example: <code>gzmiyvdljnikhway</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>province</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="province"                data-endpoint="POSTapi-v1-address-save"
+               value="k"
+               data-component="body">
+    <br>
+<p>Must not be greater than 50 characters. Example: <code>k</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>city</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="city"                data-endpoint="POSTapi-v1-address-save"
+               value="c"
+               data-component="body">
+    <br>
+<p>Must not be greater than 50 characters. Example: <code>c</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>district</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="district"                data-endpoint="POSTapi-v1-address-save"
+               value="m"
+               data-component="body">
+    <br>
+<p>Must not be greater than 50 characters. Example: <code>m</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>detail</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="detail"                data-endpoint="POSTapi-v1-address-save"
+               value="y"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>y</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_default</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="POSTapi-v1-address-save" style="display: none">
+            <input type="radio" name="is_default"
+                   value="true"
+                   data-endpoint="POSTapi-v1-address-save"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="POSTapi-v1-address-save" style="display: none">
+            <input type="radio" name="is_default"
+                   value="false"
+                   data-endpoint="POSTapi-v1-address-save"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Example: <code>false</code></p>
+        </div>
+        </form>
 
-                    <h2 id="-POSTapi-v1-address-delete">POST api/v1/address/delete</h2>
+                    <h2 id="-POSTapi-v1-address-delete">删除地址。</h2>
 
 <p>
 </p>
@@ -6716,7 +7252,11 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <pre><code class="language-bash">curl --request POST \
     "https://xiaoxia.ren/api/v1/address/delete" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"id\": 16
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -6729,10 +7269,14 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "id": 16
+};
 
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
@@ -6810,9 +7354,22 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="POSTapi-v1-address-delete"
+               value="16"
+               data-component="body">
+    <br>
+<p>Example: <code>16</code></p>
+        </div>
+        </form>
 
-                    <h2 id="-POSTapi-v1-address-default">POST api/v1/address/default</h2>
+                    <h2 id="-POSTapi-v1-address-default">设置默认地址：事务内先清空该用户所有默认标记，再标记目标地址。</h2>
 
 <p>
 </p>
@@ -6827,7 +7384,11 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <pre><code class="language-bash">curl --request POST \
     "https://xiaoxia.ren/api/v1/address/default" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"id\": 16
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -6840,10 +7401,14 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "id": 16
+};
 
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
@@ -6921,7 +7486,20 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="POSTapi-v1-address-default"
+               value="16"
+               data-component="body">
+    <br>
+<p>Example: <code>16</code></p>
+        </div>
+        </form>
 
                 <h1 id="">文章管理</h1>
 
@@ -7359,7 +7937,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-browse-index">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -7371,7 +7949,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -7490,7 +8068,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-message-index">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -7502,7 +8080,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -7617,7 +8195,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-message-unread">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -7629,7 +8207,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -8284,7 +8862,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-order-index">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -8296,7 +8874,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -8411,7 +8989,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-order-detail">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -8423,7 +9001,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -8763,7 +9341,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-orders">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -8775,7 +9353,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -8905,7 +9483,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-orders--id-">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -8917,7 +9495,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -9060,7 +9638,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-orders--id--status">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -9072,7 +9650,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -9314,7 +9892,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
     
 
-                                <h2 id="-GETapi-v1-cart-index">GET api/v1/cart/index</h2>
+                                <h2 id="-GETapi-v1-cart-index">购物车列表：with 预加载商品关联，避免 N+1。</h2>
 
 <p>
 </p>
@@ -9352,7 +9930,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-cart-index">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -9364,7 +9942,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -9441,12 +10019,15 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                         </form>
 
-                    <h2 id="-POSTapi-v1-cart-save">POST api/v1/cart/save</h2>
+                    <h2 id="-POSTapi-v1-cart-save">加入购物车 / 修改数量。</h2>
 
 <p>
 </p>
 
-
+<ul>
+<li>带 id：更新该购物车项数量。</li>
+<li>带 goods_id：updateOrCreate 原子操作，已有则累加数量，没有则新建。</li>
+</ul>
 
 <span id="example-requests-POSTapi-v1-cart-save">
 <blockquote>Example request:</blockquote>
@@ -9456,7 +10037,13 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <pre><code class="language-bash">curl --request POST \
     "https://xiaoxia.ren/api/v1/cart/save" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"id\": 16,
+    \"goods_id\": 16,
+    \"quantity\": 22
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -9469,10 +10056,16 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "id": 16,
+    "goods_id": 16,
+    "quantity": 22
+};
 
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
@@ -9550,9 +10143,46 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="POSTapi-v1-cart-save"
+               value="16"
+               data-component="body">
+    <br>
+<p>Example: <code>16</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>goods_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="goods_id"                data-endpoint="POSTapi-v1-cart-save"
+               value="16"
+               data-component="body">
+    <br>
+<p>Must match an existing stored value. Example: <code>16</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>quantity</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="quantity"                data-endpoint="POSTapi-v1-cart-save"
+               value="22"
+               data-component="body">
+    <br>
+<p>Must be at least 1. Must not be greater than 999. Example: <code>22</code></p>
+        </div>
+        </form>
 
-                    <h2 id="-POSTapi-v1-cart-delete">POST api/v1/cart/delete</h2>
+                    <h2 id="-POSTapi-v1-cart-delete">删除购物车项。</h2>
 
 <p>
 </p>
@@ -9567,7 +10197,11 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <pre><code class="language-bash">curl --request POST \
     "https://xiaoxia.ren/api/v1/cart/delete" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"id\": 16
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -9580,10 +10214,14 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "id": 16
+};
 
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
@@ -9661,7 +10299,20 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="POSTapi-v1-cart-delete"
+               value="16"
+               data-component="body">
+    <br>
+<p>Example: <code>16</code></p>
+        </div>
+        </form>
 
                 <h1 id="">钱包管理</h1>
 

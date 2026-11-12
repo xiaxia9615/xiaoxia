@@ -223,7 +223,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"code":0,"data":{"current_page":1,"data":[{"id":6,"user_id":1,"type":2,"name":"possimus aut\u6280\u80fd","slug":"possimus-aut-549","description":"Temporibus earum ut sint saepe aliquid autem. Recusandae ea voluptas voluptatem consequuntur. Explicabo sint facilis incidunt et ea nesciunt.","cover":null,"price":52651,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-10-15T15:55:38.000000Z","updated_at":"2026-10-15T15:55:38.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":5,"user_id":1,"type":2,"name":"natus beatae\u6280\u80fd","slug":"natus-beatae-237","description":"Impedit vitae corporis asperiores quam et unde. Delectus amet consequatur praesentium tempora velit id eaque. Temporibus voluptatem et fugit eius qui et. Quod et ad possimus sint rerum voluptatem deserunt accusamus.","cover":null,"price":59533,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-10-15T15:55:38.000000Z","updated_at":"2026-10-15T15:55:38.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":4,"user_id":1,"type":2,"name":"est sunt\u5546\u54c1","slug":"est-sunt-905","description":"Culpa quos asperiores et eaque. Et aperiam eveniet voluptate harum qui error. Incidunt enim facilis omnis corrupti numquam. Laboriosam eligendi magni dolorum autem. Natus incidunt dolorum minima modi.","cover":null,"price":42590,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-10-15T15:55:38.000000Z","updated_at":"2026-10-15T15:55:38.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}}],"first_page_url":"https:\/\/xiaoxia.ren\/api\/v1\/products?page=1","from":1,"last_page":1,"last_page_url":"https:\/\/xiaoxia.ren\/api\/v1\/products?page=1","links":[{"url":null,"label":"&laquo; Previous","page":null,"active":false},{"url":"https:\/\/xiaoxia.ren\/api\/v1\/products?page=1","label":"1","page":1,"active":true},{"url":null,"label":"Next &raquo;","page":null,"active":false}],"next_page_url":null,"path":"https:\/\/xiaoxia.ren\/api\/v1\/products","per_page":20,"prev_page_url":null,"to":3,"total":3}}'
+        content: '{"code":0,"data":{"current_page":1,"data":[{"id":88,"user_id":1,"type":2,"name":"\u7af9\u7ea4\u7ef4\u6bdb\u5dfe\u5957\u88c5","slug":"-KsKIpn","description":"\u7af9\u7ea4\u7ef4\u6bdb\u5dfe\u5957\u88c5 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":3900,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":87,"user_id":1,"type":2,"name":"\u73bb\u7483\u5bc6\u5c01\u8336\u4ed3","slug":"-9aZswi","description":"\u73bb\u7483\u5bc6\u5c01\u8336\u4ed3 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":5600,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":86,"user_id":1,"type":2,"name":"\u5929\u7136\u6930\u68d5\u5730\u57ab","slug":"-6Gv22v","description":"\u5929\u7136\u6930\u68d5\u5730\u57ab \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":18900,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":85,"user_id":1,"type":2,"name":"\u624b\u4f5c\u76ae\u9769\u7b14\u8bb0\u672c","slug":"-Fj36b4","description":"\u624b\u4f5c\u76ae\u9769\u7b14\u8bb0\u672c \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":7800,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":84,"user_id":1,"type":2,"name":"\u9ec4\u94dc\u70db\u53f0","slug":"-gX3VtX","description":"\u9ec4\u94dc\u70db\u53f0 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":15600,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":83,"user_id":1,"type":2,"name":"\u4e9a\u9ebb\u68c9\u9ebb\u684c\u5e03","slug":"-RsU1jR","description":"\u4e9a\u9ebb\u68c9\u9ebb\u684c\u5e03 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":9900,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":82,"user_id":1,"type":2,"name":"\u9676\u74f7\u91c9\u4e0b\u5f69\u7897","slug":"-KFNQbC","description":"\u9676\u74f7\u91c9\u4e0b\u5f69\u7897 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":4500,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":81,"user_id":1,"type":2,"name":"\u624b\u5de5\u7f16\u7ec7\u6536\u7eb3\u7bee","slug":"-v7dKDq","description":"\u624b\u5de5\u7f16\u7ec7\u6536\u7eb3\u7bee \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":6800,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":80,"user_id":1,"type":2,"name":"\u539f\u6728\u9999\u85b0\u6269\u9999","slug":"-5GA9vy","description":"\u539f\u6728\u9999\u85b0\u6269\u9999 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":8900,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":79,"user_id":1,"type":2,"name":"\u7985\u610f\u624b\u4f5c\u8336\u676f","slug":"-gI9Kpt","description":"\u7985\u610f\u624b\u4f5c\u8336\u676f \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":12900,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}}],"first_page_url":"https:\/\/xiaoxia.ren\/api\/v1\/products?page=1","from":1,"last_page":1,"last_page_url":"https:\/\/xiaoxia.ren\/api\/v1\/products?page=1","links":[{"url":null,"label":"&laquo; Previous","page":null,"active":false},{"url":"https:\/\/xiaoxia.ren\/api\/v1\/products?page=1","label":"1","page":1,"active":true},{"url":null,"label":"Next &raquo;","page":null,"active":false}],"next_page_url":null,"path":"https:\/\/xiaoxia.ren\/api\/v1\/products","per_page":20,"prev_page_url":null,"to":10,"total":10}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -634,11 +634,8 @@ endpoints:
     responses:
       -
         custom: []
-        status: 500
-        content: |-
-          {
-              "message": "Server Error"
-          }
+        status: 401
+        content: '{"message":"Unauthenticated."}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -841,11 +838,8 @@ endpoints:
     responses:
       -
         custom: []
-        status: 500
-        content: |-
-          {
-              "message": "Server Error"
-          }
+        status: 401
+        content: '{"message":"Unauthenticated."}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -884,11 +878,8 @@ endpoints:
     responses:
       -
         custom: []
-        status: 500
-        content: |-
-          {
-              "message": "Server Error"
-          }
+        status: 401
+        content: '{"message":"Unauthenticated."}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -989,11 +980,8 @@ endpoints:
     responses:
       -
         custom: []
-        status: 500
-        content: |-
-          {
-              "message": "Server Error"
-          }
+        status: 401
+        content: '{"message":"Unauthenticated."}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -1030,6 +1018,86 @@ endpoints:
     cleanBodyParameters: []
     fileParameters: []
     responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/orders
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'API 订单列表：返回 JSON 分页数据，供前端后台使用。'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/users
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'API 用户列表：返回 JSON 分页数据，供前端后台使用。'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields: []
     auth: []
     controller: null
