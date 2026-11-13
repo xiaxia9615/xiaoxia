@@ -139,3 +139,10 @@
 
 - [ ] **3 个前端文件超过 100 行未纳入 ROUTE_LINE_BUDGET**：
       admin.tsx(193行)、products.tsx(143行)、articles.tsx(102行)。
+
+- [ ] P1-工程: 替换 @qmuse/appwrite-runtime-sdk（Proprietary，支付宝团队资产，1534 行）
+  - 现状：宿主 overrides 统一 appwrite 到 ^29.2.0，功能正常
+  - 清除范围：1 依赖 + 4 处 __MUSE__/__TERN__ + 485 行 QMuse 文案
+  - 方案：用 appwrite 官方 SDK（BSD-3-Clause）重写 src/services/appwrite.ts
+  - 排期：波次 2（支付渠道）完成后立即执行
+  - 验收：grep -rn "@qmuse\|__MUSE__\|__TERN__\|QMuse" src/ package.json | wc -l 输出 0
