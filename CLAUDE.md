@@ -27,13 +27,19 @@
 
 ## 已知债务（不要重复踩）
 
-- `OrderService::payOrder` / `AdminOrderController::refund` / `WithdrawalService` / `DeductBalanceOnAiUsage` 绕过 `WalletService`，详见 `docs/tech-debt.md`。
-- `PaymentNotifyController` / `WithdrawalService` 零测试。
-- Mock 网关在生产默认生效，可伪造充值。
+- **已修复（P0/P1）**：`OrderService::payOrder` / `AdminOrderController::refund` / `WithdrawalService` / `DeductBalanceOnAiUsage` / `SkillCallService` / `TeamBillingService` 已全部统一走 `WalletService`。
+- **已修复**：`PaymentNotifyController` / `WithdrawalService` 已补测试（15 用例 + 8 用例）。
+- **已修复**：Mock 网关已限制为 `local`/`testing` 环境专用，生产环境不生效。
+- **待办（P0）**：真实支付宝/微信渠道尚未接入，当前仅 Mock 网关。
+- **待办（P0）**：Ledger → User 两处跨模块内部类引用待解耦（详见 `docs/tech-debt.md`）。
+- **待办（P1）**：退款分账反向回滚仍绕过 WalletService（自营模式暂不触发）。
+- **待办（P1）**：约 30 处模块内裸表待收敛到 `*QueryService`。
 
 ## 文档索引
 
 - `docs/progress.md` — 进度看板
 - `docs/tech-debt.md` — 技术债
 - `docs/health-log.md` — 自动体检
+- `docs/ops.md` — 运维手册
 - `docs/adr/` — 架构决策
+- `CHANGELOG.md` — 变更日志
