@@ -9,7 +9,7 @@ OUT=$(php artisan test 2>&1 | tail -3)
 echo "$OUT" | grep -q "failed" && fail "测试有失败" || ok "测试通过"
 CNT=$(echo "$OUT" | grep -oE "[0-9]+ passed" | grep -oE "[0-9]+")
 [ -z "$CNT" ] && fail "无法解析测试数"
-[ -n "$CNT" ] && { [ "$CNT" -lt 66 ] && fail "测试数 $CNT < 66" || ok "测试数 $CNT >= 66"; }
+[ -n "$CNT" ] && { [ "$CNT" -lt 200 ] && fail "测试数 $CNT < 200" || ok "测试数 $CNT >= 200"; }
 
 echo "=== 2.依赖漏洞 ==="
 composer audit 2>&1 | grep -qE "high|critical" && fail "依赖有高危" || ok "无高危"

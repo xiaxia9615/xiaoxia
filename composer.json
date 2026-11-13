@@ -17,6 +17,7 @@
         "spatie/laravel-permission": "^8.3"
     },
     "require-dev": {
+        "brianium/paratest": "^7.20",
         "fakerphp/faker": "^1.23",
         "knuckleswtf/scribe": "^5.11",
         "larastan/larastan": "^3.14",
@@ -54,10 +55,7 @@
             "Composer\\Config::disableProcessTimeout",
             "@php artisan dev"
         ],
-        "test": [
-            "@php artisan config:clear --ansi @no_additional_args",
-            "@php artisan test"
-        ],
+        "test": "php artisan test",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
@@ -75,6 +73,13 @@
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ],
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=512M --no-progress",
+        "format:test": "vendor/bin/pint --test",
+        "check": [
+            "@format:test",
+            "@analyse",
+            "@test"
         ]
     },
     "extra": {
