@@ -98,21 +98,25 @@
 
 ### P0 · 跨模块内部类引用（剩余）
 
-- [ ] **Ledger → User 两处**：`UserRegistered`（`LedgerServiceProvider.php:10`、
-      `CreateLedgerOnUserRegistered.php:8`）。方案：User 建
-      `Contracts/UserRegistered`，事件迁入。
+- [x] ~~Ledger → User 两处~~ — 2026-11-13 核实：已解决。
+      `UserRegistered` 已位于 `App\Modules\User\Contracts\Events\UserRegistered`，
+      两处引用（`LedgerServiceProvider.php:10`、`CreateLedgerOnUserRegistered.php:8`）
+      均指向 Contracts 接口，架构守卫全绿。
 
 ### P1 · 数据层
 
-- [ ] **30 处模块内裸表待收敛**：各模块 `DB::table` 散落在业务 Service 中。
+- [ ] **34 处模块内裸表待收敛**：各模块 `DB::table` 散落在业务 Service 中。
       方案：收敛到 `*QueryService`，不追求全量 Eloquent 化。
+      分布：Ledger 17 / ApiKey 6 / Skill 4 / Team 3 / System 3 / Order 1
       - ApiKey 模块部分 — 已修复（见上方已修复列表）
-      - `AdminAuditLogController` 直接用 DB facade 查询 audit_logs，未走 Service 层
+      - `AdminAuditLogController` DB facade 问题 — 已修复（未发现 DB:: 直接调用）
 
 ## 未修复 · 结构类
 
-- [ ] **Ledger / Skill / User 无 `Contracts/` 目录**：被跨模块依赖但对外零承诺。
-      方案：随 T2 逐个补契约（Ledger 已有 Contracts，Skill/User 待补）。
+- [x] ~~Ledger / User 无 `Contracts/` 目录~~ — 2026-11-13 核实：已解决。
+      Ledger 有 `LedgerContract.php` + `Events/AiUsageRecorded.php`；
+      User 有 `UserContract.php` + `Events/UserRegistered.php`。
+- [ ] **Skill 无 `Contracts/` 目录**：被 Team 等模块依赖但对外零承诺。待补契约。
 
 - [ ] **Team `Contracts/` 目录为空**：保留空目录有误导性。方案：填契约或删除目录。
 

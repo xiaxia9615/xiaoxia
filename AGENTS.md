@@ -31,9 +31,9 @@
 - **已修复**：`PaymentNotifyController` / `WithdrawalService` 已补测试（15 用例 + 8 用例）。
 - **已修复**：Mock 网关已限制为 `local`/`testing` 环境专用，生产环境不生效。
 - **待办（P0）**：真实支付宝/微信渠道尚未接入，当前仅 Mock 网关。
-- **待办（P0）**：Ledger → User 两处跨模块内部类引用待解耦（详见 `docs/tech-debt.md`）。
 - **待办（P1）**：退款分账反向回滚仍绕过 WalletService（自营模式暂不触发）。
-- **待办（P1）**：约 30 处模块内裸表待收敛到 `*QueryService`。
+- **待办（P1）**：34 处模块内裸表待收敛到 `*QueryService`（Ledger 17 / ApiKey 6 / Skill 4 / Team 3 / System 3 / Order 1）。
+- **待办（P2）**：Skill 无 Contracts/ 目录，Team Contracts/ 目录为空。
 
 ## 文档索引
 
