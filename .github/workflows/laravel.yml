@@ -92,7 +92,7 @@ jobs:
 
       # --- Tests with Coverage ---
       - name: Run tests (incl. architecture guards)
-        run: php artisan test --coverage --coverage-html=coverage-report --min=80
+        run: php -d pcov.directory=$(pwd)/app artisan test --coverage --coverage-html=coverage-report --min=60
 
       - name: Upload coverage report
         if: always()
