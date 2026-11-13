@@ -5,6 +5,7 @@
         <div class="flex items-center justify-between">
             <h3 class="text-sm font-semibold text-slate-900">技能管理</h3>
             <div class="flex items-center gap-4">
+                <a href="{{ route('admin.skills.create') }}" class="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">新建技能</a>
                 <a href="{{ route('admin.skills.calls') }}" class="text-sm text-indigo-600 hover:text-indigo-800">调用记录</a>
                 @if(Route::has('admin.dashboard'))
                     <a href="{{ route('admin.dashboard') }}" class="text-sm text-indigo-600 hover:text-indigo-800">返回仪表盘</a>

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Crypt;
 
 /**
  * @property int $product_id
+ * @property int|null $provider_id
  * @property int $pricing_type
  * @property int $provider_share
  * @property int $platform_share
@@ -22,6 +23,7 @@ use Illuminate\Support\Facades\Crypt;
  * @property int $free_quota
  * @property array|null $config
  * @property array|null $request_template
+ * @property string|null $system_prompt
  * @property string $endpoint
  * @property string $method
  */
@@ -32,15 +34,16 @@ class SkillDetail extends Model
     protected $table = 'skill_details';
 
     protected $fillable = [
-        'product_id', 'status', 'endpoint', 'method', 'api_key', 'request_template',
+        'product_id', 'provider_id', 'status', 'endpoint', 'method', 'api_key', 'request_template',
         'pricing_type', 'provider_share', 'platform_share', 'influencer_share',
-        'donation_share', 'free_quota', 'config',
+        'donation_share', 'free_quota', 'config', 'system_prompt',
     ];
 
     protected function casts(): array
     {
         return [
             'product_id' => 'integer',
+            'provider_id' => 'integer',
             'status' => SkillStatus::class,
             'pricing_type' => 'integer',
             'provider_share' => 'integer',

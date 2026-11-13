@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\System\Services;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 final class AdminSystemService
 {
@@ -26,6 +28,32 @@ final class AdminSystemService
         }
 
         return $this->isServiceActive('supervisor') ? 'ok' : 'down';
+    }
+
+    /**
+     * 队列状态总览：待处理任务数 + 失败任务列表
+     */
+    public function queueStats(): array
+    {
+        $pending = DB::table('jobs')->count();
+        $failed = DB::table('failed_jobs')
+            ->select('id', 'uuid', 'queue', 'exception', 'failed_at')
+            ->orderByDesc('id')
+            ->limit(50)
+            ->get();
+
+        return [
+            'pending' => $pending,
+            'failed' => $failed,
+        ];
+    }
+
+    /**
+     * 重试失败任务
+     */
+    public function retryFailedJob(string $uuid): void
+    {
+        Artisan::call('queue:retry', ['id' => $uuid]);
     }
 
     private function isServiceActive(string $service): bool

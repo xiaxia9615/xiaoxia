@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAiProviderController;
+use App\Http\Controllers\Admin\AdminApiCallController;
 use App\Http\Controllers\Admin\AdminApiKeyController;
 use App\Http\Controllers\Admin\AdminAuditLogController;
 use App\Http\Controllers\Admin\AdminDeveloperController;
@@ -40,15 +41,25 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/ai-providers/{id}/models', [AdminAiProviderController::class, 'models'])
         ->whereNumber('id')->name('ai-providers.models');
     Route::get('/skills', [AdminSkillController::class, 'index'])->name('skills.index');
+    Route::get('/skills/create', [AdminSkillController::class, 'create'])->name('skills.create');
+    Route::post('/skills', [AdminSkillController::class, 'store'])->name('skills.store');
     Route::get('/skills/calls', [AdminSkillController::class, 'calls'])->name('skills.calls');
     Route::get('/skills/{id}', [AdminSkillController::class, 'show'])
         ->whereNumber('id')->name('skills.show');
+    Route::get('/skills/{id}/edit', [AdminSkillController::class, 'edit'])
+        ->whereNumber('id')->name('skills.edit');
+    Route::put('/skills/{id}', [AdminSkillController::class, 'update'])
+        ->whereNumber('id')->name('skills.update');
+    Route::patch('/skills/{id}/toggle', [AdminSkillController::class, 'toggleStatus'])
+        ->whereNumber('id')->name('skills.toggle');
     Route::get('/api-keys', [AdminApiKeyController::class, 'index'])->name('api-keys.index');
     Route::delete('/api-keys/{id}', [AdminApiKeyController::class, 'revoke'])
         ->whereNumber('id')->name('api-keys.revoke');
     Route::get('/system/health', [AdminSystemController::class, 'health'])->name('system.health');
     Route::get('/system/backups', [AdminSystemController::class, 'backups'])->name('system.backups');
     Route::get('/system/logs', [AdminSystemController::class, 'logs'])->name('system.logs');
+    Route::get('/system/queues', [AdminSystemController::class, 'queues'])->name('system.queues');
+    Route::post('/system/queues/{uuid}/retry', [AdminSystemController::class, 'retryJob'])->name('system.queues.retry');
 
     // 开发者审核（自营模式暂时关闭，考取资质后恢复）
     // Route::get('/developers', [AdminDeveloperController::class, 'index'])->name('developers.index');
@@ -74,6 +85,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/products/{id}', [AdminProductController::class, 'update'])->whereNumber('id')->name('products.update');
     Route::patch('/products/{id}/status', [AdminProductController::class, 'toggleStatus'])->whereNumber('id')->name('products.toggleStatus');
     Route::post('/products/{id}/force-archive', [AdminProductController::class, 'forceArchive'])->whereNumber('id')->name('products.forceArchive');
+
+    // 调用流水与账本核对
+    Route::get('/api-calls', [AdminApiCallController::class, 'index'])->name('api-calls.index');
+    Route::get('/api-calls/{id}/ledger', [AdminApiCallController::class, 'ledger'])
+        ->whereNumber('id')->name('api-calls.ledger');
 
     // 审计日志
     Route::get('/audit-logs', [AdminAuditLogController::class, 'index'])->name('audit-logs.index');
