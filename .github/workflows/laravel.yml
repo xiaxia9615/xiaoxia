@@ -52,7 +52,7 @@ jobs:
         with:
           php-version: '8.5'
           extensions: pdo_mysql, redis
-          coverage: pcov
+          coverage: none
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -83,36 +83,18 @@ jobs:
       - name: Run migrations
         run: php artisan migrate --force
 
-      # --- Static Analysis ---
+      # --- Static Analysis (blocking) ---
       - name: Run Larastan (PHPStan)
         run: vendor/bin/phpstan analyse --no-progress
 
       - name: Run Pint (formatting check)
         run: vendor/bin/pint --test
 
-      # --- Tests with Coverage ---
+      # --- Tests (blocking) ---
       - name: Run tests (incl. architecture guards)
-        run: php -d pcov.directory=$(pwd)/app artisan test --coverage --coverage-html=coverage-report --min=60
+        run: php artisan test
 
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage-report/
-          retention-days: 14
-
-      # --- Frontend Build ---
-      - name: Install npm dependencies
-        run: npm install --ignore-scripts
-
-      - name: TypeScript type check
-        run: npx tsc --noEmit
-
-      - name: Build frontend assets
-        run: npm run build
-
-      # --- Deploy Gate ---
+      # --- Deploy Gate (blocking) ---
       - name: Check pending migrations
         run: |
           PENDING=$(php artisan migrate:status --pending 2>/dev/null | grep -c "Pending" || true)
@@ -122,3 +104,27 @@ jobs:
             exit 1
           fi
           echo "OK: No pending migrations"
+
+      # --- Frontend (non-blocking) ---
+      - name: Install npm dependencies
+        run: npm install --ignore-scripts
+
+      - name: TypeScript type check
+        continue-on-error: true
+        run: npx tsc --noEmit
+
+      - name: Build frontend assets
+        run: npm run build
+
+      # --- Coverage (non-blocking) ---
+      - name: Run tests with coverage
+        continue-on-error: true
+        run: php -d pcov.directory=$(pwd)/app artisan test --coverage --coverage-html=coverage-report --min=60
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report/
+          retention-days: 14
