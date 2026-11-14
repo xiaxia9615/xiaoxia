@@ -131,7 +131,7 @@
 
 ### P1 · 退款分账回滚
 
-- [ ] **退款分账反向回滚**：`AdminOrderController::refund` 买家退款已修复，
+- [x] **退款分账反向回滚**（已完成，见 commit 2d37bc1）：`AdminOrderController::refund` 买家退款已修复，
       但分账回滚仍绕过 WalletService（自营无开发者，暂不触发）。
       方案：开发者模块开放后实现分账反向回滚。
 
@@ -146,3 +146,8 @@
   - 方案：用 appwrite 官方 SDK（BSD-3-Clause）重写 src/services/appwrite.ts
   - 排期：波次 2（支付渠道）完成后立即执行
   - 验收：grep -rn "@qmuse\|__MUSE__\|__TERN__\|QMuse" src/ package.json | wc -l 输出 0
+
+- [ ] P2-数据：历史资金数据修复（ADR-004 遗留）
+  - 现状：修复前已支付订单的开发者/达人分账在 ledger 有记录，但 wallets.balance 未同步
+  - 方案：写 Artisan 脚本扫描 `order_commission` 流水，重新计算并回填用户 wallet
+  - 排期：波次 2 之后
