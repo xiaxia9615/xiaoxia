@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Modules\Ledger\Contracts\LedgerContract;
+use App\Modules\Distributor\Models\DistributorRelation;
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Models\Order;
 use App\Modules\System\Services\AuditService;
+use App\Modules\Wallet\Models\Wallet;
 use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,6 @@ use RuntimeException;
 class AdminOrderController extends Controller
 {
     public function __construct(
-        private readonly LedgerContract $ledger,
         private readonly WalletService $wallet,
         private readonly AuditService $auditService,
     ) {}
@@ -73,11 +73,11 @@ class AdminOrderController extends Controller
     /**
      * 订单退款：仅已支付订单可退款。
      *
-     * 事务内通过 LedgerContract 复式记账：
+     * 事务内通过 WalletService 复式记账（同步 wallets.balance 与 Ledger）：
      * 1. 原路退回买家余额（买家 credit +amount）；
-     * 2. 按 order_commission 实际分账流水反向扣回（开发者/达人/平台各自 debit 原分成额），
-     *    record() 不校验余额，达人余额不足时允许透支为负数；
-     * 3. biz_type 为 order_refund，退款前校验流水，防止重复退款。
+     * 2. 按 order_commission 实际分账流水反向扣回（开发者/平台各自 debit 原分成额）；
+     * 3. 达人 10% 佣金单独走 order_refund_commission 回滚，退款前校验余额，不足则拒绝；
+     * 4. biz_type 为 order_refund，退款前校验流水，防止重复退款。
      * 成功后订单状态置为 Refunded。
      */
     public function refund(Request $request, int $id)
@@ -113,14 +113,26 @@ class AdminOrderController extends Controller
 
             $amount = (int) $order->amount;
 
+            // 达人佣金余额检查：不足则拒绝退款，防止负余额
+            $distributorId = (int) DistributorRelation::where('user_id', $order->user_id)
+                ->value('distributor_id');
+
+            if ($distributorId > 0) {
+                $distributorShare = intdiv($amount * 10, 100);
+                $distributorBalance = (int) Wallet::where('user_id', $distributorId)->value('balance');
+
+                if ($distributorBalance < $distributorShare) {
+                    throw new RuntimeException(
+                        "达人佣金已提现，退款将导致负余额（余额 {$distributorBalance}，需扣 {$distributorShare}），请人工处理。"
+                    );
+                }
+            }
+
             // 分账回滚 splits（买家退款单独走 WalletService，不在此处）
             $splits = [];
 
-            // 注意：开发者/达人的 wallets.balance 未同步，仅 Ledger 扣回。
-            // 自营模式无真实开发者，暂不触发。待开放开发者入驻后，需确认
-            // 『余额不足时是否允许透支为负』的业务规则，另开任务修。
             // 反向回滚分账：按 order_commission 实际分账流水的 credit 分录原额反向扣回
-            // （开发者 80%、达人 10%、平台 10%/20%）；record() 不校验余额，达人余额不足时允许透支为负
+            // （开发者 80%、平台 10%/20%）；达人 10% 单独走 order_refund_commission
             $commissionCredits = DB::table('ledger_entries as e')
                 ->join('ledger_accounts as a', 'e.account_id', '=', 'a.id')
                 ->where('e.biz_type', 'order_commission')
@@ -139,6 +151,14 @@ class AdminOrderController extends Controller
                 ];
             } else {
                 foreach ($commissionCredits as $credit) {
+                    // 达人 10% 单独走 order_refund_commission，此处跳过
+                    if ($distributorId > 0
+                        && $credit->owner_type === 'user'
+                        && (int) $credit->owner_id === $distributorId
+                    ) {
+                        continue;
+                    }
+
                     $splits[] = [
                         'owner_type' => $credit->owner_type,
                         'owner_id' => (int) $credit->owner_id,
@@ -149,7 +169,28 @@ class AdminOrderController extends Controller
                 }
             }
 
-            $this->ledger->record('order_refund', $order->id, $splits);
+            $this->wallet->record('order_refund', $order->id, $splits);
+
+            // 达人 10% 佣金回滚（独立 biz_type，便于审计与幂等）
+            if ($distributorId > 0) {
+                $distributorShare = intdiv($amount * 10, 100);
+                $this->wallet->record('order_refund_commission', $order->id, [
+                    [
+                        'owner_type' => 'user',
+                        'owner_id' => $distributorId,
+                        'account_type' => 'balance',
+                        'direction' => 'debit',
+                        'amount' => $distributorShare,
+                    ],
+                    [
+                        'owner_type' => 'platform',
+                        'owner_id' => 0,
+                        'account_type' => 'platform',
+                        'direction' => 'credit',
+                        'amount' => $distributorShare,
+                    ],
+                ]);
+            }
 
             // 买家退款走 WalletService：同事务内同步 wallets.balance 与 Ledger，
             // 避免 refund 只写 Ledger 造成 wallet 缓存漂移。

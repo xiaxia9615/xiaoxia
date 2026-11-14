@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\Ledger\Listeners;
+namespace App\Modules\Wallet\Listeners;
 
-use App\Modules\Ledger\Services\LedgerService;
 use App\Modules\User\Contracts\Events\UserRegistered;
+use App\Modules\Wallet\Services\WalletService;
 
 final readonly class CreateLedgerOnUserRegistered
 {
     public function __construct(
-        private LedgerService $ledger,
+        private WalletService $wallet,
     ) {}
 
     public function handle(UserRegistered $event): void
     {
         // 注册送 100 元体验金（10000 分）
-        $this->ledger->record('signup_bonus', $event->user->id, [
+        $this->wallet->record('signup_bonus', $event->user->id, [
             [
                 'owner_type' => 'platform',
                 'owner_id' => 0,

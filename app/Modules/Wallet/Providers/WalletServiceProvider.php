@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Modules\Wallet\Providers;
 
 use App\Modules\Ledger\Contracts\Events\AiUsageRecorded;
+use App\Modules\User\Contracts\Events\UserRegistered;
+use App\Modules\Wallet\Listeners\CreateLedgerOnUserRegistered;
 use App\Modules\Wallet\Listeners\DeductBalanceOnAiUsage;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +26,11 @@ final class WalletServiceProvider extends ServiceProvider
         Event::listen(
             AiUsageRecorded::class,
             DeductBalanceOnAiUsage::class,
+        );
+
+        Event::listen(
+            UserRegistered::class,
+            CreateLedgerOnUserRegistered::class,
         );
     }
 }

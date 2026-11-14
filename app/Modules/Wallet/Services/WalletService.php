@@ -178,7 +178,29 @@ final class WalletService
      */
     public function record(string $bizType, int $bizId, array $splits): string
     {
-        return $this->ledger->record($bizType, $bizId, $splits);
+        return DB::transaction(function () use ($bizType, $bizId, $splits): string {
+            $txId = $this->ledger->record($bizType, $bizId, $splits);
+
+            foreach ($splits as $split) {
+                if (($split['owner_type'] ?? null) !== 'user') {
+                    continue;
+                }
+                if (($split['account_type'] ?? null) !== 'balance') {
+                    continue;
+                }
+
+                $delta = ($split['direction'] ?? null) === 'credit'
+                    ? (int) $split['amount']
+                    : -(int) $split['amount'];
+
+                Wallet::firstOrCreate(['user_id' => (int) $split['owner_id']]);
+                Wallet::query()
+                    ->where('user_id', (int) $split['owner_id'])
+                    ->increment('balance', $delta);
+            }
+
+            return $txId;
+        });
     }
 
     /**

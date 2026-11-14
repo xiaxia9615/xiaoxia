@@ -108,7 +108,7 @@ class AdminRefundWalletSyncTest extends TestCase
         $this->assertSame($ledgerBefore, $ledgerAfter);
     }
 
-    public function test_refund_does_not_touch_developer_wallet(): void
+    public function test_refund_syncs_developer_wallet_to_zero(): void
     {
         $admin = User::factory()->create(['is_admin' => 1]);
         $buyer = User::factory()->create();
@@ -128,9 +128,12 @@ class AdminRefundWalletSyncTest extends TestCase
         $order = $orderService->createOrder($buyer->id, $product->id);
         $orderService->payOrder($order->id, $buyer->id);
 
-        // 开发者分账后 ledger 有余额，但 wallets.balance 未同步（已知行为）
+        // 开发者分账后 wallet 与 ledger 应同步
         $devLedger = app(LedgerContract::class)->balance('user', $seller->id, 'balance');
         $this->assertGreaterThan(0, $devLedger, '开发者应有分账收入');
+        $devWallet = Wallet::where('user_id', $seller->id)->first();
+        $this->assertNotNull($devWallet, '开发者 wallet 应存在');
+        $this->assertSame($devLedger, (int) $devWallet->balance, '支付后开发者 wallet 应与 ledger 一致');
 
         $this->actingAs($admin)->post("/admin/orders/{$order->id}/refund")->assertRedirect();
 
@@ -138,10 +141,8 @@ class AdminRefundWalletSyncTest extends TestCase
         $devLedgerAfter = app(LedgerContract::class)->balance('user', $seller->id, 'balance');
         $this->assertSame(0, $devLedgerAfter, '开发者 ledger 余额应被扣回');
 
-        // 开发者 wallets.balance 从未同步（已知行为，非期望行为，记录在案）
-        $devWallet = Wallet::where('user_id', $seller->id)->first();
-        if ($devWallet) {
-            $this->assertSame(0, (int) $devWallet->balance, '开发者 wallet.balance 从未同步（已知行为）');
-        }
+        // 退款后开发者 wallet 正确归零（wallet 与 ledger 同步）
+        $devWallet->refresh();
+        $this->assertSame(0, (int) $devWallet->balance, '退款后开发者 wallet 应正确归零');
     }
 }
