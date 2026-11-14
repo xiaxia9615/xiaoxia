@@ -26,14 +26,31 @@ export class ApiError extends Error {
   readonly kind: "network" | "http" | "business" | "unauthorized";
   readonly status?: number;
   readonly code?: number;
+  /** Laravel 422 字段级校验错误（field -> 首条错误信息）。 */
+  readonly fields?: Record<string, string>;
 
-  constructor(kind: ApiError["kind"], message: string, status?: number, code?: number) {
+  constructor(
+    kind: ApiError["kind"],
+    message: string,
+    status?: number,
+    code?: number,
+    fields?: Record<string, string>,
+  ) {
     super(message);
     this.name = "ApiError";
     this.kind = kind;
     this.status = status;
     this.code = code;
+    this.fields = fields;
   }
+}
+
+/** 提取 422 字段级校验错误；非 422 或无字段信息时返回 null。 */
+export function getFieldErrors(err: unknown): Record<string, string> | null {
+  if (err instanceof ApiError && err.status === 422 && err.fields) {
+    return err.fields;
+  }
+  return null;
 }
 
 export async function request<T>(
@@ -151,7 +168,27 @@ export async function request<T>(
     return { code: 0, msg: "ok", data: { list: [], total: 0 } } as unknown as T;
   }
   if (!res.ok) {
-    throw new ApiError("http", `接口请求失败：${res.status}`, res.status);
+    let message = `接口请求失败：${res.status}`;
+    let fields: Record<string, string> | undefined;
+    try {
+      const errJson = (await res.json()) as {
+        message?: string;
+        msg?: string;
+        errors?: Record<string, unknown>;
+      };
+      if (res.status === 422 && errJson.errors && typeof errJson.errors === "object") {
+        fields = {};
+        for (const [key, value] of Object.entries(errJson.errors)) {
+          fields[key] = Array.isArray(value) ? String(value[0] ?? "") : String(value);
+        }
+        message = "表单校验未通过，请检查标红字段";
+      } else if (errJson.msg || errJson.message) {
+        message = errJson.msg ?? errJson.message ?? message;
+      }
+    } catch {
+      // 响应体非 JSON 时保留默认文案
+    }
+    throw new ApiError("http", message, res.status, undefined, fields);
   }
 
   let json: ApiResponse<T>;

@@ -156,7 +156,10 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
     Route::get('admin/orders', [AdminOrderController::class, 'apiIndex']);
     Route::get('admin/users', [AdminUserController::class, 'apiIndex']);
     Route::get('admin/products', [AdminProductController::class, 'apiIndex']);
+    Route::post('admin/products', [AdminProductController::class, 'apiStore']);
+    Route::put('admin/products/{id}', [AdminProductController::class, 'apiUpdate'])->whereNumber('id');
     Route::patch('admin/products/{id}/status', [AdminProductController::class, 'apiToggleStatus'])->whereNumber('id');
+    Route::post('admin/products/{id}/force-archive', [AdminProductController::class, 'apiForceArchive'])->whereNumber('id');
     Route::get('admin/finance/recharges', [AdminFinanceController::class, 'apiRecharges']);
     Route::get('admin/finance/withdrawals', [AdminFinanceController::class, 'apiWithdrawals']);
     Route::post('admin/finance/withdrawals/{id}/approve', [AdminFinanceController::class, 'apiApprove'])->whereNumber('id');

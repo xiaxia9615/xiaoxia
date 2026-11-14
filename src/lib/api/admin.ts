@@ -6,13 +6,26 @@ import { request } from "./request";
 
 // ===== Admin Products =====
 
-/** 商品列表条目（status: 1 上架 / 2 下架）。 */
+/** 商品列表条目（status: 0 下架 / 1 上架 / 2 强制下架；type: 1 技能 / 2 商品）。 */
 export interface AdminProductItem {
   id: number;
   name: string;
+  description: string | null;
+  cover: string | null;
   price: number;
+  type: number;
   status: number;
   created_at: string | null;
+}
+
+/** 新建 / 编辑商品的提交载荷（价格单位：分）。 */
+export interface ProductPayload {
+  name: string;
+  description?: string;
+  price: number;
+  type: number;
+  status?: number;
+  cover?: string;
 }
 
 export interface AdminProductListResponse {
@@ -25,7 +38,7 @@ export interface AdminProductListResponse {
 
 /** 商品列表（支持分页与状态过滤）。 */
 export function getAdminProducts(
-  params?: { page?: number; status?: number },
+  params?: { page?: number; status?: number; type?: number; keyword?: string },
 ): Promise<AdminProductListResponse> {
   return request<AdminProductListResponse>("/admin/products", {
     method: "GET",
@@ -38,6 +51,32 @@ export function getAdminProducts(
 export function toggleProductStatus(id: number): Promise<unknown> {
   return request<unknown>(`/v1/admin/products/${id}/status`, {
     method: "PATCH",
+    auth: true,
+  });
+}
+
+/** 新建商品。 */
+export function createAdminProduct(payload: ProductPayload): Promise<AdminProductItem> {
+  return request<AdminProductItem>("/v1/admin/products", {
+    method: "POST",
+    body: payload,
+    auth: true,
+  });
+}
+
+/** 更新商品。 */
+export function updateAdminProduct(id: number, payload: ProductPayload): Promise<AdminProductItem> {
+  return request<AdminProductItem>(`/v1/admin/products/${id}`, {
+    method: "PUT",
+    body: payload,
+    auth: true,
+  });
+}
+
+/** 强制下架（管理员特权操作）。 */
+export function forceArchiveProduct(id: number): Promise<unknown> {
+  return request<unknown>(`/v1/admin/products/${id}/force-archive`, {
+    method: "POST",
     auth: true,
   });
 }
