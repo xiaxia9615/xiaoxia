@@ -37,3 +37,11 @@ export MYSQL_PWD=$(grep ^DB_PASSWORD= /var/www/app/.env | cut -d= -f2-)
 mysql -u root $(grep ^DB_DATABASE= /var/www/app/.env | cut -d= -f2-) -e "UPDATE users SET is_admin=1 WHERE email=your@email.com"
 unset MYSQL_PWD
 ```
+
+## npm 版本要求（2026-11-14）
+
+- 必须使用 **npm 11+**：`sudo npm install -g npm@11`
+- npm 10.9.9 的 arborist 在解析 vitest peer 依赖集时崩溃（`Cannot read properties of null (reading 'edgesOut')`），全新解析的 `npm install` 必触发
+- npm 11 已修复，`npm install` 全新解析正常（20s 通过）
+- `npm ci` 仍是日常重建依赖首选（快、确定性）
+- 当前环境：Node v22.23.5 / npm 11.21.2
