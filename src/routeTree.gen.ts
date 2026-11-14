@@ -18,7 +18,6 @@ import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as BrowseHistoryRouteImport } from './routes/browse-history'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CheckoutRouteImport } from './routes/checkout'
-import { Route as ContributeRouteImport } from './routes/contribute'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as IntegralRouteImport } from './routes/integral'
 import { Route as LoginRouteImport } from './routes/login'
@@ -75,11 +74,6 @@ const CartRoute = CartRouteImport.update({
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContributeRoute = ContributeRouteImport.update({
-  id: '/contribute',
-  path: '/contribute',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FavoritesRoute = FavoritesRouteImport.update({
@@ -153,7 +147,6 @@ export interface FileRoutesByFullPath {
   '/browse-history': typeof BrowseHistoryRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
-  '/contribute': typeof ContributeRoute
   '/favorites': typeof FavoritesRoute
   '/integral': typeof IntegralRoute
   '/login': typeof LoginRoute
@@ -177,7 +170,6 @@ export interface FileRoutesByTo {
   '/browse-history': typeof BrowseHistoryRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
-  '/contribute': typeof ContributeRoute
   '/favorites': typeof FavoritesRoute
   '/integral': typeof IntegralRoute
   '/login': typeof LoginRoute
@@ -202,7 +194,6 @@ export interface FileRoutesById {
   '/browse-history': typeof BrowseHistoryRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
-  '/contribute': typeof ContributeRoute
   '/favorites': typeof FavoritesRoute
   '/integral': typeof IntegralRoute
   '/login': typeof LoginRoute
@@ -228,7 +219,6 @@ export interface FileRouteTypes {
     | '/browse-history'
     | '/cart'
     | '/checkout'
-    | '/contribute'
     | '/favorites'
     | '/integral'
     | '/login'
@@ -252,7 +242,6 @@ export interface FileRouteTypes {
     | '/browse-history'
     | '/cart'
     | '/checkout'
-    | '/contribute'
     | '/favorites'
     | '/integral'
     | '/login'
@@ -276,7 +265,6 @@ export interface FileRouteTypes {
     | '/browse-history'
     | '/cart'
     | '/checkout'
-    | '/contribute'
     | '/favorites'
     | '/integral'
     | '/login'
@@ -301,7 +289,6 @@ export interface RootRouteChildren {
   BrowseHistoryRoute: typeof BrowseHistoryRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
-  ContributeRoute: typeof ContributeRoute
   FavoritesRoute: typeof FavoritesRoute
   IntegralRoute: typeof IntegralRoute
   LoginRoute: typeof LoginRoute
@@ -379,13 +366,6 @@ declare module '@tanstack/react-router' {
       path: '/checkout'
       fullPath: '/checkout'
       preLoaderRoute: typeof CheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contribute': {
-      id: '/contribute'
-      path: '/contribute'
-      fullPath: '/contribute'
-      preLoaderRoute: typeof ContributeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/favorites': {
@@ -485,7 +465,6 @@ const rootRouteChildren: RootRouteChildren = {
   BrowseHistoryRoute: BrowseHistoryRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
-  ContributeRoute: ContributeRoute,
   FavoritesRoute: FavoritesRoute,
   IntegralRoute: IntegralRoute,
   LoginRoute: LoginRoute,

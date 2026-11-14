@@ -29,14 +29,14 @@ export const CATEGORIES: Category[] = [
 ];
 
 const IMG = {
-  hero: "https://webgw-internet.alipay.com/180020010001289296/qmuseruntimefaas/api/imageRedirect?taskId=GL0Bh8D2hDGihhgX&chatId=bgculij7usac&width=1280&height=1024",
-  mug: "https://webgw-internet.alipay.com/180020010001289296/qmuseruntimefaas/api/imageRedirect?taskId=sNntuPedyHRUHihm&chatId=bgculij7usac&width=800&height=800",
-  pillow: "https://webgw-internet.alipay.com/180020010001289296/qmuseruntimefaas/api/imageRedirect?taskId=vJEjvq-5bMHCoKiK&chatId=bgculij7usac&width=800&height=800",
-  candle: "https://webgw-internet.alipay.com/180020010001289296/qmuseruntimefaas/api/imageRedirect?taskId=8xm7Mf-mYh_-qKi3&chatId=bgculij7usac&width=800&height=800",
-  lamp: "https://webgw-internet.alipay.com/180020010001289296/qmuseruntimefaas/api/imageRedirect?taskId=niGJwRdA-TKucr4K&chatId=bgculij7usac&width=800&height=800",
-  tray: "https://webgw-internet.alipay.com/180020010001289296/qmuseruntimefaas/api/imageRedirect?taskId=PlnBTDxe2Bhi58nI&chatId=bgculij7usac&width=800&height=800",
-  basket: "https://webgw-internet.alipay.com/180020010001289296/qmuseruntimefaas/api/imageRedirect?taskId=jsyQ7cbpN1ELoB0R&chatId=bgculij7usac&width=800&height=800",
-  throw: "https://webgw-internet.alipay.com/180020010001289296/qmuseruntimefaas/api/imageRedirect?taskId=Cc7kE_JBuoY6vLX9&chatId=bgculij7usac&width=800&height=800",
+  hero: "/images/products/placeholder.svg",
+  mug: "/images/products/placeholder.svg",
+  pillow: "/images/products/placeholder.svg",
+  candle: "/images/products/placeholder.svg",
+  lamp: "/images/products/placeholder.svg",
+  tray: "/images/products/placeholder.svg",
+  basket: "/images/products/placeholder.svg",
+  throw: "/images/products/placeholder.svg",
 };
 
 export const HERO_IMAGE = IMG.hero;

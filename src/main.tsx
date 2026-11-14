@@ -16,11 +16,6 @@ function reportFatalReactError(
   error: unknown,
   errorInfo: { componentStack?: string },
 ) {
-  // 平台预览侧的错误采集（存在时才上报）
-  window.__MUSE_PREVIEW_ERROR_CAPTURE__?.reportError(error, {
-    kind: "react-error-boundary",
-    severity: "fatal",
-  });
   reportError(error, {
     source: "react",
     componentStack: errorInfo.componentStack?.slice(0, 2000),

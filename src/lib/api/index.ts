@@ -24,4 +24,3 @@ export * from "./orders";
 export * from "./pay";
 export * from "./article";
 export * from "./misc";
-export * from "./contribute";

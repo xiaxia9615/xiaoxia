@@ -14,7 +14,6 @@ import type { CategoryId, Product } from "@/data/products";
 import type { Address, AddressInput } from "../address";
 import type { Article, ArticleCategory, ArticleCategoryDto, ArticleDto } from "../article";
 import type { CartItem, CartItemDto } from "../cart";
-import type { ContributeItem, ContributeRowDto, ContributeSubmitInput } from "../contribute";
 import type { CommentDto, FavoriteDto, GoodsCategoryDto, GoodsDto, GoodsPageDto } from "../goods";
 import type { AftersaleDto, AftersaleItem, BrowseDto, BrowseItem, IntegralDto, IntegralItem, MessageDto, MessageItem } from "../misc";
 import type { OrderDetailData, OrderDetailDto, OrderDto, OrderItem } from "../orders";
@@ -36,9 +35,6 @@ export interface ContractTypeIndex {
   ArticleDto: ArticleDto;
   CartItem: CartItem;
   CartItemDto: CartItemDto;
-  ContributeItem: ContributeItem;
-  ContributeRowDto: ContributeRowDto;
-  ContributeSubmitInput: ContributeSubmitInput;
   CommentDto: CommentDto;
   FavoriteDto: FavoriteDto;
   GoodsCategoryDto: GoodsCategoryDto;
@@ -80,8 +76,8 @@ export type ContractTypeRef =
   | { kind: "unexported"; name: string; reason: string }
   | { kind: "todo" };
 
-/** 请求方式；CLOUD 表示走 QMuse 云服务表，不经过 HTTP 接口 */
-export type ContractMethod = "GET" | "POST" | "CLOUD" | "TODO";
+/** 请求方式 */
+export type ContractMethod = "GET" | "POST" | "TODO";
 
 export interface ApiContract {
   /** 接口名（原文件导出的函数名） */
@@ -572,27 +568,6 @@ export const API_CONTRACTS: ApiContract[] = [
     note: "需登录；失败降级为空列表",
   },
 
-  // ---------- 开放参与（contribute.ts） ----------
-  {
-    fn: "listContributeItems",
-    source: "lib/api/contribute.ts",
-    method: "CLOUD",
-    path: "activity_participants",
-    request: { kind: "none" },
-    response: { kind: "named", name: "ContributeItem" },
-    critical: false,
-    note: "走 QMuse 云服务数据表，非 HTTP 接口；失败降级为空列表",
-  },
-  {
-    fn: "submitContribution",
-    source: "lib/api/contribute.ts",
-    method: "CLOUD",
-    path: "activity_participants",
-    request: { kind: "named", name: "ContributeSubmitInput" },
-    response: { kind: "named", name: "ContributeItem" },
-    critical: false,
-    note: "走 QMuse 云服务数据表；写入失败显式上抛",
-  },
 ];
 
 /** 主链路接口（critical: true） */

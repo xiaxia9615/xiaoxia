@@ -4,7 +4,6 @@ const zh = {
     products: "商品",
     content: "内容",
     ai: "AI 导购",
-    contribute: "开放参与",
   },
   common: {
     search: "搜索",

@@ -1,6 +1,6 @@
 /**
  * 开放参与数据流图（内联 SVG，真实连线）。
- * 主路径：访客参与 → QMuse 云入库 → 参与墙展示。
+ * 主路径：访客参与 → 云端存储 → 参与墙展示。
  * 用箭头 marker 表达方向，颜色语义：clay 主路径、ok 完成、coral 异常。
  */
 
@@ -18,7 +18,7 @@ interface FlowNode {
 const NODES: FlowNode[] = [
   { id: "visit", x: 20, y: 96, w: 200, h: 64, label: "访客", sub: "无需登录即可参与", tone: "muted" },
   { id: "submit", x: 300, y: 96, w: 200, h: 64, label: "提交参与", sub: "称呼 · 留言", tone: "primary" },
-  { id: "cloud", x: 580, y: 96, w: 200, h: 64, label: "QMuse 云入库", sub: "数据持久化 · 多人共享", tone: "primary" },
+  { id: "cloud", x: 580, y: 96, w: 200, h: 64, label: "云端存储", sub: "数据持久化 · 多人共享", tone: "primary" },
   { id: "wall", x: 860, y: 96, w: 200, h: 64, label: "参与墙展示", sub: "实时流 · 统计", tone: "ok" },
 ];
 

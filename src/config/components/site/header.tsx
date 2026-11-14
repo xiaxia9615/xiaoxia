@@ -27,7 +27,6 @@ export function Header() {
     { to: "/products", label: t("nav.products") },
     { to: "/articles", label: t("nav.content") },
     { to: "/assistant", label: t("nav.ai") },
-    { to: "/contribute", label: t("nav.contribute"), emphasized: true },
   ];
 
   return (
@@ -47,11 +46,7 @@ export function Header() {
             <Link
               key={link.to}
               to={link.to}
-              className={
-                link.emphasized
-                  ? "rounded bg-clay px-4 py-2 font-mono text-sm font-semibold text-clay-foreground shadow-glow transition-colors hover:bg-clay/90"
-                  : "rounded px-4 py-2 font-mono text-sm font-medium text-muted-foreground transition-colors hover:bg-surface hover:text-clay"
-              }
+              className="rounded px-4 py-2 font-mono text-sm font-medium text-muted-foreground transition-colors hover:bg-surface hover:text-clay"
             >
               {link.label}
             </Link>
@@ -204,11 +199,7 @@ export function Header() {
             <Link
               key={link.to}
               to={link.to}
-              className={
-                link.emphasized
-                  ? "rounded bg-clay/15 px-4 py-3 font-mono text-sm font-semibold text-clay transition-colors hover:bg-clay/25"
-                  : "rounded px-4 py-3 font-mono text-sm font-medium text-foreground transition-colors hover:bg-surface hover:text-clay"
-              }
+              className="rounded px-4 py-3 font-mono text-sm font-medium text-foreground transition-colors hover:bg-surface hover:text-clay"
               onClick={() => setOpen(false)}
             >
               {link.label}

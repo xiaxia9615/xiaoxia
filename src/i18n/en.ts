@@ -6,7 +6,6 @@ const en: ZhDict = {
     products: "Shop",
     content: "Journal",
     ai: "AI Guide",
-    contribute: "Open Contribute",
   },
   common: {
     search: "Search",
