@@ -151,3 +151,9 @@
   - 现状：修复前已支付订单的开发者/达人分账在 ledger 有记录，但 wallets.balance 未同步
   - 方案：写 Artisan 脚本扫描 `order_commission` 流水，重新计算并回填用户 wallet
   - 排期：波次 2 之后
+- [ ] **P1 · 商品图依赖支付宝 QMuse 图床**
+      位置：src/data/products.ts（8 处图片 URL）
+      现状：指向 webgw-internet.alipay.com 外部临时图床
+      风险：图床失效/限流时商品列表全部裂图
+      方案：图片迁移到自有存储后替换 URL
+      触发条件：支付渠道接入前
