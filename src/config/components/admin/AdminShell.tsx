@@ -29,9 +29,9 @@ export function AdminShell() {
   const location = useLocation();
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <aside className="sticky top-0 hidden h-screen w-56 shrink-0 border-r border-gray-200 bg-white md:flex md:flex-col">
-        <div className="flex h-14 items-center border-b border-gray-200 px-5">
-          <span className="font-mono text-sm font-semibold tracking-tight text-gray-900">
+      <aside className="sticky top-0 hidden h-screen w-56 shrink-0 border-r border-zinc-800 bg-[#0a0a0a] md:flex md:flex-col">
+        <div className="flex h-14 items-center border-b border-zinc-800 px-5">
+          <span className="font-mono text-sm font-semibold tracking-tight text-emerald-500">
             Admin Console
           </span>
         </div>
@@ -46,10 +46,10 @@ export function AdminShell() {
                 key={item.to}
                 to={item.to}
                 className={cn(
-                  "block rounded-md px-3 py-2 text-sm transition-colors",
+                  "block rounded-md border-l-2 px-3 py-2 text-sm transition-colors",
                   active
-                    ? "bg-gray-100 font-medium text-gray-900"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                    ? "border-emerald-500 bg-zinc-800 font-medium text-emerald-500"
+                    : "border-transparent text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
                 )}
               >
                 {item.label}

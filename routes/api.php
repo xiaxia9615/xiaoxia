@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminFinanceController;
 use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Api\PaymentNotifyController;
 use App\Modules\Address\Http\Controllers\AddressController;
@@ -153,6 +155,12 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
     // Admin（管理员接口）
     Route::get('admin/orders', [AdminOrderController::class, 'apiIndex']);
     Route::get('admin/users', [AdminUserController::class, 'apiIndex']);
+    Route::get('admin/products', [AdminProductController::class, 'apiIndex']);
+    Route::patch('admin/products/{id}/status', [AdminProductController::class, 'apiToggleStatus'])->whereNumber('id');
+    Route::get('admin/finance/recharges', [AdminFinanceController::class, 'apiRecharges']);
+    Route::get('admin/finance/withdrawals', [AdminFinanceController::class, 'apiWithdrawals']);
+    Route::post('admin/finance/withdrawals/{id}/approve', [AdminFinanceController::class, 'apiApprove'])->whereNumber('id');
+    Route::post('admin/finance/withdrawals/{id}/reject', [AdminFinanceController::class, 'apiReject'])->whereNumber('id');
 });
 
 if (config('app.env') !== 'production') {

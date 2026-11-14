@@ -144,4 +144,67 @@ class AdminProductController extends Controller
 
         return back()->with('status', "商品 {$product->name} 已{$label}");
     }
+
+    /**
+     * 商品列表（JSON API，供 React SPA Admin 后台使用）。
+     */
+    public function apiIndex(Request $request)
+    {
+        $status = $request->query('status');
+
+        $products = Product::query()
+            ->when(
+                $status !== null && $status !== '',
+                fn ($query) => $query->where('status', (int) $status)
+            )
+            ->orderByDesc('created_at')
+            ->paginate(20);
+
+        $list = $products->getCollection()->map(fn (Product $p): array => [
+            'id' => $p->id,
+            'name' => $p->name,
+            'price' => $p->price,
+            'status' => $p->status,
+            'created_at' => $p->created_at?->format('Y-m-d H:i:s'),
+        ])->all();
+
+        return response()->json([
+            'code' => 0,
+            'msg' => 'ok',
+            'data' => [
+                'list' => $list,
+                'total' => $products->total(),
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'per_page' => $products->perPage(),
+            ],
+        ]);
+    }
+
+    /**
+     * 商品上下架切换（JSON API，供 React SPA Admin 后台使用）。
+     */
+    public function apiToggleStatus(Request $request, AdminProductService $service, AuditService $auditService, int $id)
+    {
+        $product = $service->toggleStatus($id);
+
+        $label = $product->status === 1 ? '上架' : '下架';
+
+        $auditService->log(
+            (int) $request->user()?->id,
+            'admin.product.toggle-status',
+            'product',
+            $product->id,
+            ['status' => $product->status],
+        );
+
+        return response()->json([
+            'code' => 0,
+            'msg' => "商品 {$product->name} 已{$label}",
+            'data' => [
+                'id' => $product->id,
+                'status' => $product->status,
+            ],
+        ]);
+    }
 }

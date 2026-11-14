@@ -90,6 +90,9 @@ export async function request<T>(
     "/verify/send": "/v1/verify/send",
     "/admin/orders": "/v1/admin/orders",
     "/admin/users": "/v1/admin/users",
+    "/admin/products": "/v1/admin/products",
+    "/admin/finance/recharges": "/v1/admin/finance/recharges",
+    "/admin/finance/withdrawals": "/v1/admin/finance/withdrawals",
   };
 
   let finalPath = PATH_MAP[path] ?? path;

@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AdminPageLayout } from "@/config/components/admin/AdminPageLayout";
+import { lazy } from "react";
 
-function DashboardPage() {
-  return (
-    <AdminPageLayout title="仪表盘">开发中...</AdminPageLayout>
-  );
-}
+const DashboardPage = lazy(() =>
+  import("@/features/admin/dashboard-page").then((m) => ({
+    default: m.DashboardPage,
+  })),
+);
 
 export const Route = createFileRoute("/admin/")({
   component: DashboardPage,
