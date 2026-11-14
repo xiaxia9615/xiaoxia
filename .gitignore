@@ -40,3 +40,5 @@ env.bak
 docs/health-log.md
 .archive/
 export/
+test-results/
+playwright-report/
