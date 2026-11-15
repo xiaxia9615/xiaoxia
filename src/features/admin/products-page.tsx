@@ -124,6 +124,16 @@ export function ProductsPage() {
     { key: "id", header: "ID", cell: (row) => row.id },
     { key: "name", header: "商品名", cell: (row) => row.name },
     { key: "type", header: "分类", cell: (row) => typeLabel(row.type) },
+    {
+      key: "nature",
+      header: "性质",
+      cell: (row) =>
+        row.nature === "virtual" ? (
+          <StatusBadge status="虚拟" type="warning" />
+        ) : (
+          <StatusBadge status="实物" type="default" />
+        ),
+    },
     { key: "price", header: "价格", cell: (row) => formatPrice(row.price) },
     {
       key: "status",

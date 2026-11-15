@@ -10,6 +10,8 @@ export interface CheckoutItem {
   original_price: number;
   count: number;
   stock: number;
+  /** 商品性质：physical 实物 / virtual 虚拟（后端补齐后返回，缺省按实物处理）。 */
+  nature?: "physical" | "virtual";
 }
 
 export interface CheckoutPayment {

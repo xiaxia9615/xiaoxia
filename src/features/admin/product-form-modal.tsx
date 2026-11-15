@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -45,16 +46,50 @@ const PRODUCT_TYPES: Array<{ value: string; label: string }> = [
   { value: "2", label: "商品" },
 ];
 
-const schema = z.object({
-  name: z.string().min(1, "商品名称不能为空").max(255, "商品名称不能超过 255 字"),
-  priceYuan: z
-    .string()
-    .min(1, "请输入价格")
-    .refine((v) => Number.isFinite(Number(v)) && Number(v) > 0, "价格必须大于 0"),
-  type: z.string().min(1, "请选择分类"),
-  cover: z.string(),
-  description: z.string(),
-});
+const schema = z
+  .object({
+    name: z.string().min(1, "商品名称不能为空").max(255, "商品名称不能超过 255 字"),
+    priceYuan: z
+      .string()
+      .min(1, "请输入价格")
+      .refine((v) => Number.isFinite(Number(v)) && Number(v) > 0, "价格必须大于 0"),
+    type: z.string().min(1, "请选择分类"),
+    nature: z.enum(["physical", "virtual"]),
+    quotaYuan: z.string(),
+    skillId: z.string(),
+    cover: z.string(),
+    description: z.string(),
+  })
+  .superRefine((values, ctx) => {
+    if (values.nature === "virtual") {
+      if (!values.quotaYuan.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["quotaYuan"],
+          message: "虚拟商品请填写赠送额度",
+        });
+      } else if (!Number.isFinite(Number(values.quotaYuan)) || Number(values.quotaYuan) <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["quotaYuan"],
+          message: "赠送额度必须大于 0",
+        });
+      }
+      if (!values.skillId.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["skillId"],
+          message: "虚拟商品请填写绑定的技能 ID",
+        });
+      } else if (!Number.isInteger(Number(values.skillId)) || Number(values.skillId) <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["skillId"],
+          message: "技能 ID 必须为正整数",
+        });
+      }
+    }
+  });
 
 type ProductForm = z.infer<typeof schema>;
 
@@ -62,6 +97,9 @@ const EMPTY_FORM: ProductForm = {
   name: "",
   priceYuan: "",
   type: "2",
+  nature: "physical",
+  quotaYuan: "",
+  skillId: "",
   cover: "",
   description: "",
 };
@@ -71,6 +109,9 @@ const SERVER_FIELD_MAP: Record<string, keyof ProductForm> = {
   name: "name",
   price: "priceYuan",
   type: "type",
+  nature: "nature",
+  quota: "quotaYuan",
+  skill_id: "skillId",
   cover: "cover",
   description: "description",
 };
@@ -96,6 +137,8 @@ export function ProductFormModal({
     mode: "onChange",
   });
 
+  const nature = form.watch("nature");
+
   useEffect(() => {
     if (open) {
       form.clearErrors();
@@ -105,6 +148,9 @@ export function ProductFormModal({
               name: editing.name,
               priceYuan: (editing.price / 100).toFixed(2),
               type: String(editing.type),
+              nature: editing.nature,
+              quotaYuan: editing.quota > 0 ? (editing.quota / 100).toFixed(2) : "",
+              skillId: editing.skill_id !== null ? String(editing.skill_id) : "",
               cover: editing.cover ?? "",
               description: editing.description ?? "",
             }
@@ -120,8 +166,13 @@ export function ProductFormModal({
         description: values.description.trim() || undefined,
         price: Math.round(Number(values.priceYuan) * 100),
         type: Number(values.type),
+        nature: values.nature,
         cover: values.cover.trim() || undefined,
       };
+      if (values.nature === "virtual") {
+        payload.quota = Math.round(Number(values.quotaYuan) * 100);
+        payload.skill_id = Number(values.skillId);
+      }
       if (editing) {
         return updateAdminProduct(editing.id, payload);
       }
@@ -167,6 +218,32 @@ export function ProductFormModal({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={onSubmit} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="nature"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-slate-300">商品性质</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      className="flex gap-6"
+                    >
+                      <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-200">
+                        <RadioGroupItem value="physical" className="border-emerald-400/40 text-emerald-400" />
+                        实物商品
+                      </label>
+                      <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-200">
+                        <RadioGroupItem value="virtual" className="border-emerald-400/40 text-emerald-400" />
+                        虚拟服务
+                      </label>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="name"
@@ -227,6 +304,52 @@ export function ProductFormModal({
                 )}
               />
             </div>
+            {nature === "virtual" ? (
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="quotaYuan"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-slate-300">赠送额度（元）</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0.01"
+                          step="0.01"
+                          inputMode="decimal"
+                          placeholder="支付后自动发放到买家余额"
+                          className={fieldClass}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="skillId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-slate-300">绑定技能 ID</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="1"
+                          step="1"
+                          inputMode="numeric"
+                          placeholder="如 9"
+                          className={fieldClass}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            ) : null}
             <FormField
               control={form.control}
               name="cover"

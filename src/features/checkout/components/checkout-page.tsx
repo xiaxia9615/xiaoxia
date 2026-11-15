@@ -15,6 +15,11 @@ export function CheckoutPage({ ids }: { ids: string }) {
     usePlaceOrder(ids);
 
   const defaultAddr = addresses.find((a) => a.is_default) ?? addresses[0];
+  /** 纯虚拟订单：无需收货地址与运费（后端 buy/index 补齐 nature 后自动生效）。 */
+  const isVirtualOnly =
+    checkout !== undefined &&
+    checkout.items.length > 0 &&
+    checkout.items.every((it) => it.nature === "virtual");
 
   return (
     <SiteLayout>
@@ -35,7 +40,9 @@ export function CheckoutPage({ ids }: { ids: string }) {
               <p className="mb-3 flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-widest text-clay">
                 <MapPin className="size-4" /> 收货地址
               </p>
-              {defaultAddr ? (
+              {isVirtualOnly ? (
+                <p className="text-sm text-muted-foreground">虚拟商品订单，支付后自动发货，无需收货地址。</p>
+              ) : defaultAddr ? (
                 <p className="text-sm text-foreground">
                   <span className="font-medium">{defaultAddr.name}</span> {defaultAddr.phone}
                   <span className="mt-1 block text-muted-foreground">{defaultAddr.province}{defaultAddr.city}{defaultAddr.district}{defaultAddr.detail}</span>
@@ -101,7 +108,9 @@ export function CheckoutPage({ ids }: { ids: string }) {
               )}
               <div className="mt-4 space-y-1 border-t pt-4 text-sm">
                 <p className="flex justify-between text-muted-foreground"><span>商品小计</span><span>{formatPrice(checkout.total_price)}</span></p>
-                <p className="flex justify-between text-muted-foreground"><span>运费</span><span>{checkout.shipping_amount > 0 ? formatPrice(checkout.shipping_amount) : "免运费"}</span></p>
+                {!isVirtualOnly && (
+                  <p className="flex justify-between text-muted-foreground"><span>运费</span><span>{checkout.shipping_amount > 0 ? formatPrice(checkout.shipping_amount) : "免运费"}</span></p>
+                )}
                 <p className="flex justify-between pt-2 text-base font-semibold text-foreground"><span>应付</span><span className="text-clay">{formatPrice(checkout.actual_price)}</span></p>
               </div>
             </section>
