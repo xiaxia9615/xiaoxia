@@ -32,6 +32,7 @@ final class AdminSkillService
                 'sd.pricing_type',
                 'sd.api_key',
                 'sd.free_quota',
+                'p.status as product_status',
             )
             ->orderByDesc('sd.id')
             ->paginate($perPage);

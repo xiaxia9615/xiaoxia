@@ -1,8 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAiProviderController;
+use App\Http\Controllers\Admin\AdminApiCallController;
+use App\Http\Controllers\Admin\AdminApiKeyController;
 use App\Http\Controllers\Admin\AdminFinanceController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\AdminSkillController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Api\PaymentNotifyController;
 use App\Modules\Address\Http\Controllers\AddressController;
@@ -165,6 +169,21 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
     Route::get('admin/finance/withdrawals', [AdminFinanceController::class, 'apiWithdrawals']);
     Route::post('admin/finance/withdrawals/{id}/approve', [AdminFinanceController::class, 'apiApprove'])->whereNumber('id');
     Route::post('admin/finance/withdrawals/{id}/reject', [AdminFinanceController::class, 'apiReject'])->whereNumber('id');
+
+    // AI 供应商（api_key 脱敏输出，留空保留原值）
+    Route::get('admin/ai-providers', [AdminAiProviderController::class, 'apiIndex']);
+    Route::patch('admin/ai-providers/{id}', [AdminAiProviderController::class, 'apiUpdate'])->whereNumber('id');
+
+    // 技能（列表 / 上下架切换）
+    Route::get('admin/skills', [AdminSkillController::class, 'apiIndex']);
+    Route::patch('admin/skills/{id}/status', [AdminSkillController::class, 'apiToggleStatus'])->whereNumber('id');
+
+    // API Keys（key 脱敏输出 / 吊销）
+    Route::get('admin/api-keys', [AdminApiKeyController::class, 'apiIndex']);
+    Route::delete('admin/api-keys/{id}', [AdminApiKeyController::class, 'apiRevoke'])->whereNumber('id');
+
+    // 调用流水
+    Route::get('admin/api-calls', [AdminApiCallController::class, 'apiIndex']);
 });
 
 if (config('app.env') !== 'production') {

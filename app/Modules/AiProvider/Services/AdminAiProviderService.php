@@ -48,4 +48,34 @@ final class AdminAiProviderService
 
         return 'sk-****'.substr($key, -4);
     }
+
+    /**
+     * 更新供应商（base_url / api_key / enabled）。
+     * 安全约束: api_key 留空时保留原值，绝不盲目覆盖。
+     */
+    public function updateProvider(int $id, array $data): AiProvider
+    {
+        $provider = AiProvider::query()->findOrFail($id);
+
+        $payload = [];
+
+        if (($data['base_url'] ?? null) !== null) {
+            $payload['base_url'] = $data['base_url'];
+        }
+
+        if (($data['api_key'] ?? null) !== null && $data['api_key'] !== '') {
+            $payload['api_key'] = $data['api_key'];
+        }
+
+        if (($data['enabled'] ?? null) !== null) {
+            $payload['enabled'] = $data['enabled'];
+        }
+
+        if ($payload !== []) {
+            $provider->fill($payload);
+            $provider->save();
+        }
+
+        return $provider->refresh();
+    }
 }
