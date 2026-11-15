@@ -87,7 +87,8 @@ class OrderTest extends TestCase
             ->postJson("/api/v1/orders/{$order->id}/pay")
             ->assertOk();
 
-        $this->assertEquals(OrderStatus::Paid, $order->fresh()->status);
+        // 实物商品支付后进入待发货（双态分流：physical -> pending_shipment）
+        $this->assertEquals(OrderStatus::PendingShipment, $order->fresh()->status);
     }
 
     public function test_pay_order_insufficient_balance(): void

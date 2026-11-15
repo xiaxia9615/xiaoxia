@@ -154,6 +154,7 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
 
     // Admin（管理员接口）
     Route::get('admin/orders', [AdminOrderController::class, 'apiIndex']);
+    Route::post('admin/orders/{id}/ship', [AdminOrderController::class, 'apiShip'])->whereNumber('id');
     Route::get('admin/users', [AdminUserController::class, 'apiIndex']);
     Route::get('admin/products', [AdminProductController::class, 'apiIndex']);
     Route::post('admin/products', [AdminProductController::class, 'apiStore']);

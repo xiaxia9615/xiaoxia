@@ -21,6 +21,9 @@ final class AdminProductService
                 'description' => $data['description'] ?? null,
                 'price' => (int) $data['price'],
                 'status' => (int) $data['status'],
+                'nature' => $data['nature'] ?? Product::NATURE_PHYSICAL,
+                'quota' => (int) ($data['quota'] ?? 0),
+                'skill_id' => $data['skill_id'] ?? null,
             ]);
         });
     }
@@ -34,6 +37,9 @@ final class AdminProductService
                 'description' => $data['description'] ?? null,
                 'price' => (int) $data['price'],
                 'type' => (int) $data['type'],
+                'nature' => $data['nature'] ?? $product->nature,
+                'quota' => (int) ($data['quota'] ?? $product->quota),
+                'skill_id' => $data['skill_id'] ?? $product->skill_id,
             ]);
 
             return $product;

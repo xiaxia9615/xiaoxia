@@ -178,6 +178,9 @@ class AdminProductController extends Controller
             'cover' => $p->cover,
             'price' => $p->price,
             'type' => $p->type,
+            'nature' => $p->nature,
+            'quota' => $p->quota,
+            'skill_id' => $p->skill_id,
             'status' => $p->status,
             'created_at' => $p->created_at?->format('Y-m-d H:i:s'),
         ])->all();
@@ -235,6 +238,9 @@ class AdminProductController extends Controller
             'type' => 'required|integer|in:1,2',
             'status' => 'required|integer|in:0,1',
             'cover' => 'nullable|string|max:255',
+            'nature' => 'nullable|string|in:physical,virtual',
+            'quota' => 'nullable|integer|min:0',
+            'skill_id' => 'nullable|integer|min:1',
         ]);
 
         $product = $service->create($data);
@@ -257,6 +263,9 @@ class AdminProductController extends Controller
                 'cover' => $product->cover,
                 'price' => $product->price,
                 'type' => $product->type,
+                'nature' => $product->nature,
+                'quota' => $product->quota,
+                'skill_id' => $product->skill_id,
                 'status' => $product->status,
             ],
         ]);
@@ -274,6 +283,9 @@ class AdminProductController extends Controller
             'price' => 'required|integer|min:1',
             'type' => 'required|integer|in:1,2',
             'cover' => 'nullable|string|max:255',
+            'nature' => 'nullable|string|in:physical,virtual',
+            'quota' => 'nullable|integer|min:0',
+            'skill_id' => 'nullable|integer|min:1',
         ]);
 
         $product = $service->update($id, $data);
@@ -296,6 +308,9 @@ class AdminProductController extends Controller
                 'cover' => $product->cover,
                 'price' => $product->price,
                 'type' => $product->type,
+                'nature' => $product->nature,
+                'quota' => $product->quota,
+                'skill_id' => $product->skill_id,
                 'status' => $product->status,
             ],
         ]);

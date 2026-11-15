@@ -6,7 +6,7 @@ import { request } from "./request";
 
 // ===== Admin Products =====
 
-/** 商品列表条目（status: 0 下架 / 1 上架 / 2 强制下架；type: 1 技能 / 2 商品）。 */
+/** 商品列表条目（status: 0 下架 / 1 上架 / 2 强制下架；type: 1 技能 / 2 商品；nature: physical 实物 / virtual 虚拟）。 */
 export interface AdminProductItem {
   id: number;
   name: string;
@@ -14,16 +14,22 @@ export interface AdminProductItem {
   cover: string | null;
   price: number;
   type: number;
+  nature: "physical" | "virtual";
+  quota: number;
+  skill_id: number | null;
   status: number;
   created_at: string | null;
 }
 
-/** 新建 / 编辑商品的提交载荷（价格单位：分）。 */
+/** 新建 / 编辑商品的提交载荷（价格与额度单位：分）。 */
 export interface ProductPayload {
   name: string;
   description?: string;
   price: number;
   type: number;
+  nature?: "physical" | "virtual";
+  quota?: number;
+  skill_id?: number;
   status?: number;
   cover?: string;
 }

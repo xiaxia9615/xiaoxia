@@ -17,6 +17,8 @@ use Illuminate\Support\Carbon;
  * @property int $amount
  * @property array|null $product_snapshot
  * @property Carbon|null $paid_at
+ * @property string|null $tracking_no
+ * @property Carbon|null $shipped_at
  * @property string $order_no
  * @property int $user_id
  * @property int $product_id
@@ -36,6 +38,8 @@ class Order extends Model
         'product_snapshot',
         'status',
         'paid_at',
+        'tracking_no',
+        'shipped_at',
     ];
 
     protected function casts(): array
@@ -45,6 +49,7 @@ class Order extends Model
             'product_snapshot' => 'array',
             'status' => OrderStatus::class,
             'paid_at' => 'datetime',
+            'shipped_at' => 'datetime',
         ];
     }
 

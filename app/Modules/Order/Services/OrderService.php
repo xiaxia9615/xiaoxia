@@ -10,6 +10,7 @@ use App\Modules\Order\Models\Order;
 use App\Modules\Product\Models\Product;
 use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
@@ -51,6 +52,9 @@ final class OrderService
                     'price' => (int) $product->price,
                     'type' => (int) $product->type,
                     'description' => $product->description,
+                    'nature' => $product->nature,
+                    'quota' => (int) $product->quota,
+                    'skill_id' => $product->skill_id,
                 ],
                 'status' => OrderStatus::Pending,
             ]);
@@ -63,7 +67,8 @@ final class OrderService
      * 2. 已支付订单幂等返回，严禁重复扣款；
      * 3. 仅待支付订单可支付；
      * 4. 严格按订单 amount（价格快照）扣款，绝不读商品最新价格；
-     * 5. 扣款成功后置为 Paid，并按比例分账（开发者/达人/平台）。
+     * 5. 扣款成功后双态分流：实物商品进入待发货，虚拟商品自动发货后完成；
+     * 6. 并按比例分账（开发者/达人/平台）。
      *
      * @return array{status: string, order: Order, message?: string}
      *
@@ -83,8 +88,8 @@ final class OrderService
                 throw new RuntimeException('订单不存在');
             }
 
-            // 幂等：已支付订单直接返回，严禁重复扣款
-            if ($order->status === OrderStatus::Paid) {
+            // 幂等：已支付订单（含待发货/已完成）直接返回，严禁重复扣款
+            if (in_array($order->status, [OrderStatus::Paid, OrderStatus::PendingShipment, OrderStatus::Completed], true)) {
                 return ['status' => 'already_paid', 'order' => $order, 'message' => '订单已支付'];
             }
 
@@ -103,8 +108,16 @@ final class OrderService
             // settleCommission 只依赖 'order_commission'，不受影响。
             $this->wallet->deduct($buyer, (int) $order->amount, 'order_'.$order->id);
 
-            $order->status = OrderStatus::Paid;
             $order->paid_at = now();
+            // 双态分流：虚拟商品支付后立即自动发货（幂等）并完成；实物商品进入待发货
+            /** @var Product|null $product */
+            $product = Product::withTrashed()->find($order->product_id);
+            if ($product && $product->isVirtual()) {
+                $this->autoDeliverVirtualOrder($order, $product);
+                $order->status = OrderStatus::Completed;
+            } else {
+                $order->status = OrderStatus::PendingShipment;
+            }
             $order->save();
 
             // 分账：开发者 80%；买家绑定上级达人时达人 10%、平台 10%，否则平台 20%；误差归平台
@@ -117,6 +130,40 @@ final class OrderService
 
             return ['status' => 'success', 'order' => $order];
         });
+    }
+
+    /**
+     * 虚拟商品自动发货（幂等）：
+     * 1. 缓存锁防并发重复触发（payOrder 行锁之外的第二道防线，兼容支付回调等多入口）；
+     * 2. WalletService::deposit 以 out_trade_no 唯一约束兜底，天然幂等，绝不重复加额度；
+     * 3. 仅当绑定技能且赠送额度 > 0 时入账。
+     */
+    private function autoDeliverVirtualOrder(Order $order, Product $product): void
+    {
+        $lock = Cache::lock("virtual_deliver:{$order->id}", 30);
+
+        if (! $lock->get()) {
+            // 并发触发：另一进程正在发货，订单状态由其推进，此处直接返回
+            return;
+        }
+
+        try {
+            if ($product->skill_id !== null && $product->quota > 0) {
+                $result = $this->wallet->deposit(
+                    $order->user,
+                    (int) $product->quota,
+                    'virtual_deliver_'.$order->id,
+                );
+                Log::info('virtual order auto delivered', [
+                    'order_no' => $order->order_no,
+                    'skill_id' => $product->skill_id,
+                    'quota' => $product->quota,
+                    'deposit_status' => $result['status'] ?? 'unknown',
+                ]);
+            }
+        } finally {
+            $lock->release();
+        }
     }
 
     /**

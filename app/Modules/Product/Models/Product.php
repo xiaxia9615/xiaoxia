@@ -20,15 +20,25 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $name
  * @property int $user_id
  * @property string|null $description
+ * @property string $nature
+ * @property int $quota
+ * @property int|null $skill_id
  */
 class Product extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
+    /** 商品性质：实物 */
+    public const NATURE_PHYSICAL = 'physical';
+
+    /** 商品性质：虚拟 */
+    public const NATURE_VIRTUAL = 'virtual';
+
     protected $fillable = [
         'user_id', 'type', 'name', 'slug', 'description',
         'cover', 'price', 'status', 'audit_note',
+        'nature', 'quota', 'skill_id',
     ];
 
     protected function casts(): array
@@ -39,7 +49,15 @@ class Product extends Model
             'status' => 'integer',
             'sales_count' => 'integer',
             'view_count' => 'integer',
+            'quota' => 'integer',
+            'skill_id' => 'integer',
         ];
+    }
+
+    /** 是否虚拟商品（虚拟服务：自动发货） */
+    public function isVirtual(): bool
+    {
+        return $this->nature === self::NATURE_VIRTUAL;
     }
 
     public function provider(): BelongsTo

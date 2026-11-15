@@ -41,7 +41,7 @@ class AdminOrderController extends Controller
     public function apiIndex(Request $request)
     {
         $orders = Order::query()
-            ->with(['user:id,name,email', 'product:id,name,cover,price'])
+            ->with(['user:id,name,email', 'product:id,name,cover,price,nature'])
             ->orderByDesc('created_at')
             ->paginate(20)
             ->withQueryString();
@@ -51,6 +51,8 @@ class AdminOrderController extends Controller
             'order_no' => $order->order_no,
             'amount' => $order->amount,
             'status' => $order->status->value,
+            'nature' => $order->product?->nature,
+            'tracking_no' => $order->tracking_no,
             'product_name' => $order->product?->name,
             'user_name' => $order->user?->name,
             'user_email' => $order->user?->email,
@@ -66,6 +68,68 @@ class AdminOrderController extends Controller
                 'current_page' => $orders->currentPage(),
                 'last_page' => $orders->lastPage(),
                 'per_page' => $orders->perPage(),
+            ],
+        ]);
+    }
+
+    /**
+     * 实物订单发货（JSON API，供 React SPA Admin 后台使用）。
+     *
+     * 1. 仅待发货（pending_shipment）订单可发货；
+     * 2. 幂等：已发货订单（tracking_no 已存在）直接返回成功，防止重复发货；
+     * 3. 发货后记录物流单号与发货时间，订单状态置为已完成。
+     */
+    public function apiShip(Request $request, AuditService $auditService, int $id)
+    {
+        $data = $request->validate([
+            'tracking_no' => 'required|string|max:64',
+        ]);
+
+        $order = DB::transaction(function () use ($data, $id, $auditService): Order {
+            /** @var Order|null $order */
+            $order = Order::query()
+                ->where('id', $id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $order) {
+                throw new RuntimeException('订单不存在');
+            }
+
+            // 幂等：已发货订单直接返回，严禁重复发货
+            if ($order->status === OrderStatus::Completed && $order->tracking_no !== null) {
+                return $order;
+            }
+
+            if ($order->status !== OrderStatus::PendingShipment) {
+                throw new RuntimeException('当前订单状态不可发货');
+            }
+
+            $order->tracking_no = $data['tracking_no'];
+            $order->shipped_at = now();
+            $order->status = OrderStatus::Completed;
+            $order->save();
+
+            $auditService->log(
+                (int) $request->user()->id,
+                'admin.order.ship',
+                'order',
+                $order->id,
+                ['order_no' => $order->order_no, 'tracking_no' => $order->tracking_no],
+            );
+
+            return $order;
+        });
+
+        return response()->json([
+            'code' => 0,
+            'msg' => "订单 {$order->order_no} 已发货",
+            'data' => [
+                'id' => $order->id,
+                'order_no' => $order->order_no,
+                'tracking_no' => $order->tracking_no,
+                'shipped_at' => $order->shipped_at?->toDateTimeString(),
+                'status' => $order->status->value,
             ],
         ]);
     }
