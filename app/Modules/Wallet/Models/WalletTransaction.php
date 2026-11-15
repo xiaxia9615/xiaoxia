@@ -6,6 +6,7 @@ namespace App\Modules\Wallet\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -13,8 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $out_trade_no
  * @property int $amount
  * @property string $type
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \App\Modules\Wallet\Models\Wallet|null $wallet
+ * @property Carbon|null $created_at
+ * @property Wallet|null $wallet
  */
 class WalletTransaction extends Model
 {

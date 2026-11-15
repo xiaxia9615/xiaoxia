@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $type
@@ -24,7 +25,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $quota
  * @property int|null $skill_id
  * @property string|null $cover
- * @property \Illuminate\Support\Carbon|null $created_at
+ * @property Carbon|null $created_at
  */
 class Product extends Model
 {
