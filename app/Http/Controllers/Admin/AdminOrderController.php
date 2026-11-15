@@ -85,7 +85,7 @@ class AdminOrderController extends Controller
             'tracking_no' => 'required|string|max:64',
         ]);
 
-        $order = DB::transaction(function () use ($data, $id, $auditService): Order {
+        $order = DB::transaction(function () use ($data, $id, $auditService, $request): Order {
             /** @var Order|null $order */
             $order = Order::query()
                 ->where('id', $id)

@@ -23,6 +23,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $nature
  * @property int $quota
  * @property int|null $skill_id
+ * @property string|null $cover
+ * @property \Illuminate\Support\Carbon|null $created_at
  */
 class Product extends Model
 {
