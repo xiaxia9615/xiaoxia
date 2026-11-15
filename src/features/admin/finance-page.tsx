@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { AdminPageLayout } from "@/config/components/admin/AdminPageLayout";
 import { DataTable, type DataTableColumn } from "@/config/components/admin/DataTable";
+import { Pagination } from "@/config/components/admin/Pagination";
 import { StatusBadge, type StatusBadgeType } from "@/config/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -23,7 +25,12 @@ import {
   type AdminRechargeItem,
   type AdminWithdrawalItem,
 } from "@/lib/api/admin";
-import { formatPrice } from "@/data/products";
+import { toErrorMessage } from "@/lib/api/request";
+
+/** 财务接口金额单位为毫（1 元 = 1000 毫），展示时 /1000 转元。 */
+function formatMilliAmount(value: number): string {
+  return `¥${(value / 1000).toFixed(2)}`;
+}
 
 /** 提现状态 -> 标签语义。 */
 function withdrawalStatusType(status: string): StatusBadgeType {
@@ -31,46 +38,6 @@ function withdrawalStatusType(status: string): StatusBadgeType {
   if (status === "pending") return "warning";
   if (status === "rejected") return "danger";
   return "default";
-}
-
-/** 分页控件（上一页/下一页 + 页码信息）。 */
-function Pagination({
-  page,
-  lastPage,
-  total,
-  onChange,
-}: {
-  page: number;
-  lastPage: number;
-  total: number;
-  onChange: (page: number) => void;
-}) {
-  if (lastPage <= 1) return null;
-  return (
-    <div className="flex items-center justify-between text-sm text-gray-500">
-      <span>
-        第 {page} / {lastPage} 页，共 {total} 条
-      </span>
-      <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={page <= 1}
-          onClick={() => onChange(Math.max(1, page - 1))}
-        >
-          上一页
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={page >= lastPage}
-          onClick={() => onChange(Math.min(lastPage, page + 1))}
-        >
-          下一页
-        </Button>
-      </div>
-    </div>
-  );
 }
 
 /** 充值流水 Tab。 */
@@ -85,7 +52,7 @@ function RechargesTab() {
     { key: "id", header: "ID", cell: (row) => row.id },
     { key: "out_trade_no", header: "外部单号", cell: (row) => row.out_trade_no ?? "-" },
     { key: "user_name", header: "用户", cell: (row) => row.user_name ?? "-" },
-    { key: "amount", header: "金额", cell: (row) => formatPrice(row.amount) },
+    { key: "amount", header: "金额", cell: (row) => formatMilliAmount(row.amount) },
     { key: "type", header: "类型", cell: (row) => row.type },
     { key: "created_at", header: "时间", cell: (row) => row.created_at ?? "-" },
   ];
@@ -108,13 +75,14 @@ function RechargesTab() {
   );
 }
 
-/** 提现审批 Tab：同意打款 / 驳回均需 AlertDialog 二次确认。 */
+/** 提现审批 Tab：同意打款 / 驳回均需 AlertDialog 二次确认，驳回需填写原因。 */
 function WithdrawalsTab() {
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState<
     { kind: "approve" | "reject"; row: AdminWithdrawalItem } | null
   >(null);
+  const [rejectReason, setRejectReason] = useState("");
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-finance-withdrawals", page],
@@ -126,19 +94,33 @@ function WithdrawalsTab() {
       if (input.kind === "approve") {
         return approveWithdrawal(input.row.id);
       }
-      // 驳回原因：默认文案，后续可扩展为表单输入
-      return rejectWithdrawal(input.row.id, "管理员驳回");
+      return rejectWithdrawal(input.row.id, rejectReason.trim());
     },
-    onSuccess: () => {
+    onSuccess: (_result, input) => {
       setConfirming(null);
+      setRejectReason("");
+      toast.success(
+        input.kind === "approve" ? "已同意打款" : "已驳回提现",
+        {
+          description:
+            input.kind === "approve"
+              ? `提现单 #${input.row.id} 审批已通过。`
+              : `提现单 #${input.row.id} 已驳回，冻结款退回可用余额。`,
+        },
+      );
       queryClient.invalidateQueries({ queryKey: ["admin-finance-withdrawals"] });
     },
+    onError: (err) => {
+      toast.error("操作失败", { description: toErrorMessage(err) });
+    },
   });
+
+  const rejectReasonValid = rejectReason.trim().length > 0 && rejectReason.trim().length <= 255;
 
   const columns: Array<DataTableColumn<AdminWithdrawalItem>> = [
     { key: "id", header: "单号", cell: (row) => `#${row.id}` },
     { key: "user_name", header: "用户", cell: (row) => row.user_name ?? "-" },
-    { key: "amount", header: "金额", cell: (row) => formatPrice(row.amount) },
+    { key: "amount", header: "金额", cell: (row) => formatMilliAmount(row.amount) },
     {
       key: "status",
       header: "状态",
@@ -146,6 +128,7 @@ function WithdrawalsTab() {
         <StatusBadge status={row.status} type={withdrawalStatusType(row.status)} />
       ),
     },
+    { key: "audited_at", header: "审核时间", cell: (row) => row.audited_at ?? "-" },
     {
       key: "actions",
       header: "操作",
@@ -193,7 +176,10 @@ function WithdrawalsTab() {
       <AlertDialog
         open={confirming !== null}
         onOpenChange={(open) => {
-          if (!open) setConfirming(null);
+          if (!open) {
+            setConfirming(null);
+            setRejectReason("");
+          }
         }}
       >
         <AlertDialogContent>
@@ -203,20 +189,39 @@ function WithdrawalsTab() {
             </AlertDialogTitle>
             <AlertDialogDescription>
               {confirming?.kind === "approve"
-                ? `确认通过提现单 #${confirming.row.id}（${formatPrice(confirming.row.amount)}）的审批？`
-                : `确认驳回提现单 #${confirming?.row.id}（${formatPrice(confirming?.row.amount ?? 0)}）？驳回后冻结款将退回可用余额。`}
+                ? `确认通过提现单 #${confirming.row.id}（${formatMilliAmount(confirming.row.amount)}）的审批？`
+                : `确认驳回提现单 #${confirming?.row.id}（${formatMilliAmount(confirming?.row.amount ?? 0)}）？驳回后冻结款将退回可用余额。`}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          {confirming?.kind === "reject" ? (
+            <div className="space-y-1.5">
+              <Textarea
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder="请填写驳回原因（必填，不超过 255 字）"
+                maxLength={255}
+                rows={3}
+              />
+              {rejectReason.trim().length === 0 ? (
+                <p className="text-xs text-red-600">驳回原因为必填项</p>
+              ) : null}
+            </div>
+          ) : null}
           <AlertDialogFooter>
             <AlertDialogCancel disabled={actionMutation.isPending}>取消</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={actionMutation.isPending}
+            <button
+              type="button"
+              className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-md bg-zinc-900 px-3 text-sm font-medium text-zinc-50 transition-colors hover:bg-zinc-800 disabled:pointer-events-none disabled:opacity-50"
+              disabled={
+                actionMutation.isPending ||
+                (confirming?.kind === "reject" && !rejectReasonValid)
+              }
               onClick={() => {
                 if (confirming) actionMutation.mutate(confirming);
               }}
             >
               {actionMutation.isPending ? "处理中…" : "确认"}
-            </AlertDialogAction>
+            </button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

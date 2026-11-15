@@ -1,14 +1,17 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { AdminPageLayout } from "@/config/components/admin/AdminPageLayout";
 import { DataTable, type DataTableColumn } from "@/config/components/admin/DataTable";
+import { Pagination } from "@/config/components/admin/Pagination";
 import { StatusBadge } from "@/config/components/admin/StatusBadge";
 import { getAdminUsers, type AdminUserItem } from "@/lib/api/generated";
 
 function UsersPage() {
+  const [page, setPage] = useState(1);
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-users"],
-    queryFn: () => getAdminUsers(),
+    queryKey: ["admin-users", page],
+    queryFn: () => getAdminUsers({ page }),
   });
 
   const columns: Array<DataTableColumn<AdminUserItem>> = [
@@ -45,6 +48,14 @@ function UsersPage() {
         data={data?.list ?? []}
         isLoading={isLoading}
         emptyText="暂无用户"
+        pagination={
+          <Pagination
+            page={data?.current_page ?? page}
+            lastPage={data?.last_page ?? 1}
+            total={data?.total ?? 0}
+            onChange={setPage}
+          />
+        }
       />
     </AdminPageLayout>
   );
