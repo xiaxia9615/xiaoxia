@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth/guard";
 import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "@/features/account/auth-provider";
 import { lazy } from "react";
@@ -8,6 +9,7 @@ const PaySelfCheckPage = lazy(() =>
 
 /** 支付自检终端：路由只解析登录态并渲染，自检状态机在 features/payment/self-check。 */
 export const Route = createFileRoute("/pay-self-check")({
+  beforeLoad: requireAuth,
   component: PaySelfCheckRoute,
 });
 

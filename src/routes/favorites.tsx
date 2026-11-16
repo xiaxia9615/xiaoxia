@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth/guard";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Heart, ShoppingBag } from "lucide-react";
@@ -11,6 +12,7 @@ import { formatPrice } from "@/data/products";
 import { AppImage } from "@/components/system/app-image";
 
 export const Route = createFileRoute("/favorites")({
+  beforeLoad: requireAuth,
   component: Favorites,
 });
 

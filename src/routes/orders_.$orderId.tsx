@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth/guard";
 import { createFileRoute } from "@tanstack/react-router";
 import { useRequireLogin } from "@/features/account/use-require-login";
 import { lazy } from "react";
@@ -8,6 +9,7 @@ const OrderDetailPage = lazy(() =>
 
 /** 订单详情：路由只解析参数、做登录守卫并渲染。 */
 export const Route = createFileRoute("/orders_/$orderId")({
+  beforeLoad: requireAuth,
   component: OrderDetailRoute,
 });
 

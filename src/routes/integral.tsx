@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth/guard";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Coins } from "lucide-react";
@@ -8,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetchIntegral } from "@/lib/api";
 
 export const Route = createFileRoute("/integral")({
+  beforeLoad: requireAuth,
   component: Integral,
 });
 

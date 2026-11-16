@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth/guard";
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy } from "react";
 import { LazyBoundary } from "@/components/system/lazy-boundary";
@@ -8,6 +9,7 @@ import { useAuth } from "@/features/account/auth-provider";
 
 /** 购物车：路由只解析登录态并渲染（未登录也可浏览本地购物车）。 */
 export const Route = createFileRoute("/cart")({
+  beforeLoad: requireAuth,
   component: CartRoute,
 });
 

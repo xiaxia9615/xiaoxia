@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth/guard";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Clock, History } from "lucide-react";
@@ -11,6 +12,7 @@ import { formatPrice } from "@/data/products";
 import { AppImage } from "@/components/system/app-image";
 
 export const Route = createFileRoute("/browse-history")({
+  beforeLoad: requireAuth,
   component: BrowseHistory,
 });
 

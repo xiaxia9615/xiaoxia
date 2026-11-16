@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth/guard";
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy } from "react";
 import { LazyBoundary } from "@/components/system/lazy-boundary";
@@ -10,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 /** 收货地址：路由只做登录守卫与渲染，业务逻辑在 features/account。 */
 export const Route = createFileRoute("/address")({
+  beforeLoad: requireAuth,
   component: AddressRoute,
 });
 

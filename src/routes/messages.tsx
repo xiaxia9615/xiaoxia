@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth/guard";
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy } from "react";
 import { LazyBoundary } from "@/components/system/lazy-boundary";
@@ -8,6 +9,7 @@ import { useRequireLogin } from "@/features/account/use-require-login";
 
 /** 通知中心：路由只做登录守卫与渲染。 */
 export const Route = createFileRoute("/messages")({
+  beforeLoad: requireAuth,
   component: MessagesRoute,
 });
 

@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth/guard";
 import { createFileRoute } from "@tanstack/react-router";
 import { useRequireLogin } from "@/features/account/use-require-login";
 import { lazy } from "react";
@@ -10,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 /** 我的订单：路由只做登录守卫与渲染。 */
 export const Route = createFileRoute("/orders")({
+  beforeLoad: requireAuth,
   component: OrdersRoute,
 });
 

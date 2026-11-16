@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // 会话中任意请求返回 401 时统一登出并提示（替代各页面静默失败）
+  // 会话中任意请求返回 401 时统一登出、提示并强制跳转登录页（携带 redirect 回跳参数）
   useEffect(() => {
     const onExpired = () => {
       setUser((prev) => {
@@ -69,6 +69,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         return null;
       });
+      // 强制跳转登录页，记录当前路径用于登录后回跳（hash 路由）
+      const current = window.location.hash.replace(/^#/, "") || "/";
+      if (current !== "/login") {
+        window.location.hash = `#/login?redirect=${encodeURIComponent(current)}`;
+      }
     };
     window.addEventListener(AUTH_EXPIRED_EVENT, onExpired);
     return () => window.removeEventListener(AUTH_EXPIRED_EVENT, onExpired);
@@ -92,6 +97,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(USER_KEY, JSON.stringify(next));
     setUser(next);
   }, []);
+
+  // 启动校验期间渲染全屏 Loading，绝不闪现子页面骨架（如 Admin 侧边栏）
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div
+            className="h-8 w-8 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent"
+            aria-hidden
+          />
+          <p className="text-sm text-muted-foreground">正在加载…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout, updateUser }}>
