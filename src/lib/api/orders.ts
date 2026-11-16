@@ -89,6 +89,8 @@ export interface OrderDetailDto {
   order_status?: number;
   status_name?: string;
   pay_status?: number;
+  nature?: string;
+  tracking_no?: string;
   goods_amount?: number;
   shipping_fee?: number;
   total_amount?: number;
@@ -120,6 +122,8 @@ export interface OrderDetailData {
   order_status: number;
   status_name: string;
   pay_status: number;
+  nature: string;
+  tracking_no: string;
   goods_amount: number;
   shipping_fee: number;
   total_amount: number;
@@ -149,6 +153,8 @@ export function toOrderDetail(dto: OrderDetailDto): OrderDetailData {
     order_status: num(dto.order_status),
     status_name: dto.status_name ?? "",
     pay_status: num(dto.pay_status),
+    nature: dto.nature ?? "physical",
+    tracking_no: dto.tracking_no ?? "",
     goods_amount: num(dto.goods_amount),
     shipping_fee: num(dto.shipping_fee),
     total_amount: num(dto.total_amount),

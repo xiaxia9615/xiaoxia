@@ -131,4 +131,77 @@ class OrderTest extends TestCase
         $balance = app(LedgerContract::class)->balance('user', $buyer->id, 'balance');
         $this->assertEquals(40000, $balance);
     }
+
+    public function test_cannot_view_others_order_detail(): void
+    {
+        Http::fake();
+        $buyer = $this->user();
+        $seller = $this->user();
+        $product = $this->product($seller);
+
+        $order = Order::factory()->create([
+            'user_id' => $buyer->id,
+            'product_id' => $product->id,
+            'amount' => 10000,
+            'status' => OrderStatus::Pending->value,
+        ]);
+
+        $attacker = $this->user();
+
+        // 旧风格端点：order/detail
+        $this->actingAs($attacker, 'sanctum')
+            ->getJson('/api/v1/order/detail?id='.$order->id)
+            ->assertStatus(404);
+
+        // REST 端点：orders/{id}
+        $this->actingAs($attacker, 'sanctum')
+            ->getJson("/api/v1/orders/{$order->id}")
+            ->assertStatus(404);
+    }
+
+    public function test_cannot_cancel_others_order(): void
+    {
+        Http::fake();
+        $buyer = $this->user();
+        $seller = $this->user();
+        $product = $this->product($seller);
+
+        $order = Order::factory()->create([
+            'user_id' => $buyer->id,
+            'product_id' => $product->id,
+            'amount' => 10000,
+            'status' => OrderStatus::Pending->value,
+        ]);
+
+        $attacker = $this->user();
+
+        $this->actingAs($attacker, 'sanctum')
+            ->postJson('/api/v1/order/cancel', ['order_id' => $order->id])
+            ->assertStatus(400);
+
+        $this->assertEquals(OrderStatus::Pending, $order->fresh()->status);
+    }
+
+    public function test_cannot_delete_others_order(): void
+    {
+        Http::fake();
+        $buyer = $this->user();
+        $seller = $this->user();
+        $product = $this->product($seller);
+
+        $order = Order::factory()->create([
+            'user_id' => $buyer->id,
+            'product_id' => $product->id,
+            'amount' => 10000,
+            'status' => OrderStatus::Cancelled->value,
+        ]);
+
+        $attacker = $this->user();
+
+        $this->actingAs($attacker, 'sanctum')
+            ->postJson('/api/v1/order/delete', ['order_id' => $order->id])
+            ->assertStatus(404);
+
+        $this->assertDatabaseHas('orders', ['id' => $order->id]);
+    }
 }

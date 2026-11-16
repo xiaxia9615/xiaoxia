@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, MapPin, Package, Receipt } from "lucide-react";
+import { ArrowLeft, MapPin, Package, Receipt, Truck } from "lucide-react";
 import { SiteLayout } from "@/components/site/layout";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,6 +32,7 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
   } = useOrderDetail(orderId);
 
   const isPending = order?.order_status === 0;
+  const isVirtual = order?.nature === "virtual";
 
   return (
     <SiteLayout>
@@ -53,18 +54,33 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
                 <p className="text-xs text-muted-foreground">订单号 {order.order_sn}</p>
                 <h1 className="mt-1 font-display text-2xl font-semibold text-foreground">{order.status_name || "订单"}</h1>
               </div>
-              <span className={`rounded px-3 py-1 text-xs font-semibold ${isPending ? "bg-clay text-clay-foreground" : "bg-surface text-muted-foreground"}`}>
-                {order.pay_status === 1 ? "已支付" : order.status_name}
+              <span className={`rounded px-3 py-1 text-xs font-semibold ${isVirtual && order.pay_status === 1 ? "bg-emerald-500/15 text-emerald-600" : isPending ? "bg-clay text-clay-foreground" : "bg-surface text-muted-foreground"}`}>
+                {isVirtual && order.pay_status === 1 ? "已自动交付" : order.pay_status === 1 ? "已支付" : order.status_name}
               </span>
             </header>
 
-            {order.receiver_name && (
+            {!isVirtual && order.receiver_name && (
               <section className="rounded-xl border bg-card p-6">
                 <p className="mb-3 flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-widest text-clay">
                   <MapPin className="size-4" /> 收货信息
                 </p>
                 <p className="text-sm font-medium text-foreground">{order.receiver_name} {order.receiver_mobile}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{order.receiver_address}</p>
+              </section>
+            )}
+
+            {!isVirtual && (
+              <section className="rounded-xl border bg-card p-6">
+                <p className="mb-3 flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-widest text-clay">
+                  <Truck className="size-4" /> 物流信息
+                </p>
+                {order.tracking_no ? (
+                  <p className="text-sm text-foreground">快递单号：{order.tracking_no}</p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    {order.order_status === 2 ? "待发货" : "暂无物流信息"}
+                  </p>
+                )}
               </section>
             )}
 
