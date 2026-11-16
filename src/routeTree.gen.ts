@@ -42,6 +42,7 @@ import { Route as AdminSystemRouteImport } from './routes/admin/system'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminWalletsRouteImport } from './routes/admin/wallets'
 import { Route as ArticlesArticleIdRouteImport } from './routes/articles_.$articleId'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders_.$orderId'
 import { Route as ProductsProductIdRouteImport } from './routes/products_.$productId'
 
@@ -210,6 +211,11 @@ const ArticlesArticleIdRoute = ArticlesArticleIdRouteImport.update({
   path: '/articles/$articleId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrdersOrderIdRoute = OrdersOrderIdRouteImport.update({
   id: '/orders_/$orderId',
   path: '/orders/$orderId',
@@ -254,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/admin/wallets': typeof AdminWalletsRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -290,6 +297,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/admin/wallets': typeof AdminWalletsRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/admin': typeof AdminIndexRoute
@@ -328,6 +336,7 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/admin/wallets': typeof AdminWalletsRoute
   '/articles_/$articleId': typeof ArticlesArticleIdRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/orders_/$orderId': typeof OrdersOrderIdRoute
   '/products_/$productId': typeof ProductsProductIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -367,6 +376,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/wallets'
     | '/articles/$articleId'
+    | '/auth/callback'
     | '/orders/$orderId'
     | '/products/$productId'
     | '/admin/'
@@ -403,6 +413,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/wallets'
     | '/articles/$articleId'
+    | '/auth/callback'
     | '/orders/$orderId'
     | '/products/$productId'
     | '/admin'
@@ -440,6 +451,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/wallets'
     | '/articles_/$articleId'
+    | '/auth/callback'
     | '/orders_/$orderId'
     | '/products_/$productId'
     | '/admin/'
@@ -465,6 +477,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   SourceExportRoute: typeof SourceExportRoute
   ArticlesArticleIdRoute: typeof ArticlesArticleIdRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
   ProductsProductIdRoute: typeof ProductsProductIdRoute
 }
@@ -702,6 +715,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArticlesArticleIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/orders_/$orderId': {
       id: '/orders_/$orderId'
       path: '/orders/$orderId'
@@ -775,6 +795,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   SourceExportRoute: SourceExportRoute,
   ArticlesArticleIdRoute: ArticlesArticleIdRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
   ProductsProductIdRoute: ProductsProductIdRoute,
 }
