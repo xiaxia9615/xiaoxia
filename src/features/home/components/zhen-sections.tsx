@@ -1,8 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Newspaper } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchArticles } from "@/lib/api";
-import { PRODUCTS } from "@/data/products";
+import { fetchArticles, fetchProducts } from "@/lib/api";
 import { ProductCard } from "@/features/catalog/product-card";
 import { AppImage } from "@/components/system/app-image";
 import { EIGHT_TRIGRAMS } from "../bagua";
@@ -68,17 +67,37 @@ export function FourDomains() {
   );
 }
 
-/** 精选商品：沿用商品卡片（数据不变），换阵法节标题。 */
+/** 精选商品：真实调用后端商品接口，推荐位优先，不足时取前 4 个。 */
 export function FeaturedGoods() {
-  const featured = PRODUCTS.filter((p) => p.featured);
+  const { data, isLoading } = useQuery({
+    queryKey: ["home-featured-goods"],
+    queryFn: () => fetchProducts({ page: 1, limit: 12 }),
+  });
+
+  const list = data?.list ?? [];
+  const featured = list.filter((p) => p.featured);
+  const picked = (featured.length > 0 ? featured : list).slice(0, 4);
+
   return (
     <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
       <SectionHead title="坎位·好物" code="goods · curated selection" action="查看全部" to="/products" />
-      <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-        {featured.map((p) => (
-          <ProductCard key={p.id} product={p} />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="aspect-[3/4] animate-pulse rounded-lg bg-muted" />
+          ))}
+        </div>
+      ) : picked.length === 0 ? (
+        <div className="border border-dashed border-border/70 bg-card/50 p-8 text-center text-sm text-muted-foreground">
+          好物筹备中，敬请期待
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+          {picked.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
