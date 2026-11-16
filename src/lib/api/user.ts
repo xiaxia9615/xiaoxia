@@ -159,6 +159,37 @@ export async function changePassword(
   return token ?? "";
 }
 
+/** 发送短信验证码（手机号登录）。调用 /v1/auth/sms/send。 */
+export async function smsSend(phone: string): Promise<void> {
+  await request<Record<string, unknown>>("/v1/auth/sms/send", {
+    method: "POST",
+    body: { phone },
+  });
+}
+
+/** 手机号验证码登录（不存在则自动注册）。调用 /v1/auth/sms/login。 */
+export async function smsLogin(phone: string, code: string): Promise<{
+  token: string;
+  user: User;
+}> {
+  const data = await request<{ token?: string; user?: Record<string, unknown> }>(
+    "/v1/auth/sms/login",
+    { method: "POST", body: { phone, code } },
+  );
+  const raw = data.user;
+  const name = raw ? String(raw.name ?? raw.username ?? "用户") : "用户";
+  const idNum = Number(raw?.id ?? 0);
+  return {
+    token: String(data.token ?? ""),
+    user: {
+      id: Number.isFinite(idNum) ? idNum : 0,
+      username: name,
+      nickname: name,
+      mobile: phone,
+    },
+  };
+}
+
 /** 发送短信验证码。scene=find_password 用于密码找回。 */
 export async function sendVerifyCode(
   mobile: string,

@@ -20,7 +20,11 @@ use Spatie\Permission\Traits\HasRoles;
  * @property bool $is_active
  * @property bool $is_developer
  * @property string $name
- * @property string $email
+ * @property string|null $email
+ * @property string|null $phone
+ * @property string|null $provider
+ * @property string|null $provider_id
+ * @property string|null $avatar
  * @property int $status
  * @property string $developer_status
  */

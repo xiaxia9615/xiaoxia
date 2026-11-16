@@ -35,4 +35,23 @@ return [
         ],
     ],
 
+    'github' => [
+        'client_id' => env('GITHUB_CLIENT_ID'),
+        'client_secret' => env('GITHUB_CLIENT_SECRET'),
+        'redirect' => env('GITHUB_REDIRECT_URI', 'https://xiaoxia.ren/api/v1/auth/callback/github'),
+    ],
+
+    'weixin' => [
+        'client_id' => env('WEIXIN_CLIENT_ID'),
+        'client_secret' => env('WEIXIN_CLIENT_SECRET'),
+        'redirect' => env('WEIXIN_REDIRECT_URI', 'https://xiaoxia.ren/api/v1/auth/callback/weixin'),
+    ],
+
+    'alipay' => [
+        'app_id' => env('ALIPAY_APP_ID'),
+        'private_key' => env('ALIPAY_PRIVATE_KEY'),
+        'public_key' => env('ALIPAY_PUBLIC_KEY'),
+        'redirect' => env('ALIPAY_REDIRECT_URI', 'https://xiaoxia.ren/api/v1/auth/callback/alipay'),
+    ],
+
 ];
