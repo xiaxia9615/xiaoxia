@@ -184,7 +184,6 @@ final class OrderController
     }
 
     /**
-     * @param  array<string, mixed>  $snapshot
      * @return array<string, mixed>
      */
     private function toDetailPayload(Order $order): array

@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $amount
+ * @property string $product_name
  * @property array|null $product_snapshot
  * @property Carbon|null $paid_at
  * @property string|null $tracking_no
