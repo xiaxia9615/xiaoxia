@@ -128,4 +128,5 @@ jobs:
         with:
           name: coverage-report
           path: ${{ github.workspace }}/coverage-report/
+          if-no-files-found: ignore
           retention-days: 14
