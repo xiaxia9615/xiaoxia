@@ -9,3 +9,6 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+*.html linguist-detectable=false
+coverage-report/** linguist-detectable=false
+public/vendor/** linguist-detectable=false
