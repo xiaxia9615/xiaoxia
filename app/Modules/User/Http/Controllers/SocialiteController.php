@@ -27,7 +27,9 @@ final class SocialiteController
         }
 
         try {
-            return Socialite::driver($provider)->redirect();
+            $targetUrl = Socialite::driver($provider)->redirect()->getTargetUrl();
+
+            return redirect()->away($targetUrl);
         } catch (RuntimeException $e) {
             Log::error('Socialite redirect failed: '.$e->getMessage(), [
                 'provider' => $provider,

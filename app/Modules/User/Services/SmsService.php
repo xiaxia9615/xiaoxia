@@ -25,7 +25,7 @@ final class SmsService
      */
     public function sendCode(string $phone, string $code): void
     {
-        $templateId = (string) config('easysms.gateways.qcloud.template_id', env('QCLOUD_SMS_TEMPLATE_ID', ''));
+        $templateId = (string) config('easysms.gateways.qcloud.template_id', '');
 
         try {
             $this->easySms->send($phone, [

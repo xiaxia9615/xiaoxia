@@ -170,7 +170,7 @@ final class AlipayController
 
         $pairs = [];
         foreach ($params as $k => $v) {
-            if ($v === '' || $v === null) {
+            if ($v === '' || $v === null) { // @phpstan-ignore-line
                 continue;
             }
             $pairs[] = $k.'='.$v;

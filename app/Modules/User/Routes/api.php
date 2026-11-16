@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Modules\User\Http\Controllers\AlipayController;
 use App\Modules\User\Http\Controllers\AuthController;
 use App\Modules\User\Http\Controllers\DeveloperController;
+use App\Modules\User\Http\Controllers\SocialiteController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('api')->prefix('api/v1/auth')->group(function (): void {
