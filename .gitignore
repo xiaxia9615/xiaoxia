@@ -42,3 +42,6 @@ docs/health-log.md
 export/
 test-results/
 playwright-report/
+coverage-report/
+test-results/
+playwright-report/
