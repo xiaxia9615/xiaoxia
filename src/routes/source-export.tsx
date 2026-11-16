@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/auth/guard";
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy } from "react";
 import { LazyBoundary } from "@/components/system/lazy-boundary";
@@ -10,6 +11,7 @@ const SourceExportPage = lazy(() =>
  * 导出完成后删除本文件、src/features/source-export 与 router.json 中对应条目。
  */
 export const Route = createFileRoute("/source-export")({
+  beforeLoad: requireAdmin,
   component: () => (
     <LazyBoundary>
       <SourceExportPage />

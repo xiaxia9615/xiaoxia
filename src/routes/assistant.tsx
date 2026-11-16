@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth/guard";
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy } from "react";
 import { LazyBoundary } from "@/components/system/lazy-boundary";
@@ -7,6 +8,7 @@ const AssistantPage = lazy(() =>
 
 /** AI 导购助手：路由只做渲染，对话状态机在 features/assistant。 */
 export const Route = createFileRoute("/assistant")({
+  beforeLoad: requireAuth,
   component: () => (
     <LazyBoundary>
       <AssistantPage />
