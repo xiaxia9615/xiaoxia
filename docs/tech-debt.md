@@ -105,11 +105,18 @@
 
 ### P1 · 数据层
 
-- [ ] **34 处模块内裸表待收敛**：各模块 `DB::table` 散落在业务 Service 中。
-      方案：收敛到 `*QueryService`，不追求全量 Eloquent 化。
-      分布：Ledger 17 / ApiKey 6 / Skill 4 / Team 3 / System 3 / Order 1
-      - ApiKey 模块部分 — 已修复（见上方已修复列表）
-      - `AdminAuditLogController` DB facade 问题 — 已修复（未发现 DB:: 直接调用）
+- [x] ~~34 处模块内裸表待收敛~~ — 2026-11-17 修复（c0e9e17 + 495b061）：
+      Ledger：新建 `LedgerQueryService`（12 处委托，事务/悲观锁/复式记账逻辑不变）+
+      `AdminLedgerService` 更名 `AdminLedgerQueryService` + 新建 `AiUsageDeductionService`
+      （Wallet 监听器跨模块裸表改服务调用）+ 删除死代码 Ledger `DeductBalanceOnAiUsage`
+      监听器（无注册点，Wallet 版本才是生效监听器，消除双重扣款隐患）。
+      Skill：新建 `AdminSkillQueryService`（4 处委托）。
+      Team：新建 `TeamBillingQueryService`（3 处委托，幂等/成员校验逻辑不变）。
+      System：新建 `SystemQueryService`（3 处委托）。
+      Order：`OrderService` 分账幂等检查改走 `LedgerQueryService::hasBizEntries`
+      （Order→Ledger 白名单内）。
+      验收：业务代码 `DB::table` 清零（仅封装服务内部保留）；pint 全绿；
+      测试 236 passed / 4 skipped / 796 assertions 与基线一致。
 
 ## 未修复 · 结构类
 
@@ -125,8 +132,9 @@
       Team 模块 Contracts 目录已不存在（现仅 Dto/Models/Services/Providers/Database），
       且 Team 不再被其他模块依赖内部类，无误导性残留。
 
-- [ ] **开发者审核模块死代码**：路由已注释（自营模式关闭），但 Controller
-      和 Blade 视图仍保留在代码库中。方案：彻底删除或加注释说明恢复条件。
+- [x] ~~开发者审核模块死代码~~ — 2026-11-17 决策：保留。
+      用户明确指示开发者板块保留（自营模式关闭但代码保留），
+      清理作废，勿删任何开发者相关文件。
 
 ## 未修复 · 资金安全类
 
@@ -142,8 +150,11 @@
 
 ## 未修复 · 前端类（非阻塞）
 
-- [ ] **3 个前端文件超过 100 行未纳入 ROUTE_LINE_BUDGET**：
-      admin.tsx(193行)、products.tsx(143行)、articles.tsx(102行)。
+- [ ] **6 个前端文件超过 100 行未纳入 ROUTE_LINE_BUDGET**（2026-11-17 核实更新）：
+      admin.tsx 已拆分（现仅 9 行布局路由，原记录过时）；实际超限：
+      admin/ai-providers.tsx(218行)、admin/orders.tsx(201行)、
+      admin/api-keys.tsx(151行)、products.tsx(143行)、
+      admin/skills.tsx(109行)、articles.tsx(102行)。
 
 - [x] ~~P1-工程: 替换 @qmuse/appwrite-runtime-sdk（Proprietary，支付宝团队资产，1534 行）~~ — 2026-11-17 修复：
       @qmuse 依赖此前已移除；本次删除死代码 services/appwrite.ts（无引用方、不在 tsconfig 编译范围）、

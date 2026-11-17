@@ -1,6 +1,6 @@
 # 项目开发进度看板
 
-> 最后更新：2026-11-17 | 状态：订单模块后端真实实现 + 前端双态展示完成，全栈依赖安全升级（0 漏洞）
+> 最后更新：2026-11-17 | 状态：多方式登录认证（短信/OAuth）后端完成 + P1 技术债清理完成，测试基线 236 全绿
 
 ## 📊 核心数据
 
@@ -16,6 +16,17 @@
 | Git 远程 | origin → Gitee + GitHub 双推 | 私有化仓库 |
 
 ## 🟢 已完成
+
+### 多方式登录认证（阶段 1-3，2026-11-16 ~ 11-17）
+- **阶段 1 依赖与表结构**：overtrue/easy-sms ^3.5 + laravel/socialite ^5.32 + socialiteproviders/weixin ^4.1 + alipaysdk/easysdk ^2.2；users 表新增 provider/provider_id + 联合索引，email/password 改 nullable；User 模型 @property 注解补充
+- **阶段 2 腾讯云短信 + 手机号登录**：config/easysms.php（qcloud 通道）；SmsService（失败记 Log 抛异常）；AuthController smsSend（Redis 频控：手机号 60s 一次 + IP 每小时 5 次，超限 429）+ smsLogin（校验成功立即删 Key 防复用、用户不存在自动创建、签发 Sanctum token、禁用账号 403）；路由 POST /api/v1/auth/sms/send + /sms/login（throttle.user_or_ip）
+- **阶段 3 OAuth 三方登录**：SocialiteController（GitHub/微信，provider+provider_id 查找或创建用户）；AlipayController（官方网关手写 RSA2 签名，auth_code 换 token + 获取用户信息）；路由 GET /api/v1/auth/redirect/{provider} + /callback/{provider}；微信 Socialite 监听器注册于 AppServiceProvider；config/services.php 三方配置齐全；回调统一重定向 https://xiaoxia.ren/#/auth/callback?token={token}&redirect=/
+- **待用户**：.env 填入真实腾讯云短信密钥并实测发送
+
+### P1 技术债清理：34 处裸表收敛（2026-11-17）
+- **Ledger 批次（c0e9e17）**：新建 LedgerQueryService（12 处委托，事务/悲观锁/复式记账逻辑不变）；AdminLedgerService 更名 AdminLedgerQueryService；新建 AiUsageDeductionService（Wallet 监听器跨模块裸表改服务调用）；删除死代码 Ledger DeductBalanceOnAiUsage 监听器（无注册点，消除双重扣款隐患）
+- **Skill/Team/System/Order 批次（495b061）**：AdminSkillQueryService（4 处）、TeamBillingQueryService（3 处）、SystemQueryService（3 处）、OrderService 分账幂等检查改走 LedgerQueryService::hasBizEntries
+- **验收**：业务代码 DB::table 清零（仅封装服务内部保留）；pint 全绿；测试 236 passed / 4 skipped / 796 assertions 与基线一致
 
 ### 订单模块后端真实实现 + 前端双态展示（2026-11-17）
 - **OrderController 真实实现**：show/orderDetail/orderCancel/orderDelete 全部对接真实数据（validate id → user_id 查询 → 404/payload），新增 toDetailPayload（含 nature/tracking_no/receiver_*/items）与 statusToNumber 私有方法
@@ -101,9 +112,18 @@
 
 ## 🚧 进行中 / 待办
 
+### 阶段 4 · 前端登录开发
+- [ ] 登录页短信登录（手机号+验证码表单、60s 倒计时、429 提示）
+- [ ] 登录页第三方登录入口（GitHub/微信/支付宝）
+- [ ] auth.callback 页 token 处理与跳转
+
 ### P0 · 支付接入
-- [ ] 真实支付宝 / 微信渠道接入
+- [ ] 真实支付宝 / 微信渠道接入（需商户资质等外部信息）
 - [ ] 退款分账回滚（开发者模块开放后）
+
+### P2 · 技术债
+- [ ] 6 个前端文件超 100 行拆分（ai-providers 218 / orders 201 / api-keys 151 / products 143 / skills 109 / articles 102）
+- [ ] 历史资金数据回填脚本（涉及资金，建议人工复核）
 
 ### P1 · C 端打磨
 - [ ] C 端页面体验优化（首页/商品/购物流程细节打磨）
@@ -112,6 +132,10 @@
 
 | Commit | 说明 |
 |--------|------|
+| `495b061` | refactor(modules): converge remaining raw table access into query services |
+| `c0e9e17` | refactor(ledger): converge raw table access into query services |
+| `71930f4` | docs: mark Skill/Team contracts tech debt as resolved |
+| `16340e8` | chore: remove QMuse remnants (dead appwrite service, platform types, unused dep) |
 | `73822ca` | ci: use official registries for composer and npm in GitHub Actions |
 | `6e257a5` | ci: use --prefer-source to avoid tencent mirror dist URL 404 on GitHub Actions |
 | `c9116ad` | chore: upgrade all composer and npm dependencies (0 vulnerabilities) |
