@@ -76,7 +76,9 @@ jobs:
         run: cp .env.example .env
 
       - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-source
+        run: |
+          composer config repo.packagist composer https://repo.packagist.org
+          composer install --no-interaction --prefer-source
 
       - name: Generate APP_KEY
         run: php artisan key:generate
@@ -108,7 +110,7 @@ jobs:
 
       # --- Frontend (non-blocking) ---
       - name: Install npm dependencies
-        run: npm install --ignore-scripts
+        run: npm install --ignore-scripts --registry=https://registry.npmjs.org
 
       - name: TypeScript type check
         continue-on-error: true
