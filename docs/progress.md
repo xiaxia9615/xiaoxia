@@ -1,12 +1,12 @@
 # 项目开发进度看板
 
-> 最后更新：2026-11-16 | 状态：Admin 后台彻底重构完成，安全架构（BFF + 路由守卫）全面加固
+> 最后更新：2026-11-17 | 状态：订单模块后端真实实现 + 前端双态展示完成，全栈依赖安全升级（0 漏洞）
 
 ## 📊 核心数据
 
 | 维度 | 状态 | 说明 |
 |---|---|---|
-| 测试基线 | **233 passed / 4 skipped / 790 断言** | 全绿，4 skip 为开发者模块休眠 |
+| 测试基线 | **236 passed / 4 skipped / 796 断言** | 全绿，4 skip 为开发者模块休眠 |
 | CI/CD | 已上线且持续转绿 | GitHub Actions（PHP 8.5 + MySQL 8 + Redis） |
 | 架构守卫 | 13 项全绿 | 模块边界 + 防裸查 + 防绕过 WalletService |
 | 静态分析 | Larastan 0 errors + Pint 0 issues | 已接入 |
@@ -16,6 +16,19 @@
 | Git 远程 | origin → Gitee + GitHub 双推 | 私有化仓库 |
 
 ## 🟢 已完成
+
+### 订单模块后端真实实现 + 前端双态展示（2026-11-17）
+- **OrderController 真实实现**：show/orderDetail/orderCancel/orderDelete 全部对接真实数据（validate id → user_id 查询 → 404/payload），新增 toDetailPayload（含 nature/tracking_no/receiver_*/items）与 statusToNumber 私有方法
+- **前端双态展示**：order-detail-page 虚拟商品已支付显示绿色「已自动交付」，收货信息/物流信息区仅实物订单显示（tracking_no 或待发货提示）
+- **orders.ts 契约补齐**：OrderDetailDto/OrderDetailData 补 nature/tracking_no 字段，toOrderDetail 映射完成
+- **越权测试**：新增 3 个测试（查看他人订单 404 / 取消他人订单 400 / 删除他人订单 404），越权校验严格
+
+### 全栈依赖安全升级（2026-11-17）
+- **Composer**：46 包升级（phpstan/larastan/sanctum/predis/spatie-permission 等），composer audit 0 漏洞
+- **NPM**：minor/patch 全量 + major 升级（orval 8.x、i18next 27.x、react-i18next 18.x、jsdom 31.x、vitest 5.x、jest-dom 7.x）
+- **npm audit**：17 漏洞（11 critical）→ **0 漏洞**
+- **CI 修复**：composer install 前切换官方 Packagist 源 + --prefer-source；npm install 指定官方 registry（解决 lock 文件国内镜像 URL 在 GitHub Actions 上 404/超时）
+- **验证全绿**：php artisan test 236 passed / phpstan 0 errors / pint 301 files PASS / typecheck + build 通过
 
 ### Admin 后台彻底重构（2026-11-15 ~ 11-16）
 - **统一布局体系**：抽离 `AdminPageLayout`、`DataTable`、`Pagination`、`StatusBadge` 共享组件，14 个模块路由全部接入
@@ -99,6 +112,10 @@
 
 | Commit | 说明 |
 |--------|------|
+| `73822ca` | ci: use official registries for composer and npm in GitHub Actions |
+| `6e257a5` | ci: use --prefer-source to avoid tencent mirror dist URL 404 on GitHub Actions |
+| `c9116ad` | chore: upgrade all composer and npm dependencies (0 vulnerabilities) |
+| `577b115` | fix(ci): resolve 4 phpstan errors (env→config, use imports, redirect type) |
 | `d16749c` | fix(auth): requireAdmin guard for admin and source-export, requireAuth for assistant |
 | `b93b5b2` | feat(auth): global route guards with requireAuth, auth loading gate and 401 redirect |
 | `1e6b80b` | feat(admin): JSON APIs and real-data pages for ai-providers, skills, api-keys and api-calls |
