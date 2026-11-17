@@ -76,7 +76,7 @@ jobs:
         run: cp .env.example .env
 
       - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist
+        run: composer install --no-interaction --prefer-source
 
       - name: Generate APP_KEY
         run: php artisan key:generate
