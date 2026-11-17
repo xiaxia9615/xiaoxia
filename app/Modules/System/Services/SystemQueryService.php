@@ -36,7 +36,7 @@ final class SystemQueryService
     /**
      * 最近失败任务列表。
      *
-     * @return Collection<int, object>
+     * @return Collection<int, \stdClass>
      */
     public function findFailedJobs(int $limit = 50)
     {

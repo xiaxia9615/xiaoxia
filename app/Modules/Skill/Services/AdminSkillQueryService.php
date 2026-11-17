@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Skill\Services;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 /**
