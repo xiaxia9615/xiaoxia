@@ -93,12 +93,12 @@ export function LoginPage({ redirect }: { redirect: string | undefined }) {
                   <form onSubmit={onLogin} className="space-y-4">
                     <FormField
                       control={loginForm.control}
-                      name="username"
+                      name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>账号</FormLabel>
+                          <FormLabel>邮箱</FormLabel>
                           <FormControl>
-                            <Input placeholder="用户名 / 手机号" autoComplete="username" {...field} />
+                            <Input placeholder="请输入邮箱" autoComplete="email" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -146,12 +146,12 @@ export function LoginPage({ redirect }: { redirect: string | undefined }) {
                     <form onSubmit={onRegister} className="space-y-4">
                       <FormField
                         control={registerForm.control}
-                        name="username"
+                        name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>账号</FormLabel>
+                            <FormLabel>邮箱</FormLabel>
                             <FormControl>
-                              <Input placeholder="用户名 / 手机号" autoComplete="username" {...field} />
+                              <Input placeholder="请输入邮箱" autoComplete="email" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

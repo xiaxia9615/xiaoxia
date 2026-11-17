@@ -18,7 +18,7 @@ function PaySelfCheckRoute() {
   return (
     <LazyBoundary>
       <PaySelfCheckPage
-        userLabel={user?.nickname ?? user?.username ?? null}
+        userLabel={user?.nickname ?? user?.name ?? null}
         authLoading={loading}
         needLogin={!loading && !user}
       />

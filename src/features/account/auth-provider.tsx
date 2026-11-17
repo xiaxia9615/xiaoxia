@@ -7,7 +7,7 @@ const USER_KEY = "xiaoxia.user";
 interface AuthState {
   user: User | null;
   loading: boolean;
-  login: (username: string, password: Promise<string> | string) => Promise<User>;
+  login: (email: string, password: string) => Promise<User>;
   logout: () => void;
   updateUser: (user: User) => void;
 }
@@ -79,8 +79,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener(AUTH_EXPIRED_EVENT, onExpired);
   }, []);
 
-  const login = useCallback(async (username: string, password: Promise<string> | string) => {
-    const { token, user } = await apiLogin(username, password);
+  const login = useCallback(async (email: string, password: string) => {
+    const { token, user } = await apiLogin(email, password);
     localStorage.setItem(TOKEN_KEY, token);
     localStorage.setItem(USER_KEY, JSON.stringify(user));
     setUser(user);

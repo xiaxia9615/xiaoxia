@@ -17,8 +17,6 @@ export function ProfilePage() {
     setTab,
     infoForm,
     passwordForm,
-    profileMutation,
-    passwordMutation,
     onSubmitProfile,
     onSubmitPassword,
   } = useProfileForms();
@@ -39,7 +37,7 @@ export function ProfilePage() {
         </span>
         <div>
           <h1 className="font-display text-2xl font-bold text-ink">个人资料</h1>
-          <p className="text-sm text-muted-foreground">账号：{user?.username}</p>
+          <p className="text-sm text-muted-foreground">账号：{user?.email}</p>
         </div>
       </div>
 
@@ -131,10 +129,10 @@ export function ProfilePage() {
                   <Button
                     type="submit"
                     className="rounded"
-                    disabled={profileMutation.isPending}
+                    disabled={false}
                   >
                     <Save className="size-4" />
-                    {profileMutation.isPending ? "保存中…" : "保存资料"}
+                    {false ? "保存中…" : "保存资料"}
                   </Button>
                 </form>
               </Form>
@@ -195,10 +193,10 @@ export function ProfilePage() {
                   <Button
                     type="submit"
                     className="rounded"
-                    disabled={passwordMutation.isPending}
+                    disabled={false}
                   >
                     <KeyRound className="size-4" />
-                    {passwordMutation.isPending ? "提交中…" : "修改密码"}
+                    {false ? "提交中…" : "修改密码"}
                   </Button>
                 </form>
               </Form>

@@ -1,10 +1,9 @@
-import { JSEncrypt } from "jsencrypt";
 import { request } from "./request";
 
 /** 用户信息。 */
 export interface User {
   id: number;
-  username: string;
+  name: string;
   nickname: string;
   avatar?: string;
   email?: string;
@@ -18,13 +17,13 @@ export interface User {
 }
 
 function mapUser(u: Record<string, unknown>): User {
-  const nickname = String(u.nickname || u.username || "用户");
+  const name = String(u.name || u.nickname || "用户");
   const avatar = typeof u.avatar === "string" ? u.avatar : undefined;
   const id = typeof u.id === "number" ? u.id : Number(u.id);
   return {
     id: Number.isFinite(id) ? id : 0,
-    username: String(u.username || ""),
-    nickname,
+    name,
+    nickname: name,
     avatar,
     email: typeof u.email === "string" ? u.email : undefined,
     sex: typeof u.sex === "number" ? u.sex : undefined,
@@ -37,129 +36,56 @@ function mapUser(u: Record<string, unknown>): User {
   };
 }
 
-interface PublicKeyData {
-  public_key: string;
-  token: string;
-  expires_in: number;
-}
-
-/** 获取登录 RSA 公钥与 rsa_token。 */
-export async function fetchPublicKey(): Promise<PublicKeyData> {
-  const data = await request<PublicKeyData>("/security/publickey");
-  return data;
-}
-
-/** 用 jsencrypt 对明文做 RSA PKCS1 v1.5 加密（匹配后端 OPENSSL_PKCS1_PADDING），返回 base64。 */
-function rsaEncrypt(plain: string, publicKeyPem: string): string {
-  const enc = new JSEncrypt();
-  enc.setPublicKey(publicKeyPem);
-  const encrypted = enc.encrypt(plain);
-  if (!encrypted) {
-    throw new Error("密码加密失败");
-  }
-  return encrypted;
-}
-
 /**
- * 登录。密码用后端下发的 RSA 公钥加密后提交（PKCS1 v1.5，带 rsa_token），
- * 与注册/改密保持一致，避免明文密码经过任何前端日志或代理层。
- * 若公钥接口不可用则回退明文提交（后端历史行为）。
+ * 登录。密码明文提交（HTTPS 已加密传输层）。
+ * 对接后端 POST /api/v1/auth/login，字段 email + password。
  */
-export async function login(username: string, password: Promise<string> | string): Promise<{
+export async function login(email: string, password: string): Promise<{
   token: string;
   user: User;
 }> {
-  const plain = await password;
-  let body: Record<string, unknown> = { username, password: plain };
-  try {
-    const pub = await fetchPublicKey();
-    const enc = new JSEncrypt();
-    enc.setPublicKey(pub.public_key);
-    const encrypted = enc.encrypt(`${plain}|${pub.token}`);
-    if (encrypted) {
-      body = { username, password: encrypted, rsa_token: pub.token, encrypt: "rsa" };
-    }
-  } catch {
-    // 公钥接口不可用：HTTPS 下回退明文，保持与旧后端兼容
-  }
   const data = await request<{ token?: string; user?: Record<string, unknown> }>(
     "/login",
-    { method: "POST", body },
+    { method: "POST", body: { email, password } },
   );
   const raw = data.user;
-  const name = raw ? String(raw.name ?? raw.username ?? username) : username;
+  const name = raw ? String(raw.name ?? "用户") : "用户";
   const idNum = Number(raw?.id ?? 0);
-  const user: User = {
-    id: Number.isFinite(idNum) ? idNum : 0,
-    username: name,
-    nickname: name,
-    email: raw && typeof raw.email === "string" ? raw.email : undefined,
+  return {
+    token: String(data.token ?? ""),
+    user: {
+      id: Number.isFinite(idNum) ? idNum : 0,
+      name,
+      nickname: name,
+      email: raw && typeof raw.email === "string" ? raw.email : undefined,
+    },
   };
-  return { token: String(data.token || ""), user };
 }
 
-/** 注册。对接官网真实接口 POST /api/register（明文账号密码）。 */
-export async function register(username: string, password: string): Promise<User> {
+/** 注册。对接后端 POST /api/v1/auth/register，字段 name + email + password。 */
+export async function register(name: string, email: string, password: string): Promise<User> {
   const data = await request<Record<string, unknown>>("/register", {
     method: "POST",
-    body: { username, password },
+    body: { name, email, password },
   });
   const u = (data.user ?? data) as Record<string, unknown>;
-  const name = String(u.name ?? u.username ?? username);
+  const userName = String(u.name ?? name);
   const idNum = Number(u.id ?? 0);
   return {
     id: Number.isFinite(idNum) ? idNum : 0,
-    username: name,
-    nickname: name,
+    name: userName,
+    nickname: userName,
     email: typeof u.email === "string" ? u.email : undefined,
   };
 }
 
-/** 用户信息（需登录）。 */
+/** 用户信息（需登录）。调用 GET /api/v1/auth/me。 */
 export async function fetchProfile(): Promise<User> {
-  const data = await request<Record<string, unknown>>("/user/profile", { auth: true });
+  const data = await request<Record<string, unknown>>("/v1/auth/me", { auth: true });
   return mapUser(data);
 }
 
-/** 用户信息编辑（user/update），返回最新用户信息。 */
-export async function updateProfile(
-  input: Partial<{
-    nickname: string;
-    avatar: string;
-    sex: number;
-    birthday: string;
-    province: string;
-    city: string;
-    district: string;
-    email: string;
-    mobile: string;
-  }>,
-): Promise<User> {
-  const data = await request<Record<string, unknown>>("/user/update", {
-    auth: true,
-    method: "POST",
-    body: input,
-  });
-  return mapUser(data);
-}
-
-/** 修改密码（user/password），密码 RSA 加密，成功后返回新 token。 */
-export async function changePassword(
-  oldPassword: string,
-  newPassword: string,
-): Promise<string> {
-  const pub = await fetchPublicKey();
-  const enc = (plain: string) => rsaEncrypt(`${plain}|${pub.token}`, pub.public_key);
-  const data = await request<Record<string, unknown>>("/user/password", {
-    auth: true,
-    method: "POST",
-    body: { old_pwd: enc(oldPassword), new_pwd: enc(newPassword), rsa_token: pub.token },
-  });
-  const token = data.token as string | undefined;
-  return token ?? "";
-}
-
-/** 发送短信验证码（手机号登录）。调用 /v1/auth/sms/send。 */
+/** 发送短信验证码（手机号登录）。调用 POST /api/v1/auth/sms/send。 */
 export async function smsSend(phone: string): Promise<void> {
   await request<Record<string, unknown>>("/v1/auth/sms/send", {
     method: "POST",
@@ -167,7 +93,7 @@ export async function smsSend(phone: string): Promise<void> {
   });
 }
 
-/** 手机号验证码登录（不存在则自动注册）。调用 /v1/auth/sms/login。 */
+/** 手机号验证码登录（不存在则自动注册）。调用 POST /api/v1/auth/sms/login。 */
 export async function smsLogin(phone: string, code: string): Promise<{
   token: string;
   user: User;
@@ -177,45 +103,16 @@ export async function smsLogin(phone: string, code: string): Promise<{
     { method: "POST", body: { phone, code } },
   );
   const raw = data.user;
-  const name = raw ? String(raw.name ?? raw.username ?? "用户") : "用户";
+  const name = raw ? String(raw.name ?? "用户") : "用户";
   const idNum = Number(raw?.id ?? 0);
   return {
     token: String(data.token ?? ""),
     user: {
       id: Number.isFinite(idNum) ? idNum : 0,
-      username: name,
+      name,
       nickname: name,
       mobile: phone,
     },
   };
 }
-
-/** 发送短信验证码。scene=find_password 用于密码找回。 */
-export async function sendVerifyCode(
-  mobile: string,
-  scene: "find_password" = "find_password",
-): Promise<void> {
-  await request<Record<string, unknown>>("/verify/send", {
-    method: "POST",
-    body: { mobile, scene },
-  });
-}
-
-/** 重置密码（手机号验证码找回，/user/reset-password）。新密码 RSA 加密后提交。 */
-export async function resetPassword(input: {
-  phone: string;
-  code: string;
-  newPassword: string;
-}): Promise<void> {
-  const pub = await fetchPublicKey();
-  const newPwd = rsaEncrypt(`${input.newPassword}|${pub.token}`, pub.public_key);
-  await request<Record<string, unknown>>("/user/reset-password", {
-    method: "POST",
-    body: {
-      phone: input.phone,
-      code: input.code,
-      new_pwd: newPwd,
-      rsa_token: pub.token,
-    },
-  });
-}
+export const AUTH_FEATURES = { profileEdit: false, changePassword: false, resetPassword: false } as const;

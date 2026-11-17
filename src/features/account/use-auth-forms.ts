@@ -9,13 +9,14 @@ import { useAuth } from "./auth-provider";
 import { TRACK_EVENTS, track } from "@/lib/observability";
 
 const loginSchema = z.object({
-  username: z.string().min(1, "请输入账号"),
+  email: z.string().email("请输入有效邮箱"),
   password: z.string().min(1, "请输入密码"),
 });
 
 const registerSchema = z
   .object({
-    username: z.string().min(1, "请输入账号"),
+    name: z.string().min(1, "请输入用户名"),
+    email: z.string().email("请输入有效邮箱"),
     password: z.string().min(6, "密码至少 6 位"),
     confirm: z.string().min(1, "请再次输入密码"),
   })
@@ -54,12 +55,12 @@ export function useAuthForms(redirect: string | undefined) {
 
   const loginForm = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { username: "", password: "" },
+    defaultValues: { email: "", password: "" },
   });
 
   const registerForm = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { username: "", password: "", confirm: "" },
+    defaultValues: { name: "", email: "", password: "", confirm: "" },
   });
 
   const goAfterAuth = async () => {
@@ -73,26 +74,26 @@ export function useAuthForms(redirect: string | undefined) {
 
   const onLogin = loginForm.handleSubmit(async (values) => {
     try {
-      await login(values.username, values.password);
+      await login(values.email, values.password);
       track(TRACK_EVENTS.login);
       await goAfterAuth();
     } catch (err) {
       loginForm.setError("password", {
         type: "manual",
-        message: toErrorMessage(err, "登录失败，请检查账号密码"),
+        message: toErrorMessage(err, "登录失败，请检查邮箱密码"),
       });
     }
   });
 
   const onRegister = registerForm.handleSubmit(async (values) => {
     try {
-      await apiRegister(values.username, values.password);
+      await apiRegister(values.name, values.email, values.password);
       toast.success("注册成功，正在登录…");
-      await login(values.username, values.password);
+      await login(values.email, values.password);
       track(TRACK_EVENTS.register);
       await goAfterAuth();
     } catch (err) {
-      registerForm.setError("username", {
+      registerForm.setError("email", {
         type: "manual",
         message: toErrorMessage(err, "注册失败，请重试"),
       });
