@@ -116,9 +116,14 @@
 - [x] ~~Ledger / User 无 `Contracts/` 目录~~ — 2026-11-13 核实：已解决。
       Ledger 有 `LedgerContract.php` + `Events/AiUsageRecorded.php`；
       User 有 `UserContract.php` + `Events/UserRegistered.php`。
-- [ ] **Skill 无 `Contracts/` 目录**：被 Team 等模块依赖但对外零承诺。待补契约。
+- [x] ~~Skill 无 `Contracts/` 目录~~ — 2026-11-17 核实：已解决。
+      Team 模块已不引用 Skill（grep 零匹配）；Product 通过自身 `SkillProductContract` 解耦；
+      Ledger/AiProvider 仅注释提及；唯一引用 Skill 内部类的是 System 的 `SkillDetail::count()`
+      （只读聚合，ADR-003 白名单豁免）。架构守卫 11 passed（18 assertions）全绿。
 
-- [ ] **Team `Contracts/` 目录为空**：保留空目录有误导性。方案：填契约或删除目录。
+- [x] ~~Team `Contracts/` 目录为空~~ — 2026-11-17 核实：已解决。
+      Team 模块 Contracts 目录已不存在（现仅 Dto/Models/Services/Providers/Database），
+      且 Team 不再被其他模块依赖内部类，无误导性残留。
 
 - [ ] **开发者审核模块死代码**：路由已注释（自营模式关闭），但 Controller
       和 Blade 视图仍保留在代码库中。方案：彻底删除或加注释说明恢复条件。
