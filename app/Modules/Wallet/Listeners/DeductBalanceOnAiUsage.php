@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Wallet\Listeners;
 
 use App\Modules\Ledger\Contracts\Events\AiUsageRecorded;
+use App\Modules\Ledger\Services\AiUsageDeductionService;
 use App\Modules\User\Models\User;
 use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,7 @@ final readonly class DeductBalanceOnAiUsage
 {
     public function __construct(
         private WalletService $walletService,
+        private AiUsageDeductionService $deductions,
     ) {}
 
     /**
@@ -44,15 +46,13 @@ final readonly class DeductBalanceOnAiUsage
                 'ai_usage_'.Str::uuid()->toString(),
             );
 
-            DB::table('ai_usage_deductions')->insert([
-                'user_id' => $event->userId,
-                'provider_id' => $event->providerId,
-                'cost' => $event->cost,
-                'input_tokens' => $event->inputTokens,
-                'output_tokens' => $event->outputTokens,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            $this->deductions->record(
+                $event->userId,
+                $event->providerId,
+                $event->cost,
+                $event->inputTokens,
+                $event->outputTokens,
+            );
         });
     }
 }

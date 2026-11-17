@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Modules\Ledger\Services\AdminLedgerService;
+use App\Modules\Ledger\Services\AdminLedgerQueryService;
 use Illuminate\Contracts\View\View;
 
 final class AdminLedgerController extends Controller
 {
-    public function __construct(private readonly AdminLedgerService $service) {}
+    public function __construct(private readonly AdminLedgerQueryService $service) {}
 
     /**
      * 账户列表 + 统计.

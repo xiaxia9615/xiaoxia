@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
  * 注意: ledger_accounts 表没有 balance 字段（B0 已确认），
  * 余额一律从 ledger_entries 按 direction 汇总（credit - debit）。
  */
-final class AdminLedgerService
+final class AdminLedgerQueryService
 {
     /**
      * 账户列表 + 余额（entries 汇总）+ 流水数.
