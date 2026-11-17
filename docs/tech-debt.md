@@ -1,6 +1,6 @@
 # 技术债记录
 
-> 最后更新：2026-11-13
+> 最后更新：2026-11-17
 > 关联文档：`docs/progress.md`（项目开发进度看板）
 
 ## 已修复
@@ -140,20 +140,17 @@
 - [ ] **3 个前端文件超过 100 行未纳入 ROUTE_LINE_BUDGET**：
       admin.tsx(193行)、products.tsx(143行)、articles.tsx(102行)。
 
-- [ ] P1-工程: 替换 @qmuse/appwrite-runtime-sdk（Proprietary，支付宝团队资产，1534 行）
-  - 现状：宿主 overrides 统一 appwrite 到 ^29.2.0，功能正常
-  - 清除范围：1 依赖 + 4 处 __MUSE__/__TERN__ + 485 行 QMuse 文案
-  - 方案：用 appwrite 官方 SDK（BSD-3-Clause）重写 src/services/appwrite.ts
-  - 排期：波次 2（支付渠道）完成后立即执行
-  - 验收：grep -rn "@qmuse\|__MUSE__\|__TERN__\|QMuse" src/ package.json | wc -l 输出 0
+- [x] ~~P1-工程: 替换 @qmuse/appwrite-runtime-sdk（Proprietary，支付宝团队资产，1534 行）~~ — 2026-11-17 修复：
+      @qmuse 依赖此前已移除；本次删除死代码 services/appwrite.ts（无引用方、不在 tsconfig 编译范围）、
+      清理 types/global.d.ts 中 __MUSE__/__TERN__ 平台注入声明（-35 行）、
+      移除未使用的 appwrite 依赖（连带 40 个传递依赖包）。
+      验收：grep -rn "@qmuse\|__MUSE__\|__TERN__\|QMuse\|appwrite" src/ services/ types/ package.json 输出 0；
+      typecheck + build 通过。
 
 - [ ] P2-数据：历史资金数据修复（ADR-004 遗留）
   - 现状：修复前已支付订单的开发者/达人分账在 ledger 有记录，但 wallets.balance 未同步
   - 方案：写 Artisan 脚本扫描 `order_commission` 流水，重新计算并回填用户 wallet
   - 排期：波次 2 之后
-- [ ] **P1 · 商品图依赖支付宝 QMuse 图床**
-      位置：src/data/products.ts（8 处图片 URL）
-      现状：指向 webgw-internet.alipay.com 外部临时图床
-      风险：图床失效/限流时商品列表全部裂图
-      方案：图片迁移到自有存储后替换 URL
-      触发条件：支付渠道接入前
+- [x] ~~P1 · 商品图依赖支付宝 QMuse 图床~~ — 2026-11-17 核实：已解决。
+      src/data/products.ts 中已无 webgw-internet.alipay.com 引用（grep 输出 0），
+      商品图已迁移至自有存储。
