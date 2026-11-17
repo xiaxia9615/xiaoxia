@@ -106,5 +106,10 @@
         {
             "name": "yang-satan-satan"
         }
-    ]
+    ],
+    "repositories": [{
+        "name": "packagist",
+        "type": "composer",
+        "url": "https://mirrors.cloud.tencent.com/composer/"
+    }]
 }
