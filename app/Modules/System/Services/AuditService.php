@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Modules\System\Services;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 final class AuditService
 {
+    public function __construct(
+        private readonly SystemQueryService $query,
+    ) {}
+
     public function log(
         int $operatorId,
         string $action,
@@ -17,7 +20,7 @@ final class AuditService
         array $payload = [],
     ): void {
         try {
-            DB::table('audit_logs')->insert([
+            $this->query->insertAuditLog([
                 'operator_id' => $operatorId,
                 'action' => $action,
                 'target_type' => $targetType,

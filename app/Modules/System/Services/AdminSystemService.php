@@ -6,10 +6,13 @@ namespace App\Modules\System\Services;
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 final class AdminSystemService
 {
+    public function __construct(
+        private readonly SystemQueryService $query,
+    ) {}
+
     public function health(): array
     {
         return [
@@ -35,12 +38,8 @@ final class AdminSystemService
      */
     public function queueStats(): array
     {
-        $pending = DB::table('jobs')->count();
-        $failed = DB::table('failed_jobs')
-            ->select('id', 'uuid', 'queue', 'exception', 'failed_at')
-            ->orderByDesc('id')
-            ->limit(50)
-            ->get();
+        $pending = $this->query->countPendingJobs();
+        $failed = $this->query->findFailedJobs();
 
         return [
             'pending' => $pending,

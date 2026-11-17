@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Order\Services;
 
 use App\Modules\Distributor\Models\DistributorRelation;
+use App\Modules\Ledger\Services\LedgerQueryService;
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Models\Order;
 use App\Modules\Product\Models\Product;
@@ -24,6 +25,7 @@ final class OrderService
 
     public function __construct(
         private readonly WalletService $wallet,
+        private readonly LedgerQueryService $ledger,
     ) {}
 
     /**
@@ -206,10 +208,7 @@ final class OrderService
     private function settleCommission(Order $order): void
     {
         // 幂等：同一订单的分账流水已存在则跳过（payOrder 已对订单行加悲观锁，此处双保险）
-        $settled = DB::table('ledger_entries')
-            ->where('biz_type', 'order_commission')
-            ->where('biz_id', $order->id)
-            ->exists();
+        $settled = $this->ledger->hasBizEntries('order_commission', $order->id);
         if ($settled) {
             return;
         }

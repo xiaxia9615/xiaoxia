@@ -19,7 +19,10 @@ use Illuminate\Support\Facades\DB;
  */
 final class TeamBillingService
 {
-    public function __construct(private readonly WalletService $walletService) {}
+    public function __construct(
+        private readonly WalletService $walletService,
+        private readonly TeamBillingQueryService $query,
+    ) {}
 
     /**
      * 团队计费：扣 billing_owner_id 的 balance 账户，记录 actor_user_id。
@@ -42,10 +45,7 @@ final class TeamBillingService
             // 与审计落库（team_billing_records 插入）同事务，任一步失败整体回滚。
             return DB::transaction(function () use ($ctx, $amount): array {
                 // 成员校验：actor_user_id 必须是 team_id 的在册成员，否则拒绝且零扣费
-                $isMember = DB::table('team_user')
-                    ->where('team_id', $ctx->teamId)
-                    ->where('user_id', $ctx->actorUserId)
-                    ->exists();
+                $isMember = $this->query->isMember($ctx->teamId, $ctx->actorUserId);
                 if (! $isMember) {
                     throw new \RuntimeException('非团队成员，拒绝扣费: team='.$ctx->teamId.' actor='.$ctx->actorUserId);
                 }
@@ -65,7 +65,7 @@ final class TeamBillingService
                 }
 
                 // 审计落库：与扣费同事务，插入失败则整体回滚
-                DB::table('team_billing_records')->insert([
+                $this->query->insertRecord([
                     'team_id' => $ctx->teamId,
                     'actor_user_id' => $ctx->actorUserId,
                     'billing_owner_id' => $ctx->billingOwnerId,
@@ -106,7 +106,7 @@ final class TeamBillingService
      */
     private function findByRequestId(string $requestId): ?array
     {
-        $row = DB::table('team_billing_records')->where('request_id', $requestId)->first();
+        $row = $this->query->findRecordByRequestId($requestId);
         if ($row === null) {
             return null;
         }

@@ -17,25 +17,12 @@ final class AdminSkillService
 {
     public function __construct(
         private readonly ApiCallContract $apiCalls,
+        private readonly AdminSkillQueryService $query,
     ) {}
 
     public function paginateSkills(int $perPage = 30)
     {
-        $skills = DB::table('skill_details as sd')
-            ->leftJoin('products as p', 'p.id', '=', 'sd.product_id')
-            ->select(
-                'sd.id',
-                'sd.product_id',
-                'p.name as product_name',
-                'sd.endpoint',
-                'sd.method',
-                'sd.pricing_type',
-                'sd.api_key',
-                'sd.free_quota',
-                'p.status as product_status',
-            )
-            ->orderByDesc('sd.id')
-            ->paginate($perPage);
+        $skills = $this->query->paginateSkills($perPage);
 
         // 通过契约批量统计各产品的调用次数（替代原 selectSub 裸查子查询）
         $counts = $this->apiCalls->countsByProduct(
@@ -76,25 +63,7 @@ final class AdminSkillService
 
     public function getSkill(int $id): ?object
     {
-        $skill = DB::table('skill_details as sd')
-            ->leftJoin('products as p', 'p.id', '=', 'sd.product_id')
-            ->select(
-                'sd.id',
-                'sd.product_id',
-                'p.name as product_name',
-                'sd.endpoint',
-                'sd.method',
-                'sd.pricing_type',
-                'sd.provider_share',
-                'sd.platform_share',
-                'sd.influencer_share',
-                'sd.donation_share',
-                'sd.free_quota',
-                'sd.request_template',
-                'sd.config',
-            )
-            ->where('sd.id', $id)
-            ->first();
+        $skill = $this->query->findSkillDetail($id);
 
         if (! $skill) {
             return null;
@@ -107,7 +76,7 @@ final class AdminSkillService
             ? json_decode($skill->config, true)
             : null;
 
-        $encryptedKey = DB::table('skill_details')->where('id', $id)->value('api_key');
+        $encryptedKey = $this->query->findApiKey($id);
         $skill->masked_api_key = $this->maskApiKey(
             $encryptedKey ? Crypt::decryptString($encryptedKey) : null
         );
@@ -120,7 +89,7 @@ final class AdminSkillService
         $callStats = $this->apiCalls->callStats();
 
         return [
-            'skills' => DB::table('skill_details')->count(),
+            'skills' => $this->query->countSkills(),
             'calls_total' => $callStats['total'],
             'calls_today' => $callStats['today'],
             'calls_success' => $callStats['success'],

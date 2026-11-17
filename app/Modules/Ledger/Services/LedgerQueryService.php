@@ -113,4 +113,15 @@ final class LedgerQueryService
             ->paginate($perPage)
             ->toArray();
     }
+
+    /**
+     * 幂等检查：指定业务类型与业务 ID 是否已存在流水。
+     */
+    public function hasBizEntries(string $bizType, int $bizId): bool
+    {
+        return DB::table('ledger_entries')
+            ->where('biz_type', $bizType)
+            ->where('biz_id', $bizId)
+            ->exists();
+    }
 }
