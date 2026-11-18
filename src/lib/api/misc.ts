@@ -212,8 +212,6 @@ export function toIntegral(dto: IntegralDto): IntegralItem {
 }
 
 export async function fetchIntegral(): Promise<IntegralItem[]> {
-  return degrade("积分明细", [], async () => {
-    const res = await request<Record<string, unknown>>("/user/integral", { auth: true });
-    return unwrapList<IntegralDto>(res).map(toIntegral);
-  });
+  // 后端 /user/integral 为空壳桩，暂返回本地空数据；后端实现后恢复 request 调用
+  return [];
 }
