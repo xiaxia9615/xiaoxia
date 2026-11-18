@@ -20,21 +20,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import {
-  forceArchiveProduct,
   getAdminProducts,
   toggleProductStatus,
   type AdminProductItem,
 } from "@/lib/api/admin";
+import { ArchiveProductDialog } from "./archive-product-dialog";
 import { toErrorMessage } from "@/lib/api/request";
 import { formatPrice } from "@/data/products";
 import { ProductFormModal } from "./product-form-modal";
@@ -97,19 +87,6 @@ export function ProductsPage() {
     onSettled: (_data, _err, id) => removePending(id),
   });
 
-  const archiveMutation = useMutation({
-    mutationFn: (id: number) => forceArchiveProduct(id),
-    onMutate: (id) => addPending(id),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["admin-products"] });
-      toast.success("已强制下架", { description: "该商品已被管理员强制下架。" });
-      setPendingArchive(null);
-    },
-    onError: (err) => {
-      toast.error("强制下架失败", { description: toErrorMessage(err) });
-    },
-    onSettled: (_data, _err, id) => removePending(id),
-  });
 
   const openCreate = () => {
     setEditing(null);
@@ -293,53 +270,13 @@ export function ProductsPage() {
         />
       )}
 
-      <ProductFormModal open={modalOpen} onOpenChange={setModalOpen} editing={editing} />
-
-      <AlertDialog
+      <ArchiveProductDialog
+        product={pendingArchive}
         open={pendingArchive !== null}
         onOpenChange={(open) => {
-          if (!open && !archiveMutation.isPending) {
-            setPendingArchive(null);
-          }
+          if (!open) setPendingArchive(null);
         }}
-      >
-        <AlertDialogContent className="border-white/10 bg-zinc-950/90 backdrop-blur-xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-slate-100">确认强制下架？</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-500">
-              将强制下架商品『{pendingArchive?.name}』（#{pendingArchive?.id}）。
-              该操作为管理员特权操作，会记录审计日志，且不会通知卖家。
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              disabled={archiveMutation.isPending}
-              className="border-white/10 bg-transparent text-slate-300 hover:bg-white/5"
-            >
-              取消
-            </AlertDialogCancel>
-            <AlertDialogAction
-              disabled={archiveMutation.isPending}
-              className="bg-red-600 text-white hover:bg-red-500"
-              onClick={(e) => {
-                e.preventDefault();
-                if (pendingArchive) {
-                  archiveMutation.mutate(pendingArchive.id);
-                }
-              }}
-            >
-              {archiveMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  执行中…
-                </>
-              ) : (
-                "确认强制下架"
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      />
     </AdminPageLayout>
   );
 }
