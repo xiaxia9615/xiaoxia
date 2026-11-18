@@ -10,7 +10,7 @@
 ## 快速开始
 
 ### 环境要求
-- PHP 8.3+
+- PHP 8.3+（推荐 8.5）
 - Composer 2.x
 - Node.js 20+ / npm 10+
 - Redis 7+（默认 phpredis，无 ext-redis 则改 REDIS_CLIENT=predis）
@@ -26,9 +26,12 @@ npm install
 cp .env.example .env
 php artisan key:generate
 php artisan migrate
+php artisan storage:link
 npm run build
 php artisan serve
 ```
+
+启动后访问 http://localhost:8000 。开发时可用 `npm run dev` 启动 Vite 热更新，但生产部署必须先 `npm run build`。
 
 ### 创建管理员
 
@@ -40,10 +43,11 @@ php artisan tinker
 ```
 
 ### 常见问题
-- **PHP 版本** → 要求 PHP 8.5（最低 8.3）
+- **PHP 版本** → 推荐 PHP 8.5（最低兼容 8.3）
 - **Redis 连不上** → 默认 phpredis 需 ext-redis；没装就改 `.env` 的 `REDIS_CLIENT=predis`
-- **前端白屏** → 先 `npm run build`，访问 Laravel 端口（非 Vite 5173）
+- **前端白屏** → 先 `npm run build`，访问 Laravel 端口 8000（非 Vite 5173）
 - **后台 403** → `users` 表 `is_admin=1` 才是管理员
+- **端口占用** → `php artisan serve --port=8080` 指定其他端口
 - **CSS 错乱** → 不要改 `vite.config.js` 的 `css.transformer`
 
 > **商用路径**：如需闭源商业部署，请联系 al@qssxmall.cn 获取商业许可，免除 AGPL-3.0 开源义务。
@@ -80,7 +84,6 @@ CI：GitHub Actions（PHP 8.5 + MySQL 8 + Redis）自动跑全量测试 + 13 项
 | [docs/progress.md](docs/progress.md) | 项目进度看板 |
 | [docs/tech-debt.md](docs/tech-debt.md) | 技术债追踪 |
 | [docs/ops.md](docs/ops.md) | 运维手册 |
-| [docs/health-log.md](docs/health-log.md) | 自动体检日志 |
 | [docs/adr/](docs/adr/) | 架构决策记录 |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | 贡献指南 |
 | [CLAUDE.md](CLAUDE.md) | AI Agent 规则 |
