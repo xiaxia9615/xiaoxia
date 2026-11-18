@@ -7,6 +7,47 @@
 本项目主体为**个体工商户**（栖霞区青丝嗣夏百货中心），采用**自营模式**。平台官方自营上架 AI 技能，用户充值后购买。
 平台保留**单级达人分销**体系（严格遵循合规要求，禁止多级分销）。开发者入驻模块已开发完毕，但目前暂未开放（API 隐藏，代码休眠）。
 
+## 快速开始
+
+### 环境要求
+- PHP 8.3+
+- Composer 2.x
+- Node.js 20+ / npm 10+
+- Redis 7+（默认 phpredis，无 ext-redis 则改 REDIS_CLIENT=predis）
+- 数据库：默认 SQLite（开箱即用），生产推荐 MySQL 8
+
+### 一键跑通（开发模式，默认 SQLite）
+
+```bash
+git clone https://gitee.com/yang-satan-satan/xiaoxia.git
+cd xiaoxia
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+npm run build
+php artisan serve
+```
+
+### 创建管理员
+
+本项目不提供默认管理员账号。首次部署后执行：
+
+```bash
+php artisan tinker
+>>> App\Models\User::create(['name'=>'Admin','email'=>'you@x.com','password'=>bcrypt('密码'),'is_admin'=>true]);
+```
+
+### 常见问题
+- **PHP 版本** → 要求 PHP 8.5（最低 8.3）
+- **Redis 连不上** → 默认 phpredis 需 ext-redis；没装就改 `.env` 的 `REDIS_CLIENT=predis`
+- **前端白屏** → 先 `npm run build`，访问 Laravel 端口（非 Vite 5173）
+- **后台 403** → `users` 表 `is_admin=1` 才是管理员
+- **CSS 错乱** → 不要改 `vite.config.js` 的 `css.transformer`
+
+> **商用路径**：如需闭源商业部署，请联系 al@qssxmall.cn 获取商业许可，免除 AGPL-3.0 开源义务。
+
 ## 技术栈
 - **后端**：Laravel 13 · PHP 8.5 · MySQL 8 · Redis · Nginx
 - **前端**：React 18 · TypeScript · Vite · TanStack Router（SPA，内嵌于 Laravel Blade）
@@ -26,7 +67,7 @@
 - **多 AI 供应商路由**：17 个供应商，11 个模型入库，支持熔断。
 
 ## 管理后台
-入口：https://xiaoxia.ren/login
+入口：`/admin`（需管理员登录）
 已实现 24 个页面（含订单管理、商品管理、财务中心、钱包流水、提现审批等）。
 
 ## 测试与质量
