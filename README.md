@@ -13,7 +13,7 @@
 
 ## 核心模块（21 个）
 **交易核心**：User（用户） / Product（商品） / Order（订单） / Payment（支付） / Wallet（钱包） / Ledger（复式记账）
-**AI 能力**：Skill（技能） / ApiKey（鉴权） / AiProvider（AI 路由，17 供应商 / 14 模型）
+**AI 能力**：Skill（技能） / ApiKey（鉴权） / AiProvider（AI 路由，17 供应商 / 11 模型）
 **业务扩展**：Cart（购物车） / Address（地址） / Favor（收藏） / Comment（评论） / Article（文章） / Message（消息） / Browse（浏览记录） / Aftersale（售后） / Goods（商品扩展）
 **渠道与计费**：Distributor（单级分销） / Team（团队计费） / System（后台管理）
 
@@ -23,14 +23,14 @@
 - **提现审批流**：申请 → 审批 → 打款 / 拒绝（含原子退款）。
 - **单级达人分销**：绑定关系、自动按比例计算达人佣金。
 - **金融级复式记账**：底层 BigInt（毫）精度，悲观锁防超扣。
-- **多 AI 供应商路由**：17 个供应商，14 个模型入库，支持熔断。
+- **多 AI 供应商路由**：17 个供应商，11 个模型入库，支持熔断。
 
 ## 管理后台
 入口：https://xiaoxia.ren/login
 已实现 24 个页面（含订单管理、商品管理、财务中心、钱包流水、提现审批等）。
 
 ## 测试与质量
-**当前基线**：`224 passed / 4 skipped`（748 个断言），全绿。
+**当前基线**：`236 passed / 4 skipped`（796 个断言），全绿。
 CI：GitHub Actions（PHP 8.5 + MySQL 8 + Redis）自动跑全量测试 + 13 项架构守卫（21 assertions）。静态分析：Larastan 0 errors + Pint 0 issues。
 
 ## 文档索引

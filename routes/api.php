@@ -156,34 +156,36 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
     Route::get('orders/{id}/status', [OrderController::class, 'status'])->whereNumber('id');
     Route::get('products/categories', [ProductController::class, 'categories']);
 
-    // Admin（管理员接口）
-    Route::get('admin/orders', [AdminOrderController::class, 'apiIndex']);
-    Route::post('admin/orders/{id}/ship', [AdminOrderController::class, 'apiShip'])->whereNumber('id');
-    Route::get('admin/users', [AdminUserController::class, 'apiIndex']);
-    Route::get('admin/products', [AdminProductController::class, 'apiIndex']);
-    Route::post('admin/products', [AdminProductController::class, 'apiStore']);
-    Route::put('admin/products/{id}', [AdminProductController::class, 'apiUpdate'])->whereNumber('id');
-    Route::patch('admin/products/{id}/status', [AdminProductController::class, 'apiToggleStatus'])->whereNumber('id');
-    Route::post('admin/products/{id}/force-archive', [AdminProductController::class, 'apiForceArchive'])->whereNumber('id');
-    Route::get('admin/finance/recharges', [AdminFinanceController::class, 'apiRecharges']);
-    Route::get('admin/finance/withdrawals', [AdminFinanceController::class, 'apiWithdrawals']);
-    Route::post('admin/finance/withdrawals/{id}/approve', [AdminFinanceController::class, 'apiApprove'])->whereNumber('id');
-    Route::post('admin/finance/withdrawals/{id}/reject', [AdminFinanceController::class, 'apiReject'])->whereNumber('id');
+    // Admin（管理员接口，仅管理员可用：admin 中间件校验 is_admin）
+    Route::middleware('admin')->group(function (): void {
+        Route::get('admin/orders', [AdminOrderController::class, 'apiIndex']);
+        Route::post('admin/orders/{id}/ship', [AdminOrderController::class, 'apiShip'])->whereNumber('id');
+        Route::get('admin/users', [AdminUserController::class, 'apiIndex']);
+        Route::get('admin/products', [AdminProductController::class, 'apiIndex']);
+        Route::post('admin/products', [AdminProductController::class, 'apiStore']);
+        Route::put('admin/products/{id}', [AdminProductController::class, 'apiUpdate'])->whereNumber('id');
+        Route::patch('admin/products/{id}/status', [AdminProductController::class, 'apiToggleStatus'])->whereNumber('id');
+        Route::post('admin/products/{id}/force-archive', [AdminProductController::class, 'apiForceArchive'])->whereNumber('id');
+        Route::get('admin/finance/recharges', [AdminFinanceController::class, 'apiRecharges']);
+        Route::get('admin/finance/withdrawals', [AdminFinanceController::class, 'apiWithdrawals']);
+        Route::post('admin/finance/withdrawals/{id}/approve', [AdminFinanceController::class, 'apiApprove'])->whereNumber('id');
+        Route::post('admin/finance/withdrawals/{id}/reject', [AdminFinanceController::class, 'apiReject'])->whereNumber('id');
 
-    // AI 供应商（api_key 脱敏输出，留空保留原值）
-    Route::get('admin/ai-providers', [AdminAiProviderController::class, 'apiIndex']);
-    Route::patch('admin/ai-providers/{id}', [AdminAiProviderController::class, 'apiUpdate'])->whereNumber('id');
+        // AI 供应商（api_key 脱敏输出，留空保留原值）
+        Route::get('admin/ai-providers', [AdminAiProviderController::class, 'apiIndex']);
+        Route::patch('admin/ai-providers/{id}', [AdminAiProviderController::class, 'apiUpdate'])->whereNumber('id');
 
-    // 技能（列表 / 上下架切换）
-    Route::get('admin/skills', [AdminSkillController::class, 'apiIndex']);
-    Route::patch('admin/skills/{id}/status', [AdminSkillController::class, 'apiToggleStatus'])->whereNumber('id');
+        // 技能（列表 / 上下架切换）
+        Route::get('admin/skills', [AdminSkillController::class, 'apiIndex']);
+        Route::patch('admin/skills/{id}/status', [AdminSkillController::class, 'apiToggleStatus'])->whereNumber('id');
 
-    // API Keys（key 脱敏输出 / 吊销）
-    Route::get('admin/api-keys', [AdminApiKeyController::class, 'apiIndex']);
-    Route::delete('admin/api-keys/{id}', [AdminApiKeyController::class, 'apiRevoke'])->whereNumber('id');
+        // API Keys（key 脱敏输出 / 吊销）
+        Route::get('admin/api-keys', [AdminApiKeyController::class, 'apiIndex']);
+        Route::delete('admin/api-keys/{id}', [AdminApiKeyController::class, 'apiRevoke'])->whereNumber('id');
 
-    // 调用流水
-    Route::get('admin/api-calls', [AdminApiCallController::class, 'apiIndex']);
+        // 调用流水
+        Route::get('admin/api-calls', [AdminApiCallController::class, 'apiIndex']);
+    });
 });
 
 if (config('app.env') !== 'production') {
