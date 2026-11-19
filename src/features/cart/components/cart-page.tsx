@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, MapPin, ShoppingBag, Trash2 } from "lucide-react";
+import { MapPin, ShoppingBag, Trash2 } from "lucide-react";
 import { SiteLayout } from "@/components/site/layout";
 import { Button } from "@/components/ui/button";
 import { toErrorMessage } from "@/lib/api";
@@ -10,8 +10,6 @@ import { useCartPage } from "../use-cart-page";
 export function CartPage({ loggedIn }: { loggedIn: boolean }) {
   const {
     items,
-    isEmpty,
-    isLoading,
     isError,
     error,
     refetch,

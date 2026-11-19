@@ -10,10 +10,10 @@ describe('Goods API Tests', () => {
 
   it('fetchProducts 正常返回列表', async () => {
     const mockData = [{ id: '1', name: '商品A' }];
-    (global.fetch as any).mockResolvedValueOnce({
+    vi.mocked(global.fetch).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ code: 0, msg: 'ok', data: { data: mockData, total: 1 } }),
-    });
+    } as Response);
 
     const res = await fetchProducts();
     expect(res.list.length).toBe(1);
@@ -21,10 +21,10 @@ describe('Goods API Tests', () => {
   });
 
   it('fetchProduct 正常返回单个详情', async () => {
-    (global.fetch as any).mockResolvedValueOnce({
+    vi.mocked(global.fetch).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ code: 0, msg: 'ok', data: { id: '7', name: '单品', price: 100 } }),
-    });
+    } as Response);
 
     const p = await fetchProduct("7");
     expect(p?.id).toBe("7");

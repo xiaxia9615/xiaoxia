@@ -129,10 +129,9 @@ export function ProfilePage() {
                   <Button
                     type="submit"
                     className="rounded"
-                    disabled={false}
                   >
                     <Save className="size-4" />
-                    {false ? "保存中…" : "保存资料"}
+                    保存资料
                   </Button>
                 </form>
               </Form>
@@ -193,10 +192,9 @@ export function ProfilePage() {
                   <Button
                     type="submit"
                     className="rounded"
-                    disabled={false}
                   >
                     <KeyRound className="size-4" />
-                    {false ? "提交中…" : "修改密码"}
+                    修改密码
                   </Button>
                 </form>
               </Form>

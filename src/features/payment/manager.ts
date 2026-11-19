@@ -47,7 +47,7 @@ export async function startPay(
   const strategy = STRATEGIES[channel];
   track(TRACK_EVENTS.payStart, { orderId, channel });
 
-  let launched = false;
+  let launched: boolean;
   try {
     launched = await strategy.pay({ order, orderId });
   } catch (err) {

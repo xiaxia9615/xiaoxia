@@ -18,7 +18,7 @@ import {
   type AdminOrderItem,
 } from "@/lib/api/generated";
 import { toErrorMessage } from "@/lib/api/request";
-import { StatusBadge, type StatusBadgeType } from "@/config/components/admin/StatusBadge";
+import { type StatusBadgeType } from "@/config/components/admin/StatusBadge";
 
 /** 订单状态 -> 标签语义。 */
 export function orderStatusType(status: string): StatusBadgeType {

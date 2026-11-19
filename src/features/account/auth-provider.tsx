@@ -26,16 +26,15 @@ function readStoredUser(): User | null {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(() => readStoredUser());
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() =>
+    typeof window === "undefined" ? false : localStorage.getItem(TOKEN_KEY) !== null,
+  );
 
   // 启动时若存在 token，则拉取用户信息校验登录态
   useEffect(() => {
     let active = true;
     const token = localStorage.getItem(TOKEN_KEY);
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    if (!token) return;
     fetchProfile()
       .then((profile) => {
         if (active) {

@@ -270,6 +270,11 @@ export function ProductsPage() {
         />
       )}
 
+      <ProductFormModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        editing={editing}
+      />
       <ArchiveProductDialog
         product={pendingArchive}
         open={pendingArchive !== null}
