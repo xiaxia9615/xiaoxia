@@ -6,7 +6,7 @@ namespace App\Modules\Team\Services;
 
 use App\Modules\Team\Dto\BillingContext;
 use App\Modules\User\Models\User;
-use App\Modules\Wallet\Services\WalletService;
+use App\Modules\Wallet\Contracts\WalletContract;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 final class TeamBillingService
 {
     public function __construct(
-        private readonly WalletService $walletService,
+        private readonly WalletContract $walletService,
         private readonly TeamBillingQueryService $query,
     ) {}
 
@@ -50,7 +50,7 @@ final class TeamBillingService
                     throw new \RuntimeException('非团队成员，拒绝扣费: team='.$ctx->teamId.' actor='.$ctx->actorUserId);
                 }
 
-                // 扣团队 owner 公户：经 WalletService::deduct（悲观锁 + 余额校验 + 幂等）
+                // 扣团队 owner 公户：经 WalletContract::deduct（悲观锁 + 余额校验 + 幂等）
                 $result = $this->walletService->deduct(
                     User::findOrFail($ctx->billingOwnerId),
                     $amount,
