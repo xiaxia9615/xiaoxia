@@ -6,8 +6,8 @@ namespace App\Modules\Wallet\Services;
 
 use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\User\Models\User;
-use App\Modules\Wallet\Models\Wallet;
 use App\Modules\Wallet\Contracts\WalletContract;
+use App\Modules\Wallet\Models\Wallet;
 use App\Modules\Wallet\Models\WalletTransaction;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\QueryException;

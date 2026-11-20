@@ -314,8 +314,8 @@ final class ModuleBoundaryTest extends TestCase
                 continue;
             }
             $allowed = $dependencies[$module] ?? [];
-            $files = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)
             );
 
             foreach ($files as $file) {
@@ -351,6 +351,7 @@ final class ModuleBoundaryTest extends TestCase
 
                     if (isset($known[$module]) && in_array($key, $known[$module], true)) {
                         $knownHits[] = "{$module} → {$key} ({$rel})";
+
                         continue;
                     }
 

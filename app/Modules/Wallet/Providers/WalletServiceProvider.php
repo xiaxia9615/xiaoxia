@@ -6,8 +6,10 @@ namespace App\Modules\Wallet\Providers;
 
 use App\Modules\Ledger\Contracts\Events\AiUsageRecorded;
 use App\Modules\User\Contracts\Events\UserRegistered;
+use App\Modules\Wallet\Contracts\WalletContract;
 use App\Modules\Wallet\Listeners\CreateLedgerOnUserRegistered;
 use App\Modules\Wallet\Listeners\DeductBalanceOnAiUsage;
+use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
@@ -17,8 +19,8 @@ final class WalletServiceProvider extends ServiceProvider
     {
         // Wallet 模块服务通过类型自动注入（WalletService 无接口依赖）
         $this->app->bind(
-            \App\Modules\Wallet\Contracts\WalletContract::class,
-            \App\Modules\Wallet\Services\WalletService::class
+            WalletContract::class,
+            WalletService::class
         );
     }
 
