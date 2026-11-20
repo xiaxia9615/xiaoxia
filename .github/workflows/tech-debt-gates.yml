@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
       - name: 安装 secretlint
         run: npm install -g secretlint @secretlint/secretlint-rule-preset-recommend
       - name: 扫描私钥/Token/密码
@@ -34,10 +34,11 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.5'
+          extensions: pdo_mysql, redis, pcov
           coverage: pcov
       - name: 安装后端依赖
         run: composer install --no-interaction --prefer-dist --no-progress
