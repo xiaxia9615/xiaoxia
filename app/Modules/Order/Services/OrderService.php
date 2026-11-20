@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Modules\Order\Services;
 
 use App\Modules\Distributor\Models\DistributorRelation;
-use App\Modules\Ledger\Services\LedgerQueryService;
+use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Models\Order;
 use App\Modules\Product\Models\Product;
-use App\Modules\Wallet\Services\WalletService;
+use App\Modules\Wallet\Contracts\WalletContract;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -24,8 +24,8 @@ final class OrderService
     private const ORDER_NO_MAX_ATTEMPTS = 5;
 
     public function __construct(
-        private readonly WalletService $wallet,
-        private readonly LedgerQueryService $ledger,
+        private readonly WalletContract $wallet,
+        private readonly LedgerContract $ledger,
     ) {}
 
     /**
@@ -104,9 +104,9 @@ final class OrderService
                 throw new RuntimeException('买家不存在');
             }
 
-            // 扣款走 WalletService：同事务内同步 wallets.balance 与 Ledger，
+            // 扣款走 WalletContract：同事务内同步 wallets.balance 与 Ledger，
             // 避免 payOrder 只扣 Ledger 造成 wallet 缓存漂移。
-            // biz_type 从 'order_pay' 变为 WalletService 内部的 'wallet_deduct'，
+            // biz_type 从 'order_pay' 变为 WalletContract 内部的 'wallet_deduct'，
             // settleCommission 只依赖 'order_commission'，不受影响。
             $this->wallet->deduct($buyer, (int) $order->amount, 'order_'.$order->id);
 
@@ -137,7 +137,7 @@ final class OrderService
     /**
      * 虚拟商品自动发货（幂等）：
      * 1. 缓存锁防并发重复触发（payOrder 行锁之外的第二道防线，兼容支付回调等多入口）；
-     * 2. WalletService::deposit 以 out_trade_no 唯一约束兜底，天然幂等，绝不重复加额度；
+     * 2. WalletContract::deposit 以 out_trade_no 唯一约束兜底，天然幂等，绝不重复加额度；
      * 3. 仅当绑定技能且赠送额度 > 0 时入账。
      */
     private function autoDeliverVirtualOrder(Order $order, Product $product): void

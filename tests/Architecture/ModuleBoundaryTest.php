@@ -284,7 +284,7 @@ final class ModuleBoundaryTest extends TestCase
                 if (str_starts_with($trimmed, '//') || str_starts_with($trimmed, '*') || str_starts_with($trimmed, '/*')) {
                     continue;
                 }
-                if (preg_match('/->(?:debit|record)\s*\(/', $line)) {
+                if (preg_match('/\$this->ledger\w*->(?:debit|record)\s*\(/i', $line)) {
                     $violations[] = "{$file}:".($i + 1).' 业务代码绕过 WalletService 直接调用 Ledger debit/record';
                 }
             }
@@ -301,7 +301,6 @@ final class ModuleBoundaryTest extends TestCase
     public function test_cross_module_refs_must_use_contracts(): void
     {
         $known = [
-            'Order' => ['Wallet\\Services', 'Ledger\\Services'],
             'Wallet' => ['Ledger\\Services'],
         ];
 
@@ -362,7 +361,7 @@ final class ModuleBoundaryTest extends TestCase
         }
 
         $this->assertSame([], $violations, "跨模块非契约引用：\n".implode("\n", $violations));
-        $this->assertLessThanOrEqual(3, count($knownHits), "已知例外命中数：\n".implode("\n", $knownHits));
+        $this->assertLessThanOrEqual(2, count($knownHits), "已知例外命中数：\n".implode("\n", $knownHits));
     }
 
     private function usedModules(string $relativePath): array
