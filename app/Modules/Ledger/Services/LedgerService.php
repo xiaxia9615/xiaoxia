@@ -12,6 +12,7 @@ final class LedgerService implements LedgerContract
 {
     public function __construct(
         private readonly LedgerQueryService $query,
+        private readonly AiUsageDeductionService $deductions,
     ) {}
 
     public function record(string $bizType, int $bizId, array $splits): string
@@ -123,5 +124,15 @@ final class LedgerService implements LedgerContract
     public function hasBizEntries(string $bizType, int $bizId): bool
     {
         return $this->query->hasBizEntries($bizType, $bizId);
+    }
+
+    public function recordAiUsage(
+        int $userId,
+        int $providerId,
+        float $cost,
+        int $inputTokens,
+        int $outputTokens,
+    ): void {
+        $this->deductions->record($userId, $providerId, $cost, $inputTokens, $outputTokens);
     }
 }

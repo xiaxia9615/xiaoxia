@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Modules\Wallet\Listeners;
 
 use App\Modules\Ledger\Contracts\Events\AiUsageRecorded;
-use App\Modules\Ledger\Services\AiUsageDeductionService;
+use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\User\Models\User;
-use App\Modules\Wallet\Services\WalletService;
+use App\Modules\Wallet\Contracts\WalletContract;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -15,8 +15,8 @@ use RuntimeException;
 final readonly class DeductBalanceOnAiUsage
 {
     public function __construct(
-        private WalletService $walletService,
-        private AiUsageDeductionService $deductions,
+        private WalletContract $walletService,
+        private LedgerContract $deductions,
     ) {}
 
     /**
@@ -46,7 +46,7 @@ final readonly class DeductBalanceOnAiUsage
                 'ai_usage_'.Str::uuid()->toString(),
             );
 
-            $this->deductions->record(
+            $this->deductions->recordAiUsage(
                 $event->userId,
                 $event->providerId,
                 $event->cost,

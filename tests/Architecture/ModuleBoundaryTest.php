@@ -301,7 +301,6 @@ final class ModuleBoundaryTest extends TestCase
     public function test_cross_module_refs_must_use_contracts(): void
     {
         $known = [
-            'Wallet' => ['Ledger\\Services'],
         ];
 
         $modules = config('modules.list');
@@ -361,7 +360,7 @@ final class ModuleBoundaryTest extends TestCase
         }
 
         $this->assertSame([], $violations, "跨模块非契约引用：\n".implode("\n", $violations));
-        $this->assertLessThanOrEqual(2, count($knownHits), "已知例外命中数：\n".implode("\n", $knownHits));
+        $this->assertSame([], $knownHits, "已知例外命中数：\n".implode("\n", $knownHits));
     }
 
     private function usedModules(string $relativePath): array

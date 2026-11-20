@@ -42,4 +42,15 @@ interface LedgerContract
      * 幂等检查：指定业务类型与业务 ID 是否已存在流水。
      */
     public function hasBizEntries(string $bizType, int $bizId): bool;
+
+    /**
+     * 写入一条 AI 用量扣费流水（须与扣款在同一事务内调用）。
+     */
+    public function recordAiUsage(
+        int $userId,
+        int $providerId,
+        float $cost,
+        int $inputTokens,
+        int $outputTokens,
+    ): void;
 }
