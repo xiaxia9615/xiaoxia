@@ -292,6 +292,81 @@ final class ModuleBoundaryTest extends TestCase
         $this->assertSame([], $violations, "业务代码绕过 WalletService 直接操作 Ledger：\n".implode("\n", $violations));
     }
 
+    /**
+     * 跨模块引用必须落在 Contracts 命名空间；Models 走白名单；Services/Http/Actions 禁止。
+     *
+     * KNOWN_SERVICE_VIOLATIONS 是冻结的存量违规清单，每消除一处删一条，
+     * 全部消除后改为空数组并收紧断言。新增耦合不在清单内即报错。
+     */
+    public function test_cross_module_refs_must_use_contracts(): void
+    {
+        $known = [
+            'Order' => ['Wallet\\Services', 'Ledger\\Services'],
+            'Skill' => ['Wallet\\Services'],
+            'Team' => ['Wallet\\Services'],
+            'Wallet' => ['Ledger\\Services'],
+        ];
+
+        $modules = config('modules.list');
+        $dependencies = config('modules.dependencies', []);
+        $violations = [];
+        $knownHits = [];
+
+        foreach ($modules as $module) {
+            $dir = base_path("app/Modules/{$module}");
+            if (! is_dir($dir)) {
+                continue;
+            }
+            $allowed = $dependencies[$module] ?? [];
+            $files = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)
+            );
+
+            foreach ($files as $file) {
+                if ($file->getExtension() !== 'php') {
+                    continue;
+                }
+                $content = (string) file_get_contents($file->getPathname());
+
+                if (! preg_match_all('/^use\s+App\\\\Modules\\\\(\w+)\\\\([^;]+);/m', $content, $m, PREG_SET_ORDER)) {
+                    continue;
+                }
+
+                foreach ($m as $match) {
+                    $target = $match[1];
+                    $sub = $match[2];
+                    if ($target === $module) {
+                        continue;
+                    }
+
+                    $isContract = $sub === 'Contracts' || str_starts_with($sub, 'Contracts\\');
+                    if ($isContract) {
+                        continue;
+                    }
+
+                    $isModel = $sub === 'Models' || str_starts_with($sub, 'Models\\');
+                    if ($isModel && in_array($target, $allowed, true)) {
+                        continue;
+                    }
+
+                    $rel = str_replace(base_path().'/', '', $file->getPathname());
+                    $segment = explode('\\', $sub)[0];
+                    $key = "{$target}\\{$segment}";
+
+                    if (isset($known[$module]) && in_array($key, $known[$module], true)) {
+                        $knownHits[] = "{$module} → {$key} ({$rel})";
+                        continue;
+                    }
+
+                    $violations[] = "{$rel}: {$module} → {$target}\\{$sub}";
+                }
+            }
+        }
+
+        $this->assertSame([], $violations, "跨模块非契约引用：\n".implode("\n", $violations));
+        $this->assertLessThanOrEqual(5, count($knownHits), "已知例外命中数：\n".implode("\n", $knownHits));
+    }
+
     private function usedModules(string $relativePath): array
     {
         $content = file_get_contents(base_path($relativePath));
