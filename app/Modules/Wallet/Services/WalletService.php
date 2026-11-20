@@ -183,14 +183,14 @@ final class WalletService implements WalletContract
             $txId = $this->ledger->record($bizType, $bizId, $splits);
 
             foreach ($splits as $split) {
-                if (($split['owner_type'] ?? null) !== 'user') {
+                if ($split['owner_type'] !== 'user') {
                     continue;
                 }
-                if (($split['account_type'] ?? null) !== 'balance') {
+                if ($split['account_type'] !== 'balance') {
                     continue;
                 }
 
-                $delta = ($split['direction'] ?? null) === 'credit'
+                $delta = $split['direction'] === 'credit'
                     ? (int) $split['amount']
                     : -(int) $split['amount'];
 
