@@ -113,16 +113,13 @@ jobs:
         run: npm install --ignore-scripts --registry=https://registry.npmjs.org
 
       - name: TypeScript type check
-        continue-on-error: true
         run: npx tsc --noEmit
 
       - name: Build frontend assets
         run: npm run build
 
-      # --- Coverage (non-blocking) ---
       - name: Run tests with coverage
-        continue-on-error: true
-        run: php artisan test --coverage --coverage-html=coverage-report --min=60 || true
+        run: php artisan test --coverage --coverage-html=coverage-report --min=55
 
       - name: Upload coverage report
         if: always()
