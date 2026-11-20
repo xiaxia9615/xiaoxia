@@ -302,7 +302,6 @@ final class ModuleBoundaryTest extends TestCase
     {
         $known = [
             'Order' => ['Wallet\\Services', 'Ledger\\Services'],
-            'Skill' => ['Wallet\\Services'],
             'Wallet' => ['Ledger\\Services'],
         ];
 
@@ -363,7 +362,7 @@ final class ModuleBoundaryTest extends TestCase
         }
 
         $this->assertSame([], $violations, "跨模块非契约引用：\n".implode("\n", $violations));
-        $this->assertLessThanOrEqual(4, count($knownHits), "已知例外命中数：\n".implode("\n", $knownHits));
+        $this->assertLessThanOrEqual(3, count($knownHits), "已知例外命中数：\n".implode("\n", $knownHits));
     }
 
     private function usedModules(string $relativePath): array

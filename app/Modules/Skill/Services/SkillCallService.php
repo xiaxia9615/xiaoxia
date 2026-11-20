@@ -9,7 +9,7 @@ use App\Modules\ApiKey\Contracts\ApiCallContract;
 use App\Modules\ApiKey\Contracts\ApiKeyContract;
 use App\Modules\Product\Contracts\SkillProductContract;
 use App\Modules\Skill\Models\SkillDetail;
-use App\Modules\Wallet\Services\WalletService;
+use App\Modules\Wallet\Contracts\WalletContract;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
@@ -20,7 +20,7 @@ use RuntimeException;
 final class SkillCallService
 {
     public function __construct(
-        private readonly WalletService $wallet,
+        private readonly WalletContract $wallet,
         private readonly SkillProductContract $products,
         private readonly ApiKeyContract $apiKeys,
         private readonly ApiCallContract $apiCalls,
@@ -130,7 +130,7 @@ final class SkillCallService
             }
             throw $e;
         }
-        // 先经 WalletService::deduct 扣减用户余额（同步 wallets.balance + Ledger），
+        // 先经 WalletContract::deduct 扣减用户余额（同步 wallets.balance + Ledger），
         // 再用 wallet->record 记录剩余分账（provider 信用、平台信用等）。
         // 平台 debit $cost 用于抵消 deduct() 中平台多出的 credit，保持账目平衡。
         $this->wallet->deduct($caller, $cost, 'skill_call_'.$callId);
