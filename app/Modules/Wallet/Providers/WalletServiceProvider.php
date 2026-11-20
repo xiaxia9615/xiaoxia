@@ -16,6 +16,10 @@ final class WalletServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Wallet 模块服务通过类型自动注入（WalletService 无接口依赖）
+        $this->app->bind(
+            \App\Modules\Wallet\Contracts\WalletContract::class,
+            \App\Modules\Wallet\Services\WalletService::class
+        );
     }
 
     public function boot(): void

@@ -37,4 +37,9 @@ interface LedgerContract
      * @throws \RuntimeException 账户不存在、扣减金额非法或余额不足
      */
     public function debit(string $ownerType, int $ownerId, string $accountType, int $amount, string $bizType, int $bizId): string;
+
+    /**
+     * 幂等检查：指定业务类型与业务 ID 是否已存在流水。
+     */
+    public function hasBizEntries(string $bizType, int $bizId): bool;
 }

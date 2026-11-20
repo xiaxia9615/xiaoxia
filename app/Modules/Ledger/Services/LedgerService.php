@@ -119,4 +119,9 @@ final class LedgerService implements LedgerContract
             return $transactionId;
         });
     }
+
+    public function hasBizEntries(string $bizType, int $bizId): bool
+    {
+        return $this->query->hasBizEntries($bizType, $bizId);
+    }
 }
