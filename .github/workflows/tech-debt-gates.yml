@@ -1,0 +1,47 @@
+# 技术债治理门禁（阶段 1：密钥扫描 + 覆盖率阈值）
+# 原型位于 /home/ubuntu/.github/workflows/tech-debt-gates.yml（占位版），
+# 本文件为填充实际命令后的生效版本。
+name: tech-debt-gates
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  secret-scan:
+    name: 门禁1-密钥扫描
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: 安装 secretlint
+        run: npm install -g secretlint @secretlint/secretlint-rule-preset-recommend
+      - name: 扫描私钥/Token/密码
+        run: secretlint "**/*"
+
+  coverage-gate:
+    name: 门禁2-代码覆盖率（后端 55% / 前端 30%，按当前基线设定，逐步提高）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: pcov
+      - name: 安装后端依赖
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: 后端测试覆盖率（阈值 55%，当前基线 59.9%）
+        run: php artisan test --coverage --min=55
+      - name: 安装前端依赖
+        run: npm ci
+      - name: 前端测试覆盖率（阈值 30%，当前基线 32.8%）
+        run: npm run test:coverage -- --coverage.thresholds.lines=30
