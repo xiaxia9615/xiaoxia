@@ -3711,7 +3711,7 @@ export interface operations {
                      */
                     price: number;
                     /**
-                     * @example 2
+                     * @example 1
                      * @enum {integer}
                      */
                     type: 1 | 2;
@@ -3906,7 +3906,7 @@ export interface operations {
                      * @example i
                      */
                     api_key?: string | null;
-                    /** @example true */
+                    /** @example false */
                     enabled?: boolean | null;
                 };
             };
