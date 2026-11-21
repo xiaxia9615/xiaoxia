@@ -86,9 +86,6 @@ jobs:
       - name: Run migrations
         run: php artisan migrate --force
 
-      - name: Generate Scribe Docs
-        run: php artisan scribe:generate
-
       # --- Static Analysis (blocking) ---
       - name: Run Larastan (PHPStan)
         run: vendor/bin/phpstan analyse --no-progress
