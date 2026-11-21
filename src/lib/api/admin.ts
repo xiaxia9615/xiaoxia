@@ -3,6 +3,7 @@
  * 后端为 Laravel Blade 服务端路由，字段以控制器返回结构为准声明契约。
  */
 import { request } from "./request";
+import type { paths } from "./schema";
 
 // ===== Admin Products =====
 
@@ -357,6 +358,91 @@ export function getAdminApiCalls(
   },
 ): Promise<AdminApiCallListResponse> {
   return request<AdminApiCallListResponse>("/v1/admin/api-calls", {
+    method: "GET",
+    params: params as Record<string, unknown> | undefined,
+    auth: true,
+  });
+}
+
+// ── Admin Orders ──────────────────────────────────────────────
+
+/** Schema 请求体类型（ship 端点无 200 响应定义，响应类型暂保留手写，见待汇报清单） */
+type ShipOrderReq = paths["/api/v1/admin/orders/{id}/ship"]["post"]["requestBody"]["content"]["application/json"];
+
+/** 后台订单条目（schema 无 200 响应定义，按 UI 使用字段声明）。 */
+export interface AdminOrderItem {
+  id: number;
+  order_sn?: string;
+  order_no?: string;
+  user_name?: string;
+  status?: string;
+  tracking_no?: string;
+  total_amount?: number;
+  amount?: number;
+  product_name?: string;
+  nature?: string;
+  created_at?: string;
+}
+
+/** 后台订单列表响应。 */
+export interface AdminOrderListResponse {
+  list: AdminOrderItem[];
+  total: number;
+  current_page: number;
+  last_page: number;
+  per_page: number;
+}
+
+/** 后台订单列表（支持分页）。 */
+export function getAdminOrders(
+  params?: { page?: number },
+): Promise<AdminOrderListResponse> {
+  return request<AdminOrderListResponse>("/v1/admin/orders", {
+    method: "GET",
+    params: params as Record<string, unknown> | undefined,
+    auth: true,
+  });
+}
+
+/** 实物订单发货（tracking_no 幂等）。 */
+export function shipAdminOrder(
+  orderId: number,
+  trackingNo: string,
+): Promise<unknown> {
+  const body: ShipOrderReq = { tracking_no: trackingNo };
+  return request<unknown>(`/v1/admin/orders/${orderId}/ship`, {
+    method: "POST",
+    auth: true,
+    body,
+  });
+}
+
+// ── Admin Users ───────────────────────────────────────────────
+
+/** 后台用户条目（schema 无 200 响应定义，按 UI 使用字段声明）。 */
+export interface AdminUserItem {
+  id: number;
+  name: string;
+  email?: string;
+  is_admin?: boolean | number;
+  is_active?: boolean | number;
+  created_at?: string;
+}
+
+/** 后台用户列表响应。 */
+export interface AdminUserListResponse {
+  list: AdminUserItem[];
+  total: number;
+  current_page: number;
+  last_page: number;
+  per_page: number;
+}
+
+/** 后台用户列表（支持分页）。 */
+export function getAdminUsers(
+  params?: { page?: number },
+): Promise<AdminUserListResponse> {
+  return request<AdminUserListResponse>("/v1/admin/users", {
     method: "GET",
     params: params as Record<string, unknown> | undefined,
     auth: true,

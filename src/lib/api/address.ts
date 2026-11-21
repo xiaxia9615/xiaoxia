@@ -1,4 +1,5 @@
 import { request } from "./request";
+import type { paths } from "./schema";
 
 /** 后端地址 DTO（显式契约声明）。 */
 export interface AddressDto {
@@ -46,6 +47,11 @@ export function toAddress(raw: AddressDto): Address | null {
   };
 }
 
+/** Schema 请求体类型（address 端点无 200 响应定义，响应类型暂保留手写，见待汇报清单） */
+type AddressSaveReq = paths["/api/v1/address/save"]["post"]["requestBody"]["content"]["application/json"];
+type AddressDeleteReq = paths["/api/v1/address/delete"]["post"]["requestBody"]["content"]["application/json"];
+type AddressDefaultReq = paths["/api/v1/address/default"]["post"]["requestBody"]["content"]["application/json"];
+
 /** 地址列表（需登录）。错误上抛由 React Query 呈现。 */
 export async function fetchAddresses(): Promise<Address[]> {
   const data = await request<{ list?: AddressDto[]; data?: AddressDto[] } | AddressDto[]>(
@@ -68,10 +74,11 @@ export interface AddressInput {
 
 /** 新增地址（需登录）。 */
 export async function createAddress(input: AddressInput): Promise<void> {
+  const body: AddressSaveReq = { ...input };
   await request<null>("/address/save", {
     method: "POST",
     auth: true,
-    body: { ...input },
+    body,
   });
 }
 
@@ -80,27 +87,30 @@ export async function updateAddress(
   addressId: number,
   input: AddressInput,
 ): Promise<void> {
+  const body: AddressSaveReq = { id: addressId, ...input };
   await request<null>("/address/save", {
     method: "POST",
     auth: true,
-    body: { id: addressId, ...input },
+    body,
   });
 }
 
 /** 删除地址（需登录）。 */
 export async function deleteAddress(addressId: number): Promise<void> {
+  const body: AddressDeleteReq = { id: addressId };
   await request<null>("/address/delete", {
     method: "POST",
     auth: true,
-    body: { id: addressId },
+    body,
   });
 }
 
 /** 设置默认地址（需登录）。 */
 export async function setDefaultAddress(addressId: number): Promise<void> {
+  const body: AddressDefaultReq = { id: addressId };
   await request<null>("/address/default", {
     method: "POST",
     auth: true,
-    body: { id: addressId },
+    body,
   });
 }

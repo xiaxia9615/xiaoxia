@@ -12,7 +12,7 @@ endpoints:
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: ''
+      title: 获取某商品的评论列表（关联用户信息）。
       description: ''
       authenticated: false
       deprecated: false
@@ -29,8 +29,8 @@ endpoints:
     responses:
       -
         custom: []
-        status: 200
-        content: '{"code":0,"msg":"ok","data":{"list":[],"total":0}}'
+        status: 401
+        content: '{"message":"Unauthenticated."}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json

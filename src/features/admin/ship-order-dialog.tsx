@@ -16,7 +16,7 @@ import {
 import {
   shipAdminOrder,
   type AdminOrderItem,
-} from "@/lib/api/generated";
+} from "@/lib/api/admin";
 import { toErrorMessage } from "@/lib/api/request";
 import { type StatusBadgeType } from "@/config/components/admin/StatusBadge";
 

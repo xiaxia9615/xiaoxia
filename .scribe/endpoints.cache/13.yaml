@@ -14,7 +14,7 @@ endpoints:
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: ''
+      title: 当前用户的消息列表。
       description: ''
       authenticated: false
       deprecated: false
@@ -54,7 +54,7 @@ endpoints:
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: ''
+      title: 当前用户的未读消息数量。
       description: ''
       authenticated: false
       deprecated: false
@@ -94,7 +94,7 @@ endpoints:
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: ''
+      title: '标记消息已读（校验 user_id 防越权）。'
       description: ''
       authenticated: false
       deprecated: false
@@ -105,8 +105,20 @@ endpoints:
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      id:
+        custom: []
+        name: id
+        description: ''
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      id: 16
     fileParameters: []
     responses: []
     responseFields: []

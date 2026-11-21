@@ -14,7 +14,7 @@ endpoints:
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: ''
+      title: 文章列表（分页）。
       description: ''
       authenticated: false
       deprecated: false
@@ -32,7 +32,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"code":0,"msg":"ok","data":{"list":[],"total":0}}'
+        content: '{"code":0,"msg":"ok","data":{"list":[],"total":0,"current_page":1,"last_page":1}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -54,7 +54,7 @@ endpoints:
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: ''
+      title: 分类列表（去重）。
       description: ''
       authenticated: false
       deprecated: false
@@ -72,7 +72,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"code":0,"msg":"ok","data":[]}'
+        content: '{"code":0,"msg":"ok","data":{"list":[]}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -94,7 +94,7 @@ endpoints:
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: ''
+      title: 文章详情。
       description: ''
       authenticated: false
       deprecated: false
@@ -111,8 +111,8 @@ endpoints:
     responses:
       -
         custom: []
-        status: 200
-        content: '{"code":0,"msg":"ok","data":null}'
+        status: 404
+        content: '{"code":1,"msg":"\u6587\u7ae0\u4e0d\u5b58\u5728","data":null}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json

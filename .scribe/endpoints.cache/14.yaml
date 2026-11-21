@@ -14,7 +14,7 @@ endpoints:
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: ''
+      title: 获取当前用户的浏览历史（关联商品信息）。
       description: ''
       authenticated: false
       deprecated: false

@@ -127,6 +127,294 @@ endpoints:
     custom: []
     httpMethods:
       - POST
+    uri: api/v1/auth/sms/send
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 发送短信验证码（带频控）。
+      description: '频控规则：同一手机号 60 秒内只能发一次；同一 IP 每小时最多 5 次。'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      phone:
+        custom: []
+        name: phone
+        description: 'Must match the regex /^1[3-9]\d{9}$/.'
+        required: true
+        example: '18642559314'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      phone: '18642559314'
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/auth/sms/login
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 手机号验证码登录（不存在则自动注册）。
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      phone:
+        custom: []
+        name: phone
+        description: 'Must match the regex /^1[3-9]\d{9}$/.'
+        required: true
+        example: '18642559314'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      code:
+        custom: []
+        name: code
+        description: 'Must be 6 characters.'
+        required: true
+        example: khwayk
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      phone: '18642559314'
+      code: khwayk
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/auth/redirect/{provider}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 重定向到第三方授权页面。
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      provider:
+        custom: []
+        name: provider
+        description: ''
+        required: true
+        example: github|weixin
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      provider: github|weixin
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+              "message": "The route api/v1/auth/redirect/github|weixin could not be found."
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/auth/callback/{provider}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: '第三方授权回调：查找或创建用户，签发 Token，重定向前端。'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      provider:
+        custom: []
+        name: provider
+        description: ''
+        required: true
+        example: github|weixin
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      provider: github|weixin
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+              "message": "The route api/v1/auth/callback/github|weixin could not be found."
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/auth/redirect/alipay
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 重定向到支付宝授权页面。
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 500
+        content: '{"code":1,"message":"\u652f\u4ed8\u5b9d\u767b\u5f55\u914d\u7f6e\u5f02\u5e38"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/auth/callback/alipay
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: '支付宝授权回调：接收 auth_code，换取 user_id 和用户信息。'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 400
+        content: '{"code":1,"message":"\u6388\u6743\u7801\u7f3a\u5931"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
     uri: api/v1/auth/logout
     metadata:
       custom: []
@@ -223,7 +511,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"code":0,"data":{"current_page":1,"data":[{"id":88,"user_id":1,"type":2,"name":"\u7af9\u7ea4\u7ef4\u6bdb\u5dfe\u5957\u88c5","slug":"-KsKIpn","description":"\u7af9\u7ea4\u7ef4\u6bdb\u5dfe\u5957\u88c5 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":3900,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":87,"user_id":1,"type":2,"name":"\u73bb\u7483\u5bc6\u5c01\u8336\u4ed3","slug":"-9aZswi","description":"\u73bb\u7483\u5bc6\u5c01\u8336\u4ed3 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":5600,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":86,"user_id":1,"type":2,"name":"\u5929\u7136\u6930\u68d5\u5730\u57ab","slug":"-6Gv22v","description":"\u5929\u7136\u6930\u68d5\u5730\u57ab \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":18900,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":85,"user_id":1,"type":2,"name":"\u624b\u4f5c\u76ae\u9769\u7b14\u8bb0\u672c","slug":"-Fj36b4","description":"\u624b\u4f5c\u76ae\u9769\u7b14\u8bb0\u672c \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":7800,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":84,"user_id":1,"type":2,"name":"\u9ec4\u94dc\u70db\u53f0","slug":"-gX3VtX","description":"\u9ec4\u94dc\u70db\u53f0 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":15600,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":83,"user_id":1,"type":2,"name":"\u4e9a\u9ebb\u68c9\u9ebb\u684c\u5e03","slug":"-RsU1jR","description":"\u4e9a\u9ebb\u68c9\u9ebb\u684c\u5e03 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":9900,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":82,"user_id":1,"type":2,"name":"\u9676\u74f7\u91c9\u4e0b\u5f69\u7897","slug":"-KFNQbC","description":"\u9676\u74f7\u91c9\u4e0b\u5f69\u7897 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":4500,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":81,"user_id":1,"type":2,"name":"\u624b\u5de5\u7f16\u7ec7\u6536\u7eb3\u7bee","slug":"-v7dKDq","description":"\u624b\u5de5\u7f16\u7ec7\u6536\u7eb3\u7bee \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":6800,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":80,"user_id":1,"type":2,"name":"\u539f\u6728\u9999\u85b0\u6269\u9999","slug":"-5GA9vy","description":"\u539f\u6728\u9999\u85b0\u6269\u9999 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":8900,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":79,"user_id":1,"type":2,"name":"\u7985\u610f\u624b\u4f5c\u8336\u676f","slug":"-gI9Kpt","description":"\u7985\u610f\u624b\u4f5c\u8336\u676f \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":12900,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}}],"first_page_url":"https:\/\/xiaoxia.ren\/api\/v1\/products?page=1","from":1,"last_page":1,"last_page_url":"https:\/\/xiaoxia.ren\/api\/v1\/products?page=1","links":[{"url":null,"label":"&laquo; Previous","page":null,"active":false},{"url":"https:\/\/xiaoxia.ren\/api\/v1\/products?page=1","label":"1","page":1,"active":true},{"url":null,"label":"Next &raquo;","page":null,"active":false}],"next_page_url":null,"path":"https:\/\/xiaoxia.ren\/api\/v1\/products","per_page":20,"prev_page_url":null,"to":10,"total":10}}'
+        content: '{"code":0,"data":{"current_page":1,"data":[{"id":88,"user_id":1,"type":2,"nature":"physical","quota":0,"skill_id":null,"name":"\u7af9\u7ea4\u7ef4\u6bdb\u5dfe\u5957\u88c5","slug":"-KsKIpn","description":"\u7af9\u7ea4\u7ef4\u6bdb\u5dfe\u5957\u88c5 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":3900,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":87,"user_id":1,"type":2,"nature":"physical","quota":0,"skill_id":null,"name":"\u73bb\u7483\u5bc6\u5c01\u8336\u4ed3","slug":"-9aZswi","description":"\u73bb\u7483\u5bc6\u5c01\u8336\u4ed3 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":5600,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":86,"user_id":1,"type":2,"nature":"physical","quota":0,"skill_id":null,"name":"\u5929\u7136\u6930\u68d5\u5730\u57ab","slug":"-6Gv22v","description":"\u5929\u7136\u6930\u68d5\u5730\u57ab \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":18900,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":85,"user_id":1,"type":2,"nature":"physical","quota":0,"skill_id":null,"name":"\u624b\u4f5c\u76ae\u9769\u7b14\u8bb0\u672c","slug":"-Fj36b4","description":"\u624b\u4f5c\u76ae\u9769\u7b14\u8bb0\u672c \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":7800,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":84,"user_id":1,"type":2,"nature":"physical","quota":0,"skill_id":null,"name":"\u9ec4\u94dc\u70db\u53f0","slug":"-gX3VtX","description":"\u9ec4\u94dc\u70db\u53f0 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":15600,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":83,"user_id":1,"type":2,"nature":"physical","quota":0,"skill_id":null,"name":"\u4e9a\u9ebb\u68c9\u9ebb\u684c\u5e03","slug":"-RsU1jR","description":"\u4e9a\u9ebb\u68c9\u9ebb\u684c\u5e03 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":9900,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":82,"user_id":1,"type":2,"nature":"physical","quota":0,"skill_id":null,"name":"\u9676\u74f7\u91c9\u4e0b\u5f69\u7897","slug":"-KFNQbC","description":"\u9676\u74f7\u91c9\u4e0b\u5f69\u7897 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":4500,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":81,"user_id":1,"type":2,"nature":"physical","quota":0,"skill_id":null,"name":"\u624b\u5de5\u7f16\u7ec7\u6536\u7eb3\u7bee","slug":"-v7dKDq","description":"\u624b\u5de5\u7f16\u7ec7\u6536\u7eb3\u7bee \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":6800,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":80,"user_id":1,"type":2,"nature":"physical","quota":0,"skill_id":null,"name":"\u539f\u6728\u9999\u85b0\u6269\u9999","slug":"-5GA9vy","description":"\u539f\u6728\u9999\u85b0\u6269\u9999 \u2014\u2014 \u7cbe\u9009\u597d\u7269\uff0c\u54c1\u8d28\u4e4b\u9009\u3002","cover":null,"price":8900,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-10T11:21:19.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}},{"id":79,"user_id":1,"type":2,"nature":"physical","quota":0,"skill_id":null,"name":"\u6d4b\u8bd5","slug":"-gI9Kpt","description":null,"cover":null,"price":12900,"status":1,"audit_note":null,"sales_count":0,"view_count":0,"created_at":"2026-11-10T11:21:19.000000Z","updated_at":"2026-11-15T02:00:10.000000Z","deleted_at":null,"provider":{"id":1,"name":"\u8d85\u7ea7\u7ba1\u7406\u5458"}}],"first_page_url":"https:\/\/xiaoxia.ren\/api\/v1\/products?page=1","from":1,"last_page":1,"last_page_url":"https:\/\/xiaoxia.ren\/api\/v1\/products?page=1","links":[{"url":null,"label":"&laquo; Previous","page":null,"active":false},{"url":"https:\/\/xiaoxia.ren\/api\/v1\/products?page=1","label":"1","page":1,"active":true},{"url":null,"label":"Next &raquo;","page":null,"active":false}],"next_page_url":null,"path":"https:\/\/xiaoxia.ren\/api\/v1\/products","per_page":20,"prev_page_url":null,"to":10,"total":10}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -1066,6 +1354,64 @@ endpoints:
   -
     custom: []
     httpMethods:
+      - POST
+    uri: 'api/v1/admin/orders/{id}/ship'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: '实物订单发货（JSON API，供 React SPA Admin 后台使用）。'
+      description: |-
+        1. 仅待发货（pending_shipment）订单可发货；
+        2. 幂等：已发货订单（tracking_no 已存在）直接返回成功，防止重复发货；
+        3. 发货后记录物流单号与发货时间，订单状态置为已完成。
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the order.'
+        required: true
+        example: '564'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: '564'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      tracking_no:
+        custom: []
+        name: tracking_no
+        description: 'Must not be greater than 64 characters.'
+        required: true
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      tracking_no: b
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
       - GET
     uri: api/v1/admin/users
     metadata:
@@ -1075,6 +1421,933 @@ endpoints:
       subgroup: ''
       subgroupDescription: ''
       title: 'API 用户列表：返回 JSON 分页数据，供前端后台使用。'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/products
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: |-
+        商品列表（JSON API，供 React SPA Admin 后台使用）。
+        支持 status / type 筛选与 name 关键字搜索。
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/admin/products
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: |-
+        新建商品（JSON API，供 React SPA Admin 后台使用）。
+        复用与 Web 表单一致的验证规则与 AdminProductService。
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: ''
+        required: false
+        example: 'Eius et animi quos velit et.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: 'Must be at least 1.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: ''
+        required: true
+        example: 1
+        type: integer
+        enumValues:
+          - 1
+          - 2
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: true
+        example: 1
+        type: integer
+        enumValues:
+          - 0
+          - 1
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      cover:
+        custom: []
+        name: cover
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: d
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      nature:
+        custom: []
+        name: nature
+        description: ''
+        required: false
+        example: physical
+        type: string
+        enumValues:
+          - physical
+          - virtual
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      quota:
+        custom: []
+        name: quota
+        description: 'Must be at least 0.'
+        required: false
+        example: 37
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      skill_id:
+        custom: []
+        name: skill_id
+        description: 'Must be at least 1.'
+        required: false
+        example: 4
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      name: b
+      description: 'Eius et animi quos velit et.'
+      price: 16
+      type: 1
+      status: 1
+      cover: d
+      nature: physical
+      quota: 37
+      skill_id: 4
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: 'api/v1/admin/products/{id}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: |-
+        更新商品（JSON API，供 React SPA Admin 后台使用）。
+        复用与 Web 表单一致的验证规则与 AdminProductService。
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the product.'
+        required: true
+        example: '564'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: '564'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: ''
+        required: false
+        example: 'Eius et animi quos velit et.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: 'Must be at least 1.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: ''
+        required: true
+        example: 2
+        type: integer
+        enumValues:
+          - 1
+          - 2
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      cover:
+        custom: []
+        name: cover
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: d
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      nature:
+        custom: []
+        name: nature
+        description: ''
+        required: false
+        example: virtual
+        type: string
+        enumValues:
+          - physical
+          - virtual
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      quota:
+        custom: []
+        name: quota
+        description: 'Must be at least 0.'
+        required: false
+        example: 37
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      skill_id:
+        custom: []
+        name: skill_id
+        description: 'Must be at least 1.'
+        required: false
+        example: 4
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      name: b
+      description: 'Eius et animi quos velit et.'
+      price: 16
+      type: 2
+      cover: d
+      nature: virtual
+      quota: 37
+      skill_id: 4
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/v1/admin/products/{id}/status'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: '商品上下架切换（JSON API，供 React SPA Admin 后台使用）。'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the product.'
+        required: true
+        example: '564'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: '564'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/admin/products/{id}/force-archive'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: |-
+        强制下架（JSON API，供 React SPA Admin 后台使用）。
+        管理员特权操作，不校验商品归属，直接将状态置为 2（强制下架）。
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the product.'
+        required: true
+        example: '564'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: '564'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/finance/recharges
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: '充值流水列表（JSON API，供 React SPA Admin 后台使用）。'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/finance/withdrawals
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: '提现单列表（JSON API，供 React SPA Admin 后台使用）。'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/admin/finance/withdrawals/{id}/approve'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: '提现审批通过（JSON API，供 React SPA Admin 后台使用）。'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the withdrawal.'
+        required: true
+        example: '564'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: '564'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/admin/finance/withdrawals/{id}/reject'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: '提现驳回（JSON API，供 React SPA Admin 后台使用）。'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the withdrawal.'
+        required: true
+        example: '564'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: '564'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      reject_reason:
+        custom: []
+        name: reject_reason
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      reject_reason: b
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/ai-providers
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'API 供应商列表（JSON，api_key 一律脱敏输出）.'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/v1/admin/ai-providers/{id}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: |-
+        API 更新供应商（base_url / api_key / enabled）。
+        安全约束: api_key 留空时保留原值，绝不盲目覆盖；返回值仅含脱敏 key。
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the ai provider.'
+        required: true
+        example: '564'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: '564'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      base_url:
+        custom: []
+        name: base_url
+        description: 'Must not be greater than 500 characters.'
+        required: false
+        example: 'http://www.bailey.biz/quos-velit-et-fugiat-sunt-nihil-accusantium-harum.html'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      api_key:
+        custom: []
+        name: api_key
+        description: 'Must not be greater than 500 characters.'
+        required: false
+        example: i
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      enabled:
+        custom: []
+        name: enabled
+        description: ''
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      base_url: 'http://www.bailey.biz/quos-velit-et-fugiat-sunt-nihil-accusantium-harum.html'
+      api_key: i
+      enabled: true
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/skills
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'API 技能列表（JSON，api_key 脱敏输出）.'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/v1/admin/skills/{id}/status'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'API 切换技能上下架状态（JSON）.'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the skill.'
+        required: true
+        example: '564'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: '564'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/api-keys
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'API Key 列表（JSON，key 脱敏输出：仅 key_prefix + ****）.'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/admin/api-keys/{id}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'API 吊销 Key（JSON）.'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the api key.'
+        required: true
+        example: '564'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: '564'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/api-calls
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'API 调用流水列表（JSON，支持 user_id / product_id / start_date / end_date 筛选）.'
       description: ''
       authenticated: false
       deprecated: false

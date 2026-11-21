@@ -5,7 +5,7 @@ import { AdminPageLayout } from "@/config/components/admin/AdminPageLayout";
 import { DataTable, type DataTableColumn } from "@/config/components/admin/DataTable";
 import { Pagination } from "@/config/components/admin/Pagination";
 import { StatusBadge } from "@/config/components/admin/StatusBadge";
-import { getAdminUsers, type AdminUserItem } from "@/lib/api/generated";
+import { getAdminUsers, type AdminUserItem } from "@/lib/api/admin";
 
 function UsersPage() {
   const [page, setPage] = useState(1);

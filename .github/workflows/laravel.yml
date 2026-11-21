@@ -86,6 +86,9 @@ jobs:
       - name: Run migrations
         run: php artisan migrate --force
 
+      - name: Generate Scribe Docs
+        run: php artisan scribe:generate
+
       # --- Static Analysis (blocking) ---
       - name: Run Larastan (PHPStan)
         run: vendor/bin/phpstan analyse --no-progress
@@ -111,6 +114,14 @@ jobs:
       # --- Frontend (non-blocking) ---
       - name: Install npm dependencies
         run: npm install --ignore-scripts --registry=https://registry.npmjs.org
+
+      - name: Check API Contract Consistency
+        run: |
+          npm run api:generate
+          if [[ -n "$(git status --porcelain src/lib/api/schema.d.ts)" ]]; then
+            echo "❌ 后端 API 契约已更新，但前端没有同步。请在本地运行 npm run api:generate 并提交更改。"
+            exit 1
+          fi
 
       - name: TypeScript type check
         run: npx tsc --noEmit

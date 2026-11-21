@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import {
   getAdminOrders,
   type AdminOrderItem,
-} from "@/lib/api/generated";
+} from "@/lib/api/admin";
 import { formatPrice } from "@/data/products";
 import {
   ShipOrderDialog,
@@ -29,7 +29,7 @@ function OrdersPage() {
     { key: "order_no", header: "订单号", cell: (row) => row.order_no },
     { key: "product_name", header: "商品", cell: (row) => row.product_name ?? "-" },
     { key: "user_name", header: "用户", cell: (row) => row.user_name ?? "-" },
-    { key: "amount", header: "金额", cell: (row) => formatPrice(row.amount) },
+    { key: "amount", header: "金额", cell: (row) => formatPrice(row.amount ?? 0) },
     {
       key: "nature",
       header: "性质",
@@ -44,7 +44,7 @@ function OrdersPage() {
       key: "status",
       header: "状态",
       cell: (row) => (
-        <StatusBadge status={orderStatusLabel(row.status)} type={orderStatusType(row.status)} />
+        <StatusBadge status={orderStatusLabel(row.status ?? "")} type={orderStatusType(row.status ?? "")} />
       ),
     },
     { key: "created_at", header: "创建时间", cell: (row) => row.created_at ?? "-" },

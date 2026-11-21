@@ -1,4 +1,5 @@
 import { fmtTime, num, request } from "./request";
+import type { paths } from "./schema";
 
 /** 后端订单列表 DTO（显式契约声明）。 */
 export interface OrderDto {
@@ -54,6 +55,10 @@ export function toOrderItem(dto: OrderDto): OrderItem {
   };
 }
 
+/** Schema 请求体类型（order 端点无 200 响应定义，响应类型暂保留手写，见待汇报清单） */
+type OrderCancelReq = paths["/api/v1/order/cancel"]["post"]["requestBody"]["content"]["application/json"];
+type OrderDeleteReq = paths["/api/v1/order/delete"]["post"]["requestBody"]["content"]["application/json"];
+
 /** 订单列表（需登录）。错误上抛由 React Query 呈现，登录态过期走全局登出。 */
 export async function fetchOrders(
   query: { page?: number; limit?: number } = {},
@@ -71,10 +76,11 @@ export async function fetchOrders(
 
 export async function cancelOrder(orderId: number): Promise<boolean> {
   try {
+    const body: OrderCancelReq = { order_id: orderId };
     await request<Record<string, unknown>>("/order/cancel", {
       auth: true,
       method: "POST",
-      body: { order_id: orderId },
+      body,
     });
     return true;
   } catch {
@@ -186,10 +192,11 @@ export async function fetchOrderDetail(orderId: number): Promise<OrderDetailData
 
 export async function deleteOrder(orderId: number): Promise<boolean> {
   try {
+    const body: OrderDeleteReq = { order_id: orderId };
     await request<Record<string, unknown>>("/order/delete", {
       auth: true,
       method: "POST",
-      body: { order_id: orderId },
+      body,
     });
     return true;
   } catch {

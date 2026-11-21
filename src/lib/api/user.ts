@@ -1,4 +1,5 @@
 import { request } from "./request";
+import type { paths } from "./schema";
 
 /** 用户信息。 */
 export interface User {
@@ -36,6 +37,12 @@ function mapUser(u: Record<string, unknown>): User {
   };
 }
 
+/** Schema 请求体类型（auth 端点 responses: never，响应类型暂保留手写，见待汇报清单） */
+type LoginReq = paths["/api/v1/auth/login"]["post"]["requestBody"]["content"]["application/json"];
+type RegisterReq = paths["/api/v1/auth/register"]["post"]["requestBody"]["content"]["application/json"];
+type SmsSendReq = paths["/api/v1/auth/sms/send"]["post"]["requestBody"]["content"]["application/json"];
+type SmsLoginReq = paths["/api/v1/auth/sms/login"]["post"]["requestBody"]["content"]["application/json"];
+
 /**
  * 登录。密码明文提交（HTTPS 已加密传输层）。
  * 对接后端 POST /api/v1/auth/login，字段 email + password。
@@ -44,9 +51,10 @@ export async function login(email: string, password: string): Promise<{
   token: string;
   user: User;
 }> {
+  const body: LoginReq = { email, password };
   const data = await request<{ token?: string; user?: Record<string, unknown> }>(
     "/login",
-    { method: "POST", body: { email, password } },
+    { method: "POST", body },
   );
   const raw = data.user;
   const name = raw ? String(raw.name ?? "用户") : "用户";
@@ -64,9 +72,10 @@ export async function login(email: string, password: string): Promise<{
 
 /** 注册。对接后端 POST /api/v1/auth/register，字段 name + email + password。 */
 export async function register(name: string, email: string, password: string): Promise<User> {
+  const body: RegisterReq = { name, email, password };
   const data = await request<Record<string, unknown>>("/register", {
     method: "POST",
-    body: { name, email, password },
+    body,
   });
   const u = (data.user ?? data) as Record<string, unknown>;
   const userName = String(u.name ?? name);
@@ -87,9 +96,10 @@ export async function fetchProfile(): Promise<User> {
 
 /** 发送短信验证码（手机号登录）。调用 POST /api/v1/auth/sms/send。 */
 export async function smsSend(phone: string): Promise<void> {
+  const body: SmsSendReq = { phone };
   await request<Record<string, unknown>>("/v1/auth/sms/send", {
     method: "POST",
-    body: { phone },
+    body,
   });
 }
 
@@ -98,9 +108,10 @@ export async function smsLogin(phone: string, code: string): Promise<{
   token: string;
   user: User;
 }> {
+  const body: SmsLoginReq = { phone, code };
   const data = await request<{ token?: string; user?: Record<string, unknown> }>(
     "/v1/auth/sms/login",
-    { method: "POST", body: { phone, code } },
+    { method: "POST", body },
   );
   const raw = data.user;
   const name = raw ? String(raw.name ?? "用户") : "用户";
