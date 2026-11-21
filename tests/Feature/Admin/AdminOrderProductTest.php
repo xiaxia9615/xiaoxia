@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Admin;
 
+use Tests\TestCase;
+
 /**
  * 旧版后台 HTML 页面测试 — 已废弃。
  *
@@ -13,7 +15,7 @@ namespace Tests\Feature\Admin;
  *
  * @deprecated 已由 SPA + API 架构替代
  */
-final class AdminOrderProductTest extends \Tests\TestCase
+final class AdminOrderProductTest extends TestCase
 {
     // 原有 6 个测试方法已移除：
     // - test_normal_user_gets_403_on_orders（HTML 路由 /admin/orders）

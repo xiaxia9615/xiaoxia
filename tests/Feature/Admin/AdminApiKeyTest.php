@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use Tests\TestCase;
 
 /**
  * 旧版后台 HTML 页面测试 — 已废弃。
@@ -13,7 +14,7 @@ declare(strict_types=1);
  *
  * @deprecated 已由 SPA + API 架构替代
  */
-final class AdminApiKeyTest extends \Tests\TestCase
+final class AdminApiKeyTest extends TestCase
 {
     // 所有 HTML 路由测试方法已移除。
 }
