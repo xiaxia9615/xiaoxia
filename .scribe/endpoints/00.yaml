@@ -1567,7 +1567,7 @@ endpoints:
         name: status
         description: ''
         required: true
-        example: 1
+        example: 0
         type: integer
         enumValues:
           - 0
@@ -1626,7 +1626,7 @@ endpoints:
       description: 'Eius et animi quos velit et.'
       price: 16
       type: 1
-      status: 1
+      status: 0
       cover: d
       nature: physical
       quota: 37
