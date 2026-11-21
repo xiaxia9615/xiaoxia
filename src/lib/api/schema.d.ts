@@ -3648,12 +3648,12 @@ export interface operations {
                      */
                     price: number;
                     /**
-                     * @example 1
+                     * @example 2
                      * @enum {integer}
                      */
                     type: 1 | 2;
                     /**
-                     * @example 1
+                     * @example 0
                      * @enum {integer}
                      */
                     status: 0 | 1;
@@ -3721,7 +3721,7 @@ export interface operations {
                      */
                     cover?: string | null;
                     /**
-                     * @example virtual
+                     * @example physical
                      * @enum {string|null}
                      */
                     nature?: "physical" | "virtual" | null;
@@ -4261,7 +4261,7 @@ export interface operations {
                      * @example y
                      */
                     detail: string;
-                    /** @example false */
+                    /** @example true */
                     is_default?: boolean | null;
                 };
             };

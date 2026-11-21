@@ -5382,7 +5382,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"description\": \"Eius et animi quos velit et.\",
     \"price\": 16,
     \"type\": 2,
-    \"status\": 1,
+    \"status\": 0,
     \"cover\": \"d\",
     \"nature\": \"physical\",
     \"quota\": 37,
@@ -5406,7 +5406,7 @@ let body = {
     "description": "Eius et animi quos velit et.",
     "price": 16,
     "type": 2,
-    "status": 1,
+    "status": 0,
     "cover": "d",
     "nature": "physical",
     "quota": 37,
@@ -5552,10 +5552,10 @@ Must be one of:
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="status"                data-endpoint="POSTapi-v1-admin-products"
-               value="1"
+               value="0"
                data-component="body">
     <br>
-<p>Example: <code>1</code></p>
+<p>Example: <code>0</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>0</code></li> <li><code>1</code></li></ul>
         </div>
@@ -5632,7 +5632,7 @@ Must be one of:
     \"name\": \"b\",
     \"description\": \"Eius et animi quos velit et.\",
     \"price\": 16,
-    \"type\": 2,
+    \"type\": 1,
     \"cover\": \"d\",
     \"nature\": \"physical\",
     \"quota\": 37,
@@ -5655,7 +5655,7 @@ let body = {
     "name": "b",
     "description": "Eius et animi quos velit et.",
     "price": 16,
-    "type": 2,
+    "type": 1,
     "cover": "d",
     "nature": "physical",
     "quota": 37,
@@ -5800,10 +5800,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="type"                data-endpoint="PUTapi-v1-admin-products--id-"
-               value="2"
+               value="1"
                data-component="body">
     <br>
-<p>Example: <code>2</code></p>
+<p>Example: <code>1</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>1</code></li> <li><code>2</code></li></ul>
         </div>
@@ -6778,7 +6778,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --data "{
     \"base_url\": \"http:\\/\\/www.bailey.biz\\/quos-velit-et-fugiat-sunt-nihil-accusantium-harum.html\",
     \"api_key\": \"i\",
-    \"enabled\": true
+    \"enabled\": false
 }"
 </code></pre></div>
 
@@ -6796,7 +6796,7 @@ const headers = {
 let body = {
     "base_url": "http:\/\/www.bailey.biz\/quos-velit-et-fugiat-sunt-nihil-accusantium-harum.html",
     "api_key": "i",
-    "enabled": true
+    "enabled": false
 };
 
 fetch(url, {
@@ -6938,7 +6938,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>true</code></p>
+<p>Example: <code>false</code></p>
         </div>
         </form>
 
