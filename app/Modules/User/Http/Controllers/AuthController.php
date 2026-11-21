@@ -68,7 +68,7 @@ final class AuthController
     {
         $u = $request->user();
 
-        return response()->json(['code' => 0, 'data' => ['id' => $u->id, 'name' => $u->name, 'email' => $u->email]]);
+        return response()->json(['code' => 0, 'data' => ['id' => $u->id, 'name' => $u->name, 'email' => $u->email, 'is_admin' => (bool) $u->is_admin, 'is_finance' => (bool) $u->is_finance, 'is_active' => (bool) $u->is_active]]);
     }
 
     /**
@@ -164,7 +164,7 @@ final class AuthController
         $token = $user->createToken('api')->plainTextToken;
 
         return response()->json(['code' => 0, 'data' => [
-            'user' => ['id' => $user->id, 'name' => $user->name, 'phone' => $user->phone],
+            'user' => ['id' => $user->id, 'name' => $user->name, 'phone' => $user->phone, 'is_admin' => (bool) $user->is_admin, 'is_finance' => (bool) $user->is_finance],
             'token' => $token,
         ]]);
     }

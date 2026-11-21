@@ -15,6 +15,10 @@ export interface User {
   city?: string;
   district?: string;
   integral?: number;
+  is_admin?: boolean;
+  is_finance?: boolean;
+  is_active?: boolean;
+  uid?: string;
 }
 
 function mapUser(u: Record<string, unknown>): User {
@@ -34,6 +38,10 @@ function mapUser(u: Record<string, unknown>): User {
     city: typeof u.city === "string" ? u.city : undefined,
     district: typeof u.district === "string" ? u.district : undefined,
     integral: typeof u.integral === "number" ? u.integral : undefined,
+    is_admin: typeof u.is_admin === "boolean" ? u.is_admin : false,
+    is_finance: typeof u.is_finance === "boolean" ? u.is_finance : false,
+    is_active: typeof u.is_active === "boolean" ? u.is_active : true,
+    uid: typeof u.uid === "string" ? u.uid : String(u.id ?? 0),
   };
 }
 
@@ -66,6 +74,10 @@ export async function login(email: string, password: string): Promise<{
       name,
       nickname: name,
       email: raw && typeof raw.email === "string" ? raw.email : undefined,
+      is_admin: raw && typeof raw.is_admin === "boolean" ? raw.is_admin : false,
+      is_finance: raw && typeof raw.is_finance === "boolean" ? raw.is_finance : false,
+      is_active: raw && typeof raw.is_active === "boolean" ? raw.is_active : true,
+      uid: raw && typeof raw.uid === "string" ? raw.uid : String(raw?.id ?? 0),
     },
   };
 }
@@ -85,6 +97,10 @@ export async function register(name: string, email: string, password: string): P
     name: userName,
     nickname: userName,
     email: typeof u.email === "string" ? u.email : undefined,
+    is_admin: typeof u.is_admin === "boolean" ? u.is_admin : false,
+    is_finance: typeof u.is_finance === "boolean" ? u.is_finance : false,
+    is_active: typeof u.is_active === "boolean" ? u.is_active : true,
+    uid: typeof u.uid === "string" ? u.uid : String(u.id ?? 0),
   };
 }
 
@@ -123,6 +139,10 @@ export async function smsLogin(phone: string, code: string): Promise<{
       name,
       nickname: name,
       mobile: phone,
+      is_admin: raw && typeof raw.is_admin === "boolean" ? raw.is_admin : false,
+      is_finance: raw && typeof raw.is_finance === "boolean" ? raw.is_finance : false,
+      is_active: raw && typeof raw.is_active === "boolean" ? raw.is_active : true,
+      uid: raw && typeof raw.uid === "string" ? raw.uid : String(raw?.id ?? 0),
     },
   };
 }

@@ -12,10 +12,10 @@ class LoginController extends Controller
     {
         if (Auth::check() && (Auth::user()->is_admin || Auth::user()->is_finance)) {
             if (Auth::user()->is_admin) {
-                return redirect()->route('admin.dashboard');
+                return redirect('/admin');
             }
 
-            return redirect()->route('admin.finance.index');
+            return redirect('/admin/finance');
         }
 
         return view('auth.login');

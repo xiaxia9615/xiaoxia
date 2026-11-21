@@ -4,9 +4,11 @@ import {
   Link,
   Outlet,
   createRootRouteWithContext,
+  redirect,
   useRouterState,
 } from "@tanstack/react-router";
 import { AuthProvider } from "@/features/account/auth-provider";
+import { TOKEN_KEY } from "@/lib/api";
 import { CartProvider } from "@/features/cart/cart-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { reportError, trackPageView } from "@/lib/observability";
@@ -69,6 +71,40 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   component: RootRoute,
   errorComponent: ErrorComponent,
   notFoundComponent: NotFoundComponent,
+  beforeLoad: async ({ location }) => {
+    if (typeof window === "undefined") return;
+
+    const token = localStorage.getItem(TOKEN_KEY);
+    const isAdminRoute = location.pathname.startsWith("/admin");
+    const isLoginRoute = location.pathname === "/login";
+
+    // 无 Token 访问 /admin/* → 重定向到 /login（携带 redirect 参数）
+    if (!token && isAdminRoute) {
+      throw redirect({
+        to: "/login",
+        search: { redirect: location.pathname + location.search },
+      });
+    }
+
+    // 有 Token 访问 /login → 根据角色跳转（防死循环：目标路由非 /login）
+    if (token && isLoginRoute) {
+      let user: { is_admin?: boolean; is_finance?: boolean } | null = null;
+      try {
+        const rawUser = localStorage.getItem("xiaoxia.user");
+        user = rawUser ? JSON.parse(rawUser) : null;
+      } catch {
+        user = null;
+      }
+
+      if (user?.is_admin) {
+        throw redirect({ to: "/admin" });
+      } else if (user?.is_finance) {
+        throw redirect({ to: "/admin/finance" });
+      } else {
+        throw redirect({ to: "/" });
+      }
+    }
+  },
 });
 
 /** 路由变化时记录页面访问（hash 路由，用路径而非完整 URL） */

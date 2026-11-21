@@ -26,7 +26,7 @@ final class AuthService
         event(new UserRegistered(UserDto::fromModel($user)));
 
         return [
-            'user' => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
+            'user' => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email, 'is_admin' => (bool) $user->is_admin, 'is_finance' => (bool) $user->is_finance],
             'token' => $user->createToken('api')->plainTextToken,
         ];
     }
@@ -44,7 +44,7 @@ final class AuthService
         }
 
         return [
-            'user' => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
+            'user' => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email, 'is_admin' => (bool) $user->is_admin, 'is_finance' => (bool) $user->is_finance],
             'token' => $user->createToken('api')->plainTextToken,
         ];
     }

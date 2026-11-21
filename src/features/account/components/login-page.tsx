@@ -299,8 +299,15 @@ function PhoneLoginForm({ redirect }: { redirect: string | undefined }) {
       localStorage.setItem("xiaoxia.token", token);
       localStorage.setItem("xiaoxia.user", JSON.stringify(user));
       track(TRACK_EVENTS.login);
-      const target = redirect && redirect.startsWith("/") ? redirect : "/";
-      await navigate({ to: target });
+      if (redirect && redirect.startsWith("/")) {
+        await navigate({ to: redirect });
+      } else if (user.is_admin) {
+        await navigate({ to: "/admin" });
+      } else if (user.is_finance) {
+        await navigate({ to: "/admin/finance" });
+      } else {
+        await navigate({ to: "/" });
+      }
     } catch (err) {
       toast.error(toErrorMessage(err, "登录失败，请检查验证码"));
     } finally {

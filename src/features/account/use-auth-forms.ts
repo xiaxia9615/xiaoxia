@@ -63,10 +63,16 @@ export function useAuthForms(redirect: string | undefined) {
     defaultValues: { name: "", email: "", password: "", confirm: "" },
   });
 
-  const goAfterAuth = async () => {
+  const goAfterAuth = async (user?: { is_admin?: boolean; is_finance?: boolean }) => {
     const target = resolveRedirect(redirect);
     if (target) {
       await navigate({ to: target.path, search: target.search });
+      return;
+    }
+    if (user?.is_admin) {
+      await navigate({ to: "/admin" });
+    } else if (user?.is_finance) {
+      await navigate({ to: "/admin/finance" });
     } else {
       await navigate({ to: "/" });
     }
@@ -74,9 +80,9 @@ export function useAuthForms(redirect: string | undefined) {
 
   const onLogin = loginForm.handleSubmit(async (values) => {
     try {
-      await login(values.email, values.password);
+      const user = await login(values.email, values.password);
       track(TRACK_EVENTS.login);
-      await goAfterAuth();
+      await goAfterAuth(user);
     } catch (err) {
       loginForm.setError("password", {
         type: "manual",
@@ -89,9 +95,9 @@ export function useAuthForms(redirect: string | undefined) {
     try {
       await apiRegister(values.name, values.email, values.password);
       toast.success("注册成功，正在登录…");
-      await login(values.email, values.password);
+      const user = await login(values.email, values.password);
       track(TRACK_EVENTS.register);
-      await goAfterAuth();
+      await goAfterAuth(user);
     } catch (err) {
       registerForm.setError("email", {
         type: "manual",

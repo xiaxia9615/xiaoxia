@@ -2,121 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Admin;
-
-use App\Models\User;
-use App\Modules\User\Enums\DeveloperStatus;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-
-final class AdminDeveloperViewTest extends TestCase
+/**
+ * 旧版后台 HTML 页面测试 — 已废弃。
+ * 系统已重构为 React SPA + API 架构，Laravel 不再渲染 admin HTML 视图。
+ * 所有测试方法基于已删除的 HTML 路由，不再适用。
+ * 后续应基于 /api/v1/admin/... 重写 API 测试。
+ *
+ * @deprecated 已由 SPA + API 架构替代
+ */
+final class AdminDeveloperViewTest extends \Tests\TestCase
 {
-    use RefreshDatabase;
-
-    private function admin(): User
-    {
-        return User::factory()->create(['is_admin' => true]);
-    }
-
-    private function normalUser(): User
-    {
-        return User::factory()->create(['is_admin' => false]);
-    }
-
-    private function pendingDeveloper(): User
-    {
-        return User::factory()->create([
-            'is_admin' => false,
-            'is_developer' => false,
-            'developer_status' => DeveloperStatus::Pending,
-        ]);
-    }
-
-    // ────── 开发者审核页面 ──────
-
-    public function test_admin_can_view_developers_page(): void
-    {
-        $this->markTestSkipped('开发者模块已关闭，切换为自营模式');
-        $dev = $this->pendingDeveloper();
-
-        $this->actingAs($this->admin())
-            ->get('/admin/developers')
-            ->assertOk()
-            ->assertSee($dev->email);
-    }
-
-    public function test_normal_user_forbidden_on_developers(): void
-    {
-        $this->markTestSkipped('开发者模块已关闭，切换为自营模式');
-        $this->actingAs($this->normalUser())
-            ->get('/admin/developers')
-            ->assertForbidden();
-    }
-
-    public function test_admin_can_approve_developer(): void
-    {
-        $this->markTestSkipped('开发者模块已关闭，切换为自营模式');
-        $dev = $this->pendingDeveloper();
-
-        $this->actingAs($this->admin())
-            ->post("/admin/developers/{$dev->id}/audit", ['action' => 'approve'])
-            ->assertRedirect();
-
-        $dev->refresh();
-        $this->assertTrue((bool) $dev->is_developer);
-        $this->assertSame(DeveloperStatus::Approved->value, $dev->developer_status->value);
-    }
-
-    public function test_admin_can_reject_developer(): void
-    {
-        $this->markTestSkipped('开发者模块已关闭，切换为自营模式');
-        $dev = $this->pendingDeveloper();
-
-        $this->actingAs($this->admin())
-            ->post("/admin/developers/{$dev->id}/audit", ['action' => 'reject'])
-            ->assertRedirect();
-
-        $dev->refresh();
-        $this->assertFalse((bool) $dev->is_developer);
-        $this->assertSame(DeveloperStatus::Rejected->value, $dev->developer_status->value);
-    }
-
-    // ────── 技能审核页面 ──────
-
-    public function test_admin_can_view_skills_pending_page(): void
-    {
-        $this->actingAs($this->admin())
-            ->get('/admin/skills/pending')
-            ->assertOk();
-    }
-
-    public function test_normal_user_forbidden_on_skills_pending(): void
-    {
-        $this->actingAs($this->normalUser())
-            ->get('/admin/skills/pending')
-            ->assertForbidden();
-    }
-
-    // ────── 钱包管理页面 ──────
-
-    public function test_admin_can_view_wallets_page(): void
-    {
-        $this->actingAs($this->admin())
-            ->get('/admin/wallets')
-            ->assertOk();
-    }
-
-    public function test_normal_user_forbidden_on_wallets(): void
-    {
-        $this->actingAs($this->normalUser())
-            ->get('/admin/wallets')
-            ->assertForbidden();
-    }
-
-    public function test_admin_can_view_wallet_recharges(): void
-    {
-        $this->actingAs($this->admin())
-            ->get('/admin/wallets/recharges')
-            ->assertOk();
-    }
+    // 所有 HTML 路由测试方法已移除。
 }

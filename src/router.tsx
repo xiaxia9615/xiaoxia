@@ -1,12 +1,12 @@
 import { QueryClient } from "@tanstack/react-query";
-import { createHashHistory, createRouter } from "@tanstack/react-router";
+import { createBrowserHistory, createRouter } from "@tanstack/react-router";
 import { ApiError } from "@/lib/api";
 import { routeTree } from "./routeTree.gen";
 
 /**
  * 全局查询默认值：
  * - staleTime 30s：避免页面来回切换时的重复请求
- * - 仅网络/HTTP 错误重试 1 次；业务错误（如"库存不足"）与未登录不重试
+ * - 仅网络/HTTP 错误重试 1 次；业务错误（如『库存不足』）与未登录不重试
  */
 function shouldRetry(failureCount: number, error: unknown): boolean {
   if (error instanceof ApiError) {
@@ -26,11 +26,11 @@ export const getRouter = () => {
       mutations: { retry: false },
     },
   });
-  const hashHistory = createHashHistory();
+  const browserHistory = createBrowserHistory();
 
   const router = createRouter({
     routeTree,
-    history: hashHistory,
+    history: browserHistory,
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,

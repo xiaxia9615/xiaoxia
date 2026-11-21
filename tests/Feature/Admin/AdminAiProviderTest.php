@@ -2,91 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Admin;
-
-use App\Models\User;
-use App\Modules\AiProvider\Models\AiProvider;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
-use Tests\TestCase;
-
-final class AdminAiProviderTest extends TestCase
+/**
+ * 旧版后台 HTML 页面测试 — 已废弃。
+ * 系统已重构为 React SPA + API 架构，Laravel 不再渲染 admin HTML 视图。
+ * 所有测试方法基于已删除的 HTML 路由，不再适用。
+ * 后续应基于 /api/v1/admin/... 重写 API 测试。
+ *
+ * @deprecated 已由 SPA + API 架构替代
+ */
+final class AdminAiProviderTest extends \Tests\TestCase
 {
-    use RefreshDatabase;
-
-    private const FULL_KEY = 'sk-test-abcdef1234567890';
-
-    private function admin(): User
-    {
-        return User::factory()->create(['is_admin' => true]);
-    }
-
-    private function makeProvider(): AiProvider
-    {
-        return AiProvider::create([
-            'name' => 'test-provider',
-            'display_name' => '测试供应商',
-            'base_url' => 'https://api.example.com/v1',
-            'driver' => 'openai',
-            'model_name' => 'gpt-test',
-            'api_key' => self::FULL_KEY,
-            'enabled' => true,
-            'cost_per_1k_input' => 1,
-            'cost_per_1k_output' => 2,
-        ]);
-    }
-
-    public function test_admin_can_view_providers(): void
-    {
-        $provider = $this->makeProvider();
-
-        $this->actingAs($this->admin())
-            ->get('/admin/ai-providers')
-            ->assertOk()
-            ->assertSee('test-provider');
-    }
-
-    public function test_api_key_is_masked(): void
-    {
-        $provider = $this->makeProvider();
-
-        $response = $this->actingAs($this->admin())
-            ->get('/admin/ai-providers');
-
-        $response->assertOk();
-        // 断言响应不含完整 key
-        $response->assertDontSee(self::FULL_KEY);
-        // 断言含脱敏形式（末 4 位）
-        $response->assertSee('sk-****7890');
-    }
-
-    public function test_admin_can_view_provider_models(): void
-    {
-        $provider = $this->makeProvider();
-
-        DB::table('ai_models')->insert([
-            'provider_id' => $provider->id,
-            'name' => 'gpt-4o',
-            'display_name' => 'GPT-4o',
-            'input_price_per_1k' => 5,
-            'output_price_per_1k' => 15,
-            'enabled' => 1,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $this->actingAs($this->admin())
-            ->get("/admin/ai-providers/{$provider->id}/models")
-            ->assertOk()
-            ->assertSee('GPT-4o');
-    }
-
-    public function test_non_admin_forbidden(): void
-    {
-        $user = User::factory()->create(['is_admin' => false]);
-
-        $this->actingAs($user)
-            ->get('/admin/ai-providers')
-            ->assertForbidden();
-    }
+    // 所有 HTML 路由测试方法已移除。
 }
