@@ -3,12 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Modules\ApiKey\Models\ApiCall;
-use App\Modules\ApiKey\Models\ApiKey;
-use App\Modules\System\Services\AuditService;
 use App\Modules\User\Services\AdminUserService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class AdminUserController extends Controller
 {
@@ -40,5 +35,4 @@ class AdminUserController extends Controller
             ],
         ]);
     }
-
 }
