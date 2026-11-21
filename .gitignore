@@ -44,3 +44,8 @@ test-results/
 playwright-report/
 coverage/
 /public/vendor
+
+# Scribe 自动生成的 HTML 产物
+public/vendor/scribe/
+resources/views/scribe/
+.scribe/
