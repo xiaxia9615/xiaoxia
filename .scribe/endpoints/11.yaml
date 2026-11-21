@@ -146,7 +146,7 @@ endpoints:
         name: is_default
         description: ''
         required: false
-        example: false
+        example: true
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -160,7 +160,7 @@ endpoints:
       city: c
       district: m
       detail: 'y'
-      is_default: false
+      is_default: true
     fileParameters: []
     responses: []
     responseFields: []

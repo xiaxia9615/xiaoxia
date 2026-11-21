@@ -1556,7 +1556,7 @@ endpoints:
         name: type
         description: ''
         required: true
-        example: 1
+        example: 2
         type: integer
         enumValues:
           - 1
@@ -1627,7 +1627,7 @@ endpoints:
       name: b
       description: 'Eius et animi quos velit et.'
       price: 16
-      type: 1
+      type: 2
       status: 1
       cover: d
       nature: physical
@@ -1715,7 +1715,7 @@ endpoints:
         name: type
         description: ''
         required: true
-        example: 1
+        example: 2
         type: integer
         enumValues:
           - 1
@@ -1739,7 +1739,7 @@ endpoints:
         name: nature
         description: ''
         required: false
-        example: virtual
+        example: physical
         type: string
         enumValues:
           - physical
@@ -1773,9 +1773,9 @@ endpoints:
       name: b
       description: 'Eius et animi quos velit et.'
       price: 16
-      type: 1
+      type: 2
       cover: d
-      nature: virtual
+      nature: physical
       quota: 37
       skill_id: 4
     fileParameters: []
@@ -2155,7 +2155,7 @@ endpoints:
         name: enabled
         description: ''
         required: false
-        example: false
+        example: true
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -2164,7 +2164,7 @@ endpoints:
     cleanBodyParameters:
       base_url: 'http://www.bailey.biz/quos-velit-et-fugiat-sunt-nihil-accusantium-harum.html'
       api_key: i
-      enabled: false
+      enabled: true
     fileParameters: []
     responses: []
     responseFields: []

@@ -5381,7 +5381,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"name\": \"b\",
     \"description\": \"Eius et animi quos velit et.\",
     \"price\": 16,
-    \"type\": 1,
+    \"type\": 2,
     \"status\": 1,
     \"cover\": \"d\",
     \"nature\": \"physical\",
@@ -5405,7 +5405,7 @@ let body = {
     "name": "b",
     "description": "Eius et animi quos velit et.",
     "price": 16,
-    "type": 1,
+    "type": 2,
     "status": 1,
     "cover": "d",
     "nature": "physical",
@@ -5538,10 +5538,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="type"                data-endpoint="POSTapi-v1-admin-products"
-               value="1"
+               value="2"
                data-component="body">
     <br>
-<p>Example: <code>1</code></p>
+<p>Example: <code>2</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>1</code></li> <li><code>2</code></li></ul>
         </div>
@@ -5632,9 +5632,9 @@ Must be one of:
     \"name\": \"b\",
     \"description\": \"Eius et animi quos velit et.\",
     \"price\": 16,
-    \"type\": 1,
+    \"type\": 2,
     \"cover\": \"d\",
-    \"nature\": \"virtual\",
+    \"nature\": \"physical\",
     \"quota\": 37,
     \"skill_id\": 4
 }"
@@ -5655,9 +5655,9 @@ let body = {
     "name": "b",
     "description": "Eius et animi quos velit et.",
     "price": 16,
-    "type": 1,
+    "type": 2,
     "cover": "d",
-    "nature": "virtual",
+    "nature": "physical",
     "quota": 37,
     "skill_id": 4
 };
@@ -5800,10 +5800,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="type"                data-endpoint="PUTapi-v1-admin-products--id-"
-               value="1"
+               value="2"
                data-component="body">
     <br>
-<p>Example: <code>1</code></p>
+<p>Example: <code>2</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>1</code></li> <li><code>2</code></li></ul>
         </div>
@@ -5826,10 +5826,10 @@ Must be one of:
  &nbsp;
                 <input type="text" style="display: none"
                               name="nature"                data-endpoint="PUTapi-v1-admin-products--id-"
-               value="virtual"
+               value="physical"
                data-component="body">
     <br>
-<p>Example: <code>virtual</code></p>
+<p>Example: <code>physical</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>physical</code></li> <li><code>virtual</code></li></ul>
         </div>
@@ -6778,7 +6778,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --data "{
     \"base_url\": \"http:\\/\\/www.bailey.biz\\/quos-velit-et-fugiat-sunt-nihil-accusantium-harum.html\",
     \"api_key\": \"i\",
-    \"enabled\": false
+    \"enabled\": true
 }"
 </code></pre></div>
 
@@ -6796,7 +6796,7 @@ const headers = {
 let body = {
     "base_url": "http:\/\/www.bailey.biz\/quos-velit-et-fugiat-sunt-nihil-accusantium-harum.html",
     "api_key": "i",
-    "enabled": false
+    "enabled": true
 };
 
 fetch(url, {
@@ -6938,7 +6938,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>false</code></p>
+<p>Example: <code>true</code></p>
         </div>
         </form>
 
@@ -10427,7 +10427,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"city\": \"c\",
     \"district\": \"m\",
     \"detail\": \"y\",
-    \"is_default\": false
+    \"is_default\": true
 }"
 </code></pre></div>
 
@@ -10450,7 +10450,7 @@ let body = {
     "city": "c",
     "district": "m",
     "detail": "y",
-    "is_default": false
+    "is_default": true
 };
 
 fetch(url, {
@@ -10639,7 +10639,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>false</code></p>
+<p>Example: <code>true</code></p>
         </div>
         </form>
 
