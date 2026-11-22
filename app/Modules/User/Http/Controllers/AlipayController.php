@@ -166,9 +166,14 @@ final class AlipayController
 
         $response = Http::asForm()->timeout(10)->post('https://openapi.alipay.com/gateway.do', $params);
 
-        $body = json_decode($response->body(), true);
+        $rawBody = $response->body();
+        // 清理 BOM 头和前导不可见字符
+        $rawBody = preg_replace('/^\xEF\xBB\xBF/', '', $rawBody);
+        $rawBody = ltrim($rawBody);
+
+        $body = json_decode($rawBody, true);
         if (! is_array($body)) {
-            throw new RuntimeException('支付宝 OAuth 响应非 JSON：'.$response->body());
+            throw new RuntimeException('支付宝 OAuth 响应解析失败：'.json_last_error_msg().'，原始响应：'.$rawBody);
         }
 
         // 网关层错误（签名错、缺证书 SN 等）
