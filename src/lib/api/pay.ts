@@ -101,7 +101,7 @@ export interface PaySubmitData {
   client?: string;
 }
 
-/** 发起支付：需登录。payment 为 alipay / weixin / paypal，client 为 app / mini / pc。 */
+/** 发起支付：需登录。payment 为 alipay / weixin，client 为 app / mini / pc。 */
 export async function paySubmit(input: {
   orderId: number;
   payment: string;
