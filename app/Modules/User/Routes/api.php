@@ -19,7 +19,7 @@ Route::middleware('api')->prefix('api/v1/auth')->group(function (): void {
     Route::get('/callback/{provider}', [SocialiteController::class, 'callback'])->where('provider', 'github|weixin');
     Route::get('/redirect/alipay', [AlipayController::class, 'redirect']);
     Route::get('/callback/alipay', [AlipayController::class, 'callback']);
-    Route::middleware('auth:sanctum')->group(function (): void {
+    Route::middleware('uid.auth')->group(function (): void {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
     });
@@ -27,10 +27,10 @@ Route::middleware('api')->prefix('api/v1/auth')->group(function (): void {
 
 // 开发者API（自营模式暂时关闭）
 // Route::middleware('api')->prefix('api/v1/developers')->group(function (): void {
-//     Route::post('/apply', [DeveloperController::class, 'apply'])->middleware('auth:sanctum');
+//     Route::post('/apply', [DeveloperController::class, 'apply'])->middleware('uid.auth');
 // });
 
 // 开发者API（自营模式暂时关闭）
-// Route::middleware(['api', 'auth:sanctum', 'admin'])->prefix('api/v1/admin/developers')->group(function (): void {
+// Route::middleware(['api', 'uid.auth', 'admin'])->prefix('api/v1/admin/developers')->group(function (): void {
 //     Route::post('/{id}/audit', [DeveloperController::class, 'audit'])->whereNumber('id');
 // });

@@ -1,4 +1,4 @@
-import { request } from "./request";
+import { request, TOKEN_KEY, UID_KEY } from "./request";
 import type { paths } from "./schema";
 
 /** 用户信息。 */
@@ -67,8 +67,12 @@ export async function login(email: string, password: string): Promise<{
   const raw = data.user;
   const name = raw ? String(raw.name ?? "用户") : "用户";
   const idNum = Number(raw?.id ?? 0);
+  const token = data.token ?? "";
+  const uid = raw && typeof raw.uid === "string" ? raw.uid : String(raw?.id ?? 0);
+  if (token) localStorage.setItem(TOKEN_KEY, token);
+  if (uid && uid !== "0") localStorage.setItem(UID_KEY, uid);
   return {
-    token: String(data.token ?? ""),
+    token,
     user: {
       id: Number.isFinite(idNum) ? idNum : 0,
       name,
@@ -77,7 +81,7 @@ export async function login(email: string, password: string): Promise<{
       is_admin: raw && typeof raw.is_admin === "boolean" ? raw.is_admin : false,
       is_finance: raw && typeof raw.is_finance === "boolean" ? raw.is_finance : false,
       is_active: raw && typeof raw.is_active === "boolean" ? raw.is_active : true,
-      uid: raw && typeof raw.uid === "string" ? raw.uid : String(raw?.id ?? 0),
+      uid,
     },
   };
 }
@@ -132,8 +136,12 @@ export async function smsLogin(phone: string, code: string): Promise<{
   const raw = data.user;
   const name = raw ? String(raw.name ?? "用户") : "用户";
   const idNum = Number(raw?.id ?? 0);
+  const token = data.token ?? "";
+  const uid = raw && typeof raw.uid === "string" ? raw.uid : String(raw?.id ?? 0);
+  if (token) localStorage.setItem(TOKEN_KEY, token);
+  if (uid && uid !== "0") localStorage.setItem(UID_KEY, uid);
   return {
-    token: String(data.token ?? ""),
+    token,
     user: {
       id: Number.isFinite(idNum) ? idNum : 0,
       name,
@@ -142,7 +150,7 @@ export async function smsLogin(phone: string, code: string): Promise<{
       is_admin: raw && typeof raw.is_admin === "boolean" ? raw.is_admin : false,
       is_finance: raw && typeof raw.is_finance === "boolean" ? raw.is_finance : false,
       is_active: raw && typeof raw.is_active === "boolean" ? raw.is_active : true,
-      uid: raw && typeof raw.uid === "string" ? raw.uid : String(raw?.id ?? 0),
+      uid,
     },
   };
 }

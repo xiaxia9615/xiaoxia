@@ -11,6 +11,8 @@
  */
 export const API_BASE = import.meta.env.VITE_API_BASE ?? "https://xiaoxia.ren/api";
 export const TOKEN_KEY = "xiaoxia.token";
+export const UID_KEY = "xiaoxia.uid";
+export const APP_KEY = import.meta.env.VITE_APP_KEY ?? "";
 
 /** 401 登录态失效事件（auth-provider 监听并统一登出） */
 export const AUTH_EXPIRED_EVENT = "xiaoxia:auth-expired";
@@ -132,10 +134,22 @@ export async function request<T>(
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (init.auth) {
     const token = localStorage.getItem(TOKEN_KEY);
-    if (!token) {
-      throw new ApiError("unauthorized", "请先登录");
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    } else {
+      const uid = localStorage.getItem(UID_KEY);
+      if (uid && APP_KEY) {
+        const timestamp = String(Math.floor(Date.now() / 1000));
+        const nonce = crypto.randomUUID();
+        const sign = await hmacSha256(uid + timestamp + nonce, APP_KEY);
+        headers["X-Uid"] = uid;
+        headers["X-Sign"] = sign;
+        headers["X-Timestamp"] = timestamp;
+        headers["X-Nonce"] = nonce;
+      } else {
+        throw new ApiError("unauthorized", "请先登录");
+      }
     }
-    headers.Authorization = `Bearer ${token}`;
   }
 
   let res: Response;
@@ -201,6 +215,20 @@ export async function request<T>(
     throw new ApiError("business", json.msg || "接口返回异常", res.status, json.code);
   }
   return json.data;
+}
+
+/** HMAC-SHA256 签名（Web Crypto API）。 */
+async function hmacSha256(message: string, key: string): Promise<string> {
+  const enc = new TextEncoder();
+  const cryptoKey = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(key),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const buf = await crypto.subtle.sign("HMAC", cryptoKey, enc.encode(message));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 /** 回退到本地数据时记录日志，便于生产排查接口可用性。 */

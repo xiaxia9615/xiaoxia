@@ -40,7 +40,7 @@ Route::get('/health', function () {
 
 Route::get('/user', function (Request $request) {
     return $request->user();
-})->middleware('auth:sanctum');
+})->middleware('uid.auth');
 
 Route::prefix('v1/payment/notify')->group(function (): void {
     Route::post('/wechat', [PaymentNotifyController::class, 'wechat']);
@@ -77,7 +77,7 @@ Route::prefix('v1')->group(function (): void {
 
 // ===== 需登录路由 =====
 
-Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
+Route::middleware('uid.auth')->prefix('v1')->group(function (): void {
     // Comment（评论）
     Route::get('comments/index', [CommentController::class, 'index']);
 

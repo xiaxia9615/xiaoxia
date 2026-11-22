@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsureIsFinance;
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\ThrottleByUserOrIp;
+use App\Http\Middleware\UidAuth;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'finance' => EnsureIsFinance::class,
             'active' => EnsureUserIsActive::class,
             'throttle.user_or_ip' => ThrottleByUserOrIp::class,
+            'uid.auth' => UidAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
