@@ -131,7 +131,7 @@ final class AlipayController
             'format' => 'JSON',
             'charset' => 'utf-8',
             'sign_type' => 'RSA2',
-            'timestamp' => date('Y-m-d H:i:s'),
+            'timestamp' => (new \DateTime('now', new \DateTimeZone('Asia/Shanghai')))->format('Y-m-d H:i:s'),
             'version' => '1.0',
             'grant_type' => 'authorization_code',
             'code' => $authCode,
@@ -163,6 +163,15 @@ final class AlipayController
             throw new RuntimeException('支付宝 OAuth 签名失败');
         }
         $params['sign'] = base64_encode($signature);
+
+        Log::debug('Alipay OAuth request', [
+            'app_id' => $params['app_id'],
+            'method' => $params['method'],
+            'timestamp' => $params['timestamp'],
+            'code_prefix' => substr($params['code'], 0, 4).'****'.substr($params['code'], -4),
+            'has_app_cert_sn' => isset($params['app_cert_sn']),
+            'has_root_cert_sn' => isset($params['alipay_root_cert_sn']),
+        ]);
 
         $response = Http::asForm()->timeout(10)->post('https://openapi.alipay.com/gateway.do', $params);
 
