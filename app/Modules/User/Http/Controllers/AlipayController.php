@@ -170,6 +170,11 @@ final class AlipayController
         // 清理 BOM 头和前导不可见字符
         $rawBody = preg_replace('/^\xEF\xBB\xBF/', '', $rawBody);
         $rawBody = ltrim($rawBody);
+        // 支付宝网关错误响应可能返回 GBK 编码，转为 UTF-8 后再解析
+        $encoding = mb_detect_encoding($rawBody, ['UTF-8', 'GBK', 'GB2312', 'ASCII'], true);
+        if ($encoding !== false && $encoding !== 'UTF-8') {
+            $rawBody = mb_convert_encoding($rawBody, 'UTF-8', $encoding);
+        }
 
         $body = json_decode($rawBody, true);
         if (! is_array($body)) {
