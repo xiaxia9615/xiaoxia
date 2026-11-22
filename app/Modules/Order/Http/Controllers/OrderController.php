@@ -82,6 +82,110 @@ final class OrderController
     }
 
     /**
+     * 购物车/单品下单入口（前端 buy/add）
+     *
+     * @group 订单管理
+     *
+     * @authenticated
+     */
+    public function buyAdd(Request $request): JsonResponse
+    {
+        $productId = (int) $request->input('product_id');
+        if ($productId <= 0) {
+            return response()->json(['code' => 422, 'msg' => '商品 ID 无效', 'data' => null], 422);
+        }
+
+        try {
+            $order = $this->service->createOrder((int) $request->user()->id, $productId);
+        } catch (RuntimeException $e) {
+            return response()->json(['code' => 422, 'msg' => $e->getMessage(), 'data' => null], 422);
+        }
+
+        return response()->json([
+            'code' => 0,
+            'msg' => 'ok',
+            'data' => [
+                'order_ids' => [$order->id],
+                'order_sn' => $order->order_no,
+                'payment_id' => 0,
+            ],
+        ]);
+    }
+
+    /**
+     * 结算预览（前端 buy/index）
+     *
+     * @group 订单管理
+     *
+     * @authenticated
+     */
+    public function buyIndex(Request $request): JsonResponse
+    {
+        return response()->json([
+            'code' => 0,
+            'msg' => 'ok',
+            'data' => [
+                'items' => [],
+                'total_price' => 0,
+                'shipping_amount' => 0,
+                'actual_price' => 0,
+                'goods_count' => 0,
+                'address' => null,
+                'payments' => [],
+                'default_payment_id' => 0,
+            ],
+        ]);
+    }
+
+    /**
+     * 发起支付（前端 pay/submit）
+     *
+     * @group 订单管理
+     *
+     * @authenticated
+     */
+    public function paySubmit(Request $request): JsonResponse
+    {
+        $orderId = (int) ($request->input('orderId') ?: $request->input('order_id') ?: 0);
+        if ($orderId <= 0) {
+            return response()->json(['code' => 400, 'msg' => '订单 ID 无效', 'data' => null], 400);
+        }
+
+        try {
+            $result = $this->service->payOrder($orderId, (int) $request->user()->id);
+        } catch (RuntimeException $e) {
+            return response()->json(['code' => 422, 'msg' => $e->getMessage(), 'data' => null], 422);
+        }
+
+        return response()->json([
+            'code' => 0,
+            'msg' => 'ok',
+            'data' => array_merge(['order_id' => $orderId], $result),
+        ]);
+    }
+
+    /**
+     * 查询支付状态（前端 pay/query）
+     *
+     * @group 订单管理
+     *
+     * @authenticated
+     */
+    public function payQuery(Request $request): JsonResponse
+    {
+        $orderId = (int) ($request->input('orderId') ?: $request->input('order_id') ?: 0);
+
+        return response()->json([
+            'code' => 0,
+            'msg' => 'ok',
+            'data' => [
+                'order_id' => $orderId,
+                'status' => 'pending',
+            ],
+        ]);
+    }
+
+    /**
      * 订单列表（分页）
      *
      * @group 订单管理

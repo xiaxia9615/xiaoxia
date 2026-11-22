@@ -13,3 +13,15 @@ Route::middleware(['api', 'auth:sanctum'])->prefix('api/v1/orders')->group(funct
     // 取消订单（仅待支付订单可取消）
     Route::post('/{id}/cancel', [OrderController::class, 'cancel'])->whereNumber('id');
 });
+
+// 前端购物车/单品下单入口
+Route::middleware(['api', 'auth:sanctum'])->prefix('api/v1/buy')->group(function (): void {
+    Route::post('/add', [OrderController::class, 'buyAdd']);
+    Route::post('/index', [OrderController::class, 'buyIndex']);
+});
+
+// 前端支付入口
+Route::middleware(['api', 'auth:sanctum'])->prefix('api/v1/pay')->group(function (): void {
+    Route::post('/submit', [OrderController::class, 'paySubmit']);
+    Route::get('/query', [OrderController::class, 'payQuery']);
+});

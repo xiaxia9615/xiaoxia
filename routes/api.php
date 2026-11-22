@@ -117,20 +117,6 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
     Route::post('order/cancel', [OrderController::class, 'orderCancel']);
     Route::post('order/delete', [OrderController::class, 'orderDelete']);
 
-    // Buy / Pay
-    Route::post('buy/index', function () {
-        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => []]);
-    });
-    Route::post('buy/add', function () {
-        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => []]);
-    });
-    Route::post('pay/submit', function () {
-        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => []]);
-    });
-    Route::get('pay/query', function () {
-        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => []]);
-    });
-
     // User（用户：额外接口）
     Route::get('user/profile', function () {
         return response()->json(['code' => 0, 'msg' => 'ok', 'data' => []]);
