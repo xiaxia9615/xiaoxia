@@ -82,7 +82,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     if (!token && isAdminRoute) {
       throw redirect({
         to: "/login",
-        search: { redirect: location.pathname + location.search },
+        search: { redirect: window.location.pathname + window.location.search },
       });
     }
 
