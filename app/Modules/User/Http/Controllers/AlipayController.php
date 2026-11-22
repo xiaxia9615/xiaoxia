@@ -166,7 +166,7 @@ final class AlipayController
 
         $response = Http::asForm()->timeout(10)->post('https://openapi.alipay.com/gateway.do', $params);
 
-        $body = $response->json();
+        $body = json_decode($response->body(), true);
         if (! is_array($body)) {
             throw new RuntimeException('支付宝 OAuth 响应非 JSON：'.$response->body());
         }
@@ -207,9 +207,9 @@ final class AlipayController
             throw new RuntimeException('解析应用公钥证书失败');
         }
 
-        $issuerStr = $this->formatIssuer($parsed['issuer'] ?? []);
+        $issuerStr = $this->array2string(array_reverse($parsed['issuer'] ?? []));
 
-        return md5($issuerStr.($parsed['serialNumber'] ?? ''));
+        return md5($issuerStr.$this->formatSerialNumber($parsed));
     }
 
     /**
@@ -234,29 +234,63 @@ final class AlipayController
             if ($parsed === false) {
                 continue;
             }
-            $issuerStr = $this->formatIssuer($parsed['issuer'] ?? []);
-            $sns[] = md5($issuerStr.($parsed['serialNumber'] ?? ''));
+            // 仅保留 RSA 签名类型的证书（排除 SM2、ecdsa 等）
+            $sigType = $parsed['signatureTypeLN'] ?? '';
+            if ($sigType !== 'sha1WithRSAEncryption' && $sigType !== 'sha256WithRSAEncryption') {
+                continue;
+            }
+            $issuerStr = $this->array2string(array_reverse($parsed['issuer'] ?? []));
+            $sns[] = md5($issuerStr.$this->formatSerialNumber($parsed));
         }
 
         return implode('_', $sns);
     }
 
     /**
-     * 格式化 issuer 字段为支付宝要求的字符串形式。
+     * 将数组转为 key=value 逗号分隔字符串（与 yansongda/pay SDK 一致）。
      *
-     * @param  array<string, mixed>  $issuer
+     * @param  array<string, mixed>  $array
      */
-    private function formatIssuer(array $issuer): string
+    private function array2string(array $array): string
     {
         $parts = [];
-        foreach ($issuer as $key => $value) {
+        foreach ($array as $key => $value) {
             if (is_array($value)) {
                 $value = implode(',', $value);
             }
             $parts[] = $key.'='.$value;
         }
-        sort($parts);
 
         return implode(',', $parts);
+    }
+
+    /**
+     * 格式化证书序列号：0x 开头的十六进制转为十进制。
+     *
+     * @param  array<string, mixed>  $parsed
+     */
+    private function formatSerialNumber(array $parsed): string
+    {
+        $serial = (string) ($parsed['serialNumber'] ?? '');
+        if (str_starts_with($serial, '0x')) {
+            return $this->hex2dec($parsed['serialNumberHex'] ?? '');
+        }
+
+        return $serial;
+    }
+
+    /**
+     * 十六进制转十进制字符串（处理大数）。
+     */
+    private function hex2dec(string $hex): string
+    {
+        $dec = '0';
+        $len = strlen($hex);
+        for ($i = 1; $i <= $len; $i++) {
+            $dec = bcmul($dec, '16');
+            $dec = bcadd($dec, (string) hexdec($hex[$i - 1]));
+        }
+
+        return $dec;
     }
 }
