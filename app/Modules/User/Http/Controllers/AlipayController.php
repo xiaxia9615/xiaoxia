@@ -5,27 +5,40 @@ declare(strict_types=1);
 namespace App\Modules\User\Http\Controllers;
 
 use App\Models\User;
+use App\Modules\User\Plugins\AlipayMethodPlugin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
+use Yansongda\Artful\Plugin\ParserPlugin;
+use Yansongda\Pay\Pay;
+use Yansongda\Pay\Plugin\Alipay\V2\AddPayloadSignaturePlugin;
+use Yansongda\Pay\Plugin\Alipay\V2\AddRadarPlugin;
+use Yansongda\Pay\Plugin\Alipay\V2\ResponsePlugin;
+use Yansongda\Pay\Plugin\Alipay\V2\StartPlugin;
+use Yansongda\Pay\Plugin\Alipay\V2\VerifySignaturePlugin;
+use Yansongda\Pay\Provider\Alipay;
 
+/**
+ * 支付宝 OAuth 登录控制器（基于 yansongda/pay v3 SDK 证书模式）。
+ *
+ * 统一使用 payment.alipay 证书配置，与 AlipayGateway 共享同一套密钥体系，
+ * 消除手写 openssl_sign 导致的私钥格式问题。
+ */
 final class AlipayController
 {
     private const FRONTEND_CALLBACK = 'https://xiaoxia.ren/#/auth/callback';
 
     private const PROVIDER = 'alipay';
 
-    private const GATEWAY = 'https://openapi.alipay.com/gateway.do';
-
     /**
      * 重定向到支付宝授权页面。
      */
     public function redirect(): RedirectResponse|JsonResponse
     {
-        $appId = (string) config('services.alipay.app_id', '');
+        $appId = (string) config('payment.alipay.app_id', '');
         $redirectUri = (string) config('services.alipay.redirect', '');
 
         if ($appId === '' || $redirectUri === '') {
@@ -56,10 +69,10 @@ final class AlipayController
             $tokenResult = $this->alipayRequest('alipay.system.oauth.token', [
                 'grant_type' => 'authorization_code',
                 'code' => $authCode,
-            ]);
+            ], true);
 
-            $userId = $tokenResult['user_id'] ?? null;
-            $accessToken = $tokenResult['access_token'] ?? null;
+            $userId = $tokenResult->get('user_id');
+            $accessToken = $tokenResult->get('access_token');
 
             if (! $userId || ! $accessToken) {
                 return response()->json(['code' => 1, 'message' => '支付宝授权失败'], 500);
@@ -68,10 +81,10 @@ final class AlipayController
             // 第二步：获取用户信息（昵称、头像）
             $userInfo = $this->alipayRequest('alipay.user.info.share', [
                 'auth_token' => $accessToken,
-            ]);
+            ], true);
 
-            $nickName = $userInfo['nick_name'] ?? '支付宝用户';
-            $avatar = $userInfo['avatar'] ?? null;
+            $nickName = $userInfo->get('nick_name', '支付宝用户');
+            $avatar = $userInfo->get('avatar');
         } catch (RuntimeException $e) {
             Log::error('Alipay callback failed: '.$e->getMessage(), [
                 'exception' => $e,
@@ -109,80 +122,79 @@ final class AlipayController
     }
 
     /**
-     * 向支付宝网关发送请求（手写 RSA2 签名）。
+     * 通过 yansongda/pay v3 SDK 向支付宝网关发送请求。
      *
-     * @param  array<string, string>  $bizParams
-     * @return array<string, mixed>
+     * @param  array<string, string>  $params  业务参数
+     * @param  bool  $topLevel  OAuth 类 API 参数放在顶层（非 biz_content）
+     * @return Collection
      *
-     * @throws RuntimeException
+     * @throws RuntimeException 网关请求失败或业务错误
      */
-    private function alipayRequest(string $method, array $bizParams): array
+    private function alipayRequest(string $method, array $params, bool $topLevel = false)
     {
-        $appId = (string) config('services.alipay.app_id', '');
-        $privateKey = (string) config('services.alipay.private_key', '');
-        $publicKey = (string) config('services.alipay.public_key', '');
+        $client = $this->payClient();
 
-        if ($appId === '' || $privateKey === '' || $publicKey === '') {
-            throw new RuntimeException('支付宝配置不完整');
-        }
+        $requestParams = array_merge($params, [
+            '_method' => $method,
+            '_top_level' => $topLevel,
+        ]);
 
-        $params = [
-            'app_id' => $appId,
-            'method' => $method,
-            'format' => 'JSON',
-            'charset' => 'utf-8',
-            'sign_type' => 'RSA2',
-            'timestamp' => date('Y-m-d H:i:s'),
-            'version' => '1.0',
-            'biz_content' => json_encode($bizParams, JSON_UNESCAPED_UNICODE),
-        ];
+        $result = $client->pay([
+            StartPlugin::class,
+            AlipayMethodPlugin::class,
+            AddPayloadSignaturePlugin::class,
+            AddRadarPlugin::class,
+            VerifySignaturePlugin::class,
+            ResponsePlugin::class,
+            ParserPlugin::class,
+        ], $requestParams);
 
-        $params['sign'] = $this->generateSign($params, $privateKey);
-
-        $response = Http::connectTimeout(5)->timeout(15)->asForm()->post(self::GATEWAY, $params);
-
-        if (! $response->ok()) {
-            throw new RuntimeException('支付宝网关请求失败: HTTP '.$response->status());
-        }
-
-        $data = $response->json();
         $responseKey = str_replace('.', '_', $method).'_response';
-        $result = $data[$responseKey] ?? [];
+        $data = $result->all();
+        $bizResult = $data[$responseKey] ?? $data;
 
-        if (isset($result['code']) && $result['code'] !== '10000') {
-            $msg = $result['sub_msg'] ?? $result['msg'] ?? '未知错误';
+        if (isset($bizResult['code']) && $bizResult['code'] !== '10000') {
+            $msg = $bizResult['sub_msg'] ?? $bizResult['msg'] ?? '未知错误';
             throw new RuntimeException('支付宝接口错误: '.$msg);
         }
 
-        return $result;
+        return collect($bizResult);
     }
 
     /**
-     * 生成 RSA2 签名。
+     * 构建 SDK 客户端：校验证书路径后注册配置（与 AlipayGateway 共享同一套证书）。
      *
-     * @param  array<string, string>  $params
+     * @throws RuntimeException 配置缺失或证书文件不存在
      */
-    private function generateSign(array $params, string $privateKey): string
+    private function payClient(): Alipay
     {
-        // 移除 sign 和 sign_type，按 key 升序排列
-        unset($params['sign'], $params['sign_type']);
-        ksort($params);
-
-        $pairs = [];
-        foreach ($params as $k => $v) {
-            if ($v === '' || $v === null) { // @phpstan-ignore-line
-                continue;
-            }
-            $pairs[] = $k.'='.$v;
+        $appId = config('payment.alipay.app_id');
+        if (! is_string($appId) || $appId === '') {
+            throw new RuntimeException('Alipay app_id is not configured');
         }
-        $signContent = implode('&', $pairs);
 
-        $key = "-----BEGIN RSA PRIVATE KEY-----\n".
-            wordwrap($privateKey, 64, "\n", true).
-            "\n-----END RSA PRIVATE KEY-----";
+        $certPaths = [
+            'app_secret_cert_path' => config('payment.alipay.app_secret_cert_path'),
+            'app_public_cert_path' => config('payment.alipay.app_public_cert_path'),
+            'alipay_public_cert_path' => config('payment.alipay.alipay_public_cert_path'),
+            'alipay_root_cert_path' => config('payment.alipay.alipay_root_cert_path'),
+        ];
 
-        openssl_sign($signContent, $signature, $key, OPENSSL_ALGO_SHA256);
+        foreach ($certPaths as $key => $path) {
+            if (! is_string($path) || $path === '' || ! file_exists($path)) {
+                throw new RuntimeException('Alipay cert file not found: '.$key.' ('.(is_string($path) ? $path : '(null)').')');
+            }
+        }
 
-        return base64_encode($signature);
+        Pay::config([
+            'alipay' => [
+                'default' => $certPaths + [
+                    'app_id' => $appId,
+                    'notify_url' => config('payment.alipay.notify_url'),
+                ],
+            ],
+        ]);
+
+        return Pay::alipay();
     }
 }
