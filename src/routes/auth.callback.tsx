@@ -9,7 +9,10 @@ function AuthCallbackPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    // hash 路由模式下查询参数在 # 之后，window.location.search 为空
+    const hash = window.location.hash.slice(1);
+    const queryString = hash.includes('?') ? hash.split('?')[1] : '';
+    const params = new URLSearchParams(queryString);
     const token = params.get("token");
     const redirect = params.get("redirect") || "/";
 
