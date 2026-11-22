@@ -37,7 +37,7 @@ return [
         'System' => ['User', 'Product', 'ApiKey', 'Skill'],
         'Wallet' => ['User', 'Ledger', 'Payment'],
         'Payment' => [],
-        'Order' => ['User', 'Product', 'Ledger', 'Distributor', 'Wallet'],
+        'Order' => ['User', 'Product', 'Ledger', 'Distributor', 'Wallet', 'Cart'],
         'Distributor' => ['User'],
         'Address' => ['User'],
         'Cart' => ['User', 'Product'],

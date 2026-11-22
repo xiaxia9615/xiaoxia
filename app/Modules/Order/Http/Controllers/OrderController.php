@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Order\Http\Controllers;
 
+use App\Modules\Cart\Models\CartItem;
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Models\Order;
 use App\Modules\Order\Services\OrderService;
@@ -121,18 +122,57 @@ final class OrderController
      */
     public function buyIndex(Request $request): JsonResponse
     {
+        $cartItems = CartItem::query()
+            ->with('product')
+            ->where('user_id', $request->user()->id)
+            ->get();
+
+        $items = [];
+        $totalPrice = 0;
+        $goodsCount = 0;
+
+        foreach ($cartItems as $item) {
+            $product = $item->product;
+            if ($product === null) {
+                continue;
+            }
+            $price = (int) $product->price;
+            $quantity = (int) $item->quantity;
+            $subtotal = $price * $quantity;
+            $totalPrice += $subtotal;
+            $goodsCount += $quantity;
+
+            $items[] = [
+                'id' => $item->id,
+                'goods_id' => $item->product_id,
+                'goods_name' => $product->name,
+                'image' => $product->cover,
+                'price' => $price,
+                'quantity' => $quantity,
+                'subtotal' => $subtotal,
+            ];
+        }
+
+        $shippingAmount = 0;
+        $actualPrice = $totalPrice + $shippingAmount;
+
+        $payments = [
+            ['id' => 1, 'name' => '支付宝', 'channel' => 'alipay'],
+            ['id' => 2, 'name' => '微信支付', 'channel' => 'weixin'],
+        ];
+
         return response()->json([
             'code' => 0,
             'msg' => 'ok',
             'data' => [
-                'items' => [],
-                'total_price' => 0,
-                'shipping_amount' => 0,
-                'actual_price' => 0,
-                'goods_count' => 0,
+                'items' => $items,
+                'total_price' => $totalPrice,
+                'shipping_amount' => $shippingAmount,
+                'actual_price' => $actualPrice,
+                'goods_count' => $goodsCount,
                 'address' => null,
-                'payments' => [],
-                'default_payment_id' => 0,
+                'payments' => $payments,
+                'default_payment_id' => 1,
             ],
         ]);
     }
@@ -175,12 +215,47 @@ final class OrderController
     {
         $orderId = (int) ($request->input('orderId') ?: $request->input('order_id') ?: 0);
 
+        if ($orderId <= 0) {
+            return response()->json([
+                'code' => 0,
+                'msg' => 'ok',
+                'data' => [
+                    'order_id' => $orderId,
+                    'status' => 'pending',
+                ],
+            ]);
+        }
+
+        $order = Order::where('user_id', $request->user()->id)->find($orderId);
+
+        if ($order === null) {
+            return response()->json([
+                'code' => 0,
+                'msg' => 'ok',
+                'data' => [
+                    'order_id' => $orderId,
+                    'status' => 'pending',
+                ],
+            ]);
+        }
+
+        $status = match ($order->status) {
+            OrderStatus::Pending => 'pending',
+            OrderStatus::Paid, OrderStatus::PendingShipment, OrderStatus::Completed => 'paid',
+            OrderStatus::Cancelled => 'cancelled',
+            OrderStatus::Refunded => 'refunded',
+        };
+
         return response()->json([
             'code' => 0,
             'msg' => 'ok',
             'data' => [
                 'order_id' => $orderId,
-                'status' => 'pending',
+                'status' => $status,
+                'order_status' => $order->status->value,
+                'status_name' => $order->status->label(),
+                'pay_status' => $order->paid_at !== null ? 1 : 0,
+                'pay_time' => $order->paid_at?->toDateTimeString(),
             ],
         ]);
     }

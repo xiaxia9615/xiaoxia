@@ -4,7 +4,6 @@ import type { BuyAddData } from "@/lib/api";
 import type { PayChannel, PayStrategy } from "./types";
 import { alipayStrategy } from "./strategies/alipay";
 import { weixinStrategy } from "./strategies/weixin";
-import { paypalStrategy } from "./strategies/paypal";
 import { TRACK_EVENTS, track } from "@/lib/observability";
 
 /**
@@ -14,7 +13,6 @@ import { TRACK_EVENTS, track } from "@/lib/observability";
 const STRATEGIES: Record<PayChannel, PayStrategy> = {
   alipay: alipayStrategy,
   weixin: weixinStrategy,
-  paypal: paypalStrategy,
 };
 
 /** 供 UI 渲染渠道选项的渠道列表。 */

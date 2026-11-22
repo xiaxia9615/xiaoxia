@@ -1,7 +1,7 @@
 import type { BuyAddData } from "@/lib/api";
 
 /** 支持的支付渠道。新增渠道时先在此登记类型。 */
-export type PayChannel = "alipay" | "weixin" | "paypal";
+export type PayChannel = "alipay" | "weixin";
 
 /** 支付上下文：由 manager 组装，策略只消费。 */
 export interface PayContext {
