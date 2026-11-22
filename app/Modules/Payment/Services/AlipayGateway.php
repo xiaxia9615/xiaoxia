@@ -186,7 +186,7 @@ final class AlipayGateway implements PaymentGatewayInterface
         if ($keyResource === false) {
             return false;
         }
-        $decodedSign = base64_decode($sign);
+        $decodedSign = base64_decode($sign, true);
         if ($decodedSign === false) {
             return false;
         }
