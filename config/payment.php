@@ -8,7 +8,9 @@ return [
     'wechat' => [
         'app_id' => env('WECHAT_PAY_APP_ID'),
         'mch_id' => env('WECHAT_PAY_MCH_ID'),
-        'key' => env('WECHAT_PAY_KEY'),
+        'mch_secret_cert' => env('WECHAT_PAY_MCH_SECRET_CERT'),
+        'mch_secret_key' => env('WECHAT_PAY_MCH_SECRET_KEY'),
+        'mch_public_cert_path' => env('WECHAT_PAY_MCH_PUBLIC_CERT_PATH'),
         'notify_url' => env('WECHAT_PAY_NOTIFY_URL'),
     ],
     'alipay' => [

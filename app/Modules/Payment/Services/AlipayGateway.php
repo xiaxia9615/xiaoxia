@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Payment\Services;
 
 use App\Modules\Payment\Contracts\PaymentGatewayInterface;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Throwable;
 use Yansongda\Pay\Pay;
@@ -19,7 +20,35 @@ final class AlipayGateway implements PaymentGatewayInterface
 {
     public function transfer(string $account, int $amountInCents): bool
     {
-        throw new RuntimeException('AlipayGateway::transfer not implemented');
+        $result = $this->payClient()->transfer([
+            'out_biz_no' => 'transfer_'.time().'_'.random_int(1000, 9999),
+            'trans_amount' => number_format($amountInCents / 1000, 2, '.', ''),
+            'product_code' => 'TRANS_ACCOUNT_NO_PWD',
+            'biz_scene' => 'DIRECT_TRANSFER',
+            'payee_info' => [
+                'identity' => $account,
+                'identity_type' => 'ALIPAY_LOGON_ID',
+            ],
+        ]);
+
+        $status = $result->get('status', '');
+        $code = $result->get('code', '');
+
+        if ($code === '10000' && in_array($status, ['SUCCESS', 'SUCCESS_WITHDRAWING'], true)) {
+            return true;
+        }
+
+        Log::warning('AlipayGateway transfer failed', [
+            'account' => $account,
+            'amount_in_cents' => $amountInCents,
+            'status' => $status,
+            'code' => $code,
+            'msg' => $result->get('msg', ''),
+            'sub_code' => $result->get('sub_code', ''),
+            'sub_msg' => $result->get('sub_msg', ''),
+        ]);
+
+        return false;
     }
 
     public function createPayment(string $orderNo, int $amountInCents, string $subject): array
