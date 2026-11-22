@@ -101,7 +101,7 @@ final class AlipayGateway implements PaymentGatewayInterface
         }
 
         $certPaths = [
-            'app_secret_cert_path' => config('payment.alipay.app_secret_cert_path'),
+            'app_secret_cert' => config('payment.alipay.app_secret_cert_path'),
             'app_public_cert_path' => config('payment.alipay.app_public_cert_path'),
             'alipay_public_cert_path' => config('payment.alipay.alipay_public_cert_path'),
             'alipay_root_cert_path' => config('payment.alipay.alipay_root_cert_path'),
