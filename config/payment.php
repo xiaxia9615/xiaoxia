@@ -13,8 +13,8 @@ return [
     ],
     'alipay' => [
         'app_id' => env('ALIPAY_APP_ID'),
-        'private_key' => env('ALIPAY_PRIVATE_KEY'),
-        'public_key' => env('ALIPAY_PUBLIC_KEY'),
+        'private_key_path' => env('ALIPAY_PRIVATE_KEY_PATH', storage_path('app/certs/alipay_private_key.pem')),
+        'public_key_path' => env('ALIPAY_PUBLIC_KEY_PATH', storage_path('app/certs/alipay_public_key.pem')),
         'notify_url' => env('ALIPAY_NOTIFY_URL'),
     ],
 ];

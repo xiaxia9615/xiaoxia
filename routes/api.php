@@ -42,12 +42,10 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-if (config('app.env') !== 'production') {
-    Route::prefix('v1/payment/notify')->group(function (): void {
-        Route::post('/wechat', [PaymentNotifyController::class, 'wechat']);
-        Route::post('/alipay', [PaymentNotifyController::class, 'alipay']);
-    });
-}
+Route::prefix('v1/payment/notify')->group(function (): void {
+    Route::post('/wechat', [PaymentNotifyController::class, 'wechat']);
+    Route::post('/alipay', [PaymentNotifyController::class, 'alipay']);
+});
 
 if (config('app.env') === 'testing') {
     Route::post('v1/payment/notify/mock', [PaymentNotifyController::class, 'mock']);

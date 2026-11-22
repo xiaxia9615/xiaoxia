@@ -50,3 +50,29 @@ export function requireAdmin({
     });
   }
 }
+
+/**
+ * 访客路由守卫：已登录用户访问 /login 时按身份跳转。
+ * is_admin → /admin，其他已登录用户 → /，只跳一次，避免与 requireAdmin 形成循环。
+ */
+export function requireGuest() {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) {
+    return;
+  }
+
+  let target = "/";
+  try {
+    const raw = localStorage.getItem(USER_KEY);
+    if (raw) {
+      const user = JSON.parse(raw) as { is_admin?: unknown };
+      if (user.is_admin === true) {
+        target = "/admin";
+      }
+    }
+  } catch {
+    // 用户信息损坏时按普通用户处理，跳首页
+  }
+
+  throw redirect({ to: target });
+}
