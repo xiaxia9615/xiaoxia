@@ -58,7 +58,7 @@ final class AlipayController
         try {
             $tokenData = $this->fetchOAuthToken($authCode);
 
-            $userId = $tokenData['user_id'] ?? null;
+            $userId = $tokenData['user_id'] ?? $tokenData['open_id'] ?? null;
             $accessToken = $tokenData['access_token'] ?? null;
 
             if (! $userId || ! $accessToken) {
@@ -207,6 +207,13 @@ final class AlipayController
                 .' - '.($tokenData['sub_msg'] ?? $tokenData['msg'] ?? '')
             );
         }
+
+        Log::info('Alipay OAuth response', [
+            'keys' => array_keys($tokenData),
+            'has_user_id' => isset($tokenData['user_id']),
+            'has_open_id' => isset($tokenData['open_id']),
+            'has_access_token' => isset($tokenData['access_token']),
+        ]);
 
         return $tokenData;
     }
