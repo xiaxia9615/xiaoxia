@@ -77,6 +77,7 @@ export function usePlaceOrder(ids: string) {
     /** 提交订单（同一动作出口，供页面按钮调用） */
     submitOrder: () => placeOrder.mutate(),
     checkout: checkoutQuery.data,
+    checkoutError: checkoutQuery.error,
     isLoading: checkoutQuery.isLoading,
     addresses: addressesQuery.data ?? [],
   };

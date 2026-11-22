@@ -11,15 +11,14 @@ import { usePlaceOrder } from "../use-place-order";
 
 /** 结算页：交易流程在 usePlaceOrder，组件只负责渲染。 */
 export function CheckoutPage({ ids }: { ids: string }) {
-  const { payment, setPayment, placeOrder, submitOrder, checkout, isLoading, addresses } =
+  const { payment, setPayment, placeOrder, submitOrder, checkout, checkoutError, isLoading, addresses } =
     usePlaceOrder(ids);
 
   const defaultAddr = addresses.find((a) => a.is_default) ?? addresses[0];
   /** 纯虚拟订单：无需收货地址与运费（后端 buy/index 补齐 nature 后自动生效）。 */
   const isVirtualOnly =
-    checkout !== undefined &&
-    checkout.items.length > 0 &&
-    checkout.items.every((it) => it.nature === "virtual");
+    (checkout?.items?.length ?? 0) > 0 &&
+    (checkout?.items ?? []).every((it) => it.nature === "virtual");
 
   return (
     <SiteLayout>
@@ -32,7 +31,16 @@ export function CheckoutPage({ ids }: { ids: string }) {
           <h1 className="mt-2 font-display text-3xl font-semibold text-foreground">核对并提交</h1>
         </header>
 
-        {isLoading || !checkout ? (
+        {isLoading ? (
+          <Skeleton className="h-72 rounded-xl" />
+        ) : checkoutError ? (
+          <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 text-center">
+            <p className="text-sm text-destructive">结算信息加载失败，请稍后重试</p>
+            <Button variant="outline" size="sm" className="mt-3" onClick={() => window.location.reload()}>
+              重新加载
+            </Button>
+          </div>
+        ) : !checkout ? (
           <Skeleton className="h-72 rounded-xl" />
         ) : (
           <div className="space-y-5">
@@ -59,7 +67,7 @@ export function CheckoutPage({ ids }: { ids: string }) {
             <section className="rounded-xl border bg-card p-6">
               <p className="mb-4 font-mono text-[11px] font-semibold uppercase tracking-widest text-clay">商品清单</p>
               <ul className="space-y-4">
-                {checkout.items.map((it) => (
+                {(checkout.items ?? []).map((it) => (
                   <li key={it.goods_id} className="flex items-center gap-4">
                     {it.image ? (
                       <AppImage src={it.image} alt={it.name} className="size-16 rounded-xl object-cover" />
@@ -101,9 +109,9 @@ export function CheckoutPage({ ids }: { ids: string }) {
                   ))}
                 </span>
               </p>
-              {checkout.payments.length > 0 && (
+              {(checkout.payments ?? []).length > 0 && (
                 <p className="mt-2 text-xs text-muted-foreground">
-                  可用支付渠道：{checkout.payments.map((p) => p.name).join(" / ")}
+                  可用支付渠道：{(checkout.payments ?? []).map((p) => p.name).join(" / ")}
                 </p>
               )}
               <div className="mt-4 space-y-1 border-t pt-4 text-sm">
