@@ -41,6 +41,7 @@ return [
         'Distributor' => ['User'],
         'Address' => ['User'],
         'Cart' => ['User', 'Product'],
+        'Goods' => ['Product'],
         'Article' => [],
         'Browse' => ['User', 'Product'],
         'Comment' => ['User', 'Product'],

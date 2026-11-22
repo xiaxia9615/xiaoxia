@@ -129,7 +129,7 @@ final class CartController
             'image' => $product?->cover,
             'price' => $product?->price,
             'quantity' => $item->quantity,
-            'stock' => 99,
+            'stock' => $product->isVirtual() ? ($product->quota > 0 ? $product->quota : null) : null,
         ];
     }
 }

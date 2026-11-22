@@ -305,7 +305,14 @@ final class OrderController
     /** @group 订单管理 */
     public function orderIndex(Request $request): JsonResponse
     {
-        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => ['list' => [], 'total' => 0]]);
+        $orders = Order::where('user_id', $request->user()->id)
+            ->orderByDesc('id')
+            ->limit(20)
+            ->get();
+
+        $list = $orders->map(fn (Order $order): array => $this->toDetailPayload($order))->all();
+
+        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => ['list' => $list, 'total' => count($list)]]);
     }
 
     /** @group 订单管理 */
