@@ -12,8 +12,11 @@ use RuntimeException;
 final class AlipayGateway implements PaymentGatewayInterface
 {
     private const GATEWAY_URL = 'https://openapi.alipay.com/gateway.do';
+
     private const SIGN_TYPE = 'RSA2';
+
     private const CHARSET = 'UTF-8';
+
     private const PRODUCT_CODE = 'FACE_TO_FACE_PAYMENT';
 
     private Client $httpClient;
@@ -39,8 +42,8 @@ final class AlipayGateway implements PaymentGatewayInterface
         }
 
         $privateKeyPath = config('payment.alipay.private_key_path');
-        if (empty($privateKeyPath) || !file_exists($privateKeyPath)) {
-            throw new RuntimeException('Alipay private key file not found: ' . ($privateKeyPath ?? '(null)'));
+        if (empty($privateKeyPath) || ! file_exists($privateKeyPath)) {
+            throw new RuntimeException('Alipay private key file not found: '.($privateKeyPath ?? '(null)'));
         }
         $privateKey = file_get_contents($privateKeyPath);
         if ($privateKey === false) {
@@ -88,17 +91,17 @@ final class AlipayGateway implements PaymentGatewayInterface
                 'form_params' => $params,
             ]);
         } catch (GuzzleException $e) {
-            throw new RuntimeException('Alipay API request failed: ' . $e->getMessage(), 0, $e);
+            throw new RuntimeException('Alipay API request failed: '.$e->getMessage(), 0, $e);
         }
 
         $body = $response->getBody()->getContents();
         $result = json_decode($body, true);
-        if (!is_array($result)) {
+        if (! is_array($result)) {
             throw new RuntimeException('Alipay API returned invalid JSON');
         }
 
         $precreateResult = $result['alipay_trade_precreate_response'] ?? null;
-        if (!is_array($precreateResult)) {
+        if (! is_array($precreateResult)) {
             throw new RuntimeException('Alipay API response missing alipay_trade_precreate_response');
         }
 
@@ -125,8 +128,8 @@ final class AlipayGateway implements PaymentGatewayInterface
     public function verifyNotify(array $payload): array
     {
         $publicKeyPath = config('payment.alipay.public_key_path');
-        if (empty($publicKeyPath) || !file_exists($publicKeyPath)) {
-            throw new RuntimeException('Alipay public key file not found: ' . ($publicKeyPath ?? '(null)'));
+        if (empty($publicKeyPath) || ! file_exists($publicKeyPath)) {
+            throw new RuntimeException('Alipay public key file not found: '.($publicKeyPath ?? '(null)'));
         }
         $publicKey = file_get_contents($publicKeyPath);
         if ($publicKey === false) {
@@ -164,8 +167,9 @@ final class AlipayGateway implements PaymentGatewayInterface
         ksort($params);
         $pairs = [];
         foreach ($params as $key => $value) {
-            $pairs[] = $key . '=' . $value;
+            $pairs[] = $key.'='.$value;
         }
+
         return implode('&', $pairs);
     }
 
@@ -177,6 +181,7 @@ final class AlipayGateway implements PaymentGatewayInterface
         }
         $signature = '';
         $result = openssl_sign($data, $signature, $keyResource, OPENSSL_ALGO_SHA256);
+
         return $result ? base64_encode($signature) : false;
     }
 
@@ -192,6 +197,7 @@ final class AlipayGateway implements PaymentGatewayInterface
         }
         $algo = $signType === 'RSA2' ? OPENSSL_ALGO_SHA256 : OPENSSL_ALGO_SHA1;
         $result = openssl_verify($data, $decodedSign, $keyResource, $algo);
+
         return $result === 1;
     }
 }
