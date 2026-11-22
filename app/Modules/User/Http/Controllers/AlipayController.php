@@ -86,8 +86,11 @@ final class AlipayController
                 'provider' => self::PROVIDER,
                 'provider_id' => $userId,
                 'avatar' => $avatar,
-                'status' => 1,
             ]);
+            // is_active 和 status 在 $guarded 中，create 无法批量赋值，需显式设置
+            $user->is_active = true;
+            $user->status = 1;
+            $user->save();
         } else {
             $user->avatar = $avatar;
             $user->save();
