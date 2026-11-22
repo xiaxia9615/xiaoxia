@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace App\Modules\User\Http\Controllers;
 
 use App\Models\User;
-use App\Modules\User\Plugins\AlipayMethodPlugin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Yansongda\Artful\Plugin\ParserPlugin;
 use Yansongda\Pay\Pay;
 use Yansongda\Pay\Plugin\Alipay\V2\AddPayloadSignaturePlugin;
 use Yansongda\Pay\Plugin\Alipay\V2\AddRadarPlugin;
+use Yansongda\Pay\Plugin\Alipay\V2\Member\Authorization\TokenPlugin;
+use Yansongda\Pay\Plugin\Alipay\V2\Member\DetailPlugin;
 use Yansongda\Pay\Plugin\Alipay\V2\ResponsePlugin;
 use Yansongda\Pay\Plugin\Alipay\V2\StartPlugin;
 use Yansongda\Pay\Plugin\Alipay\V2\VerifySignaturePlugin;
@@ -66,10 +66,19 @@ final class AlipayController
 
         try {
             // 第一步：用 auth_code 换取 access_token 和 user_id
-            $tokenResult = $this->alipayRequest('alipay.system.oauth.token', [
+            $client = $this->payClient();
+            $tokenResult = $client->pay([
+                StartPlugin::class,
+                TokenPlugin::class,
+                AddPayloadSignaturePlugin::class,
+                AddRadarPlugin::class,
+                VerifySignaturePlugin::class,
+                ResponsePlugin::class,
+                ParserPlugin::class,
+            ], [
                 'grant_type' => 'authorization_code',
                 'code' => $authCode,
-            ], true);
+            ]);
 
             $userId = $tokenResult->get('user_id');
             $accessToken = $tokenResult->get('access_token');
@@ -79,9 +88,17 @@ final class AlipayController
             }
 
             // 第二步：获取用户信息（昵称、头像）
-            $userInfo = $this->alipayRequest('alipay.user.info.share', [
+            $userInfo = $client->pay([
+                StartPlugin::class,
+                DetailPlugin::class,
+                AddPayloadSignaturePlugin::class,
+                AddRadarPlugin::class,
+                VerifySignaturePlugin::class,
+                ResponsePlugin::class,
+                ParserPlugin::class,
+            ], [
                 'auth_token' => $accessToken,
-            ], true);
+            ]);
 
             $nickName = $userInfo->get('nick_name', '支付宝用户');
             $avatar = $userInfo->get('avatar');
@@ -119,46 +136,6 @@ final class AlipayController
         $token = $user->createToken('api')->plainTextToken;
 
         return redirect(self::FRONTEND_CALLBACK.'?token='.$token.'&redirect=/');
-    }
-
-    /**
-     * 通过 yansongda/pay v3 SDK 向支付宝网关发送请求。
-     *
-     * @param  array<string, string>  $params  业务参数
-     * @param  bool  $topLevel  OAuth 类 API 参数放在顶层（非 biz_content）
-     * @return Collection
-     *
-     * @throws RuntimeException 网关请求失败或业务错误
-     */
-    private function alipayRequest(string $method, array $params, bool $topLevel = false)
-    {
-        $client = $this->payClient();
-
-        $requestParams = array_merge($params, [
-            '_method' => $method,
-            '_top_level' => $topLevel,
-        ]);
-
-        $result = $client->pay([
-            StartPlugin::class,
-            AlipayMethodPlugin::class,
-            AddPayloadSignaturePlugin::class,
-            AddRadarPlugin::class,
-            VerifySignaturePlugin::class,
-            ResponsePlugin::class,
-            ParserPlugin::class,
-        ], $requestParams);
-
-        $responseKey = str_replace('.', '_', $method).'_response';
-        $data = $result->all();
-        $bizResult = $data[$responseKey] ?? $data;
-
-        if (isset($bizResult['code']) && $bizResult['code'] !== '10000') {
-            $msg = $bizResult['sub_msg'] ?? $bizResult['msg'] ?? '未知错误';
-            throw new RuntimeException('支付宝接口错误: '.$msg);
-        }
-
-        return collect($bizResult);
     }
 
     /**
