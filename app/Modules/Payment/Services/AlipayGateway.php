@@ -5,30 +5,18 @@ declare(strict_types=1);
 namespace App\Modules\Payment\Services;
 
 use App\Modules\Payment\Contracts\PaymentGatewayInterface;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use RuntimeException;
+use Throwable;
+use Yansongda\Pay\Pay;
+use Yansongda\Pay\Provider\Alipay;
 
+/**
+ * 支付宝网关（公钥证书模式，基于 yansongda/pay v3）。
+ *
+ * 金额单位约定：内部为毫（千分之一元），与支付宝交互时转为元（两位小数）。
+ */
 final class AlipayGateway implements PaymentGatewayInterface
 {
-    private const GATEWAY_URL = 'https://openapi.alipay.com/gateway.do';
-
-    private const SIGN_TYPE = 'RSA2';
-
-    private const CHARSET = 'UTF-8';
-
-    private const PRODUCT_CODE = 'FACE_TO_FACE_PAYMENT';
-
-    private Client $httpClient;
-
-    public function __construct(?Client $httpClient = null)
-    {
-        $this->httpClient = $httpClient ?? new Client([
-            'timeout' => 30,
-            'verify' => true,
-        ]);
-    }
-
     public function transfer(string $account, int $amountInCents): bool
     {
         throw new RuntimeException('AlipayGateway::transfer not implemented');
@@ -36,87 +24,15 @@ final class AlipayGateway implements PaymentGatewayInterface
 
     public function createPayment(string $orderNo, int $amountInCents, string $subject): array
     {
-        $appId = config('payment.alipay.app_id');
-        if (empty($appId)) {
-            throw new RuntimeException('Alipay app_id is not configured');
-        }
-
-        $privateKeyPath = config('payment.alipay.private_key_path');
-        if (empty($privateKeyPath) || ! file_exists($privateKeyPath)) {
-            throw new RuntimeException('Alipay private key file not found: '.($privateKeyPath ?? '(null)'));
-        }
-        $privateKey = file_get_contents($privateKeyPath);
-        if ($privateKey === false) {
-            throw new RuntimeException('Failed to read Alipay private key file');
-        }
-
-        $notifyUrl = config('payment.alipay.notify_url');
-        if (empty($notifyUrl)) {
-            throw new RuntimeException('Alipay notify_url is not configured');
-        }
-
-        $totalAmount = number_format($amountInCents / 1000, 2, '.', '');
-
-        $bizContent = json_encode([
+        $result = $this->payClient()->scan([
             'out_trade_no' => $orderNo,
-            'total_amount' => $totalAmount,
+            'total_amount' => number_format($amountInCents / 1000, 2, '.', ''),
             'subject' => $subject,
-            'product_code' => self::PRODUCT_CODE,
-        ], JSON_UNESCAPED_UNICODE);
+        ]);
 
-        if ($bizContent === false) {
-            throw new RuntimeException('Failed to encode biz_content JSON');
-        }
-
-        $params = [
-            'app_id' => $appId,
-            'method' => 'alipay.trade.precreate',
-            'charset' => self::CHARSET,
-            'sign_type' => self::SIGN_TYPE,
-            'timestamp' => date('Y-m-d H:i:s'),
-            'version' => '1.0',
-            'biz_content' => $bizContent,
-            'notify_url' => $notifyUrl,
-        ];
-
-        $signString = $this->buildSignString($params);
-        $signature = $this->rsaSign($signString, $privateKey);
-        if ($signature === false) {
-            throw new RuntimeException('RSA2 signature generation failed');
-        }
-        $params['sign'] = $signature;
-
-        try {
-            $response = $this->httpClient->post(self::GATEWAY_URL, [
-                'form_params' => $params,
-            ]);
-        } catch (GuzzleException $e) {
-            throw new RuntimeException('Alipay API request failed: '.$e->getMessage(), 0, $e);
-        }
-
-        $body = $response->getBody()->getContents();
-        $result = json_decode($body, true);
-        if (! is_array($result)) {
-            throw new RuntimeException('Alipay API returned invalid JSON');
-        }
-
-        $precreateResult = $result['alipay_trade_precreate_response'] ?? null;
-        if (! is_array($precreateResult)) {
-            throw new RuntimeException('Alipay API response missing alipay_trade_precreate_response');
-        }
-
-        $code = $precreateResult['code'] ?? '';
-        if ($code !== '10000') {
-            $msg = $precreateResult['msg'] ?? '';
-            $subMsg = $precreateResult['sub_msg'] ?? '';
-            throw new RuntimeException(
-                sprintf('Alipay precreate failed: code=%s msg=%s sub_msg=%s', $code, $msg, $subMsg)
-            );
-        }
-
-        $qrCode = $precreateResult['qr_code'] ?? '';
-        if (empty($qrCode)) {
-            throw new RuntimeException('Alipay precreate response missing qr_code');
+        $qrCode = $result->get('qr_code', '');
+        if (! is_string($qrCode) || $qrCode === '') {
+            throw new RuntimeException('Alipay scan response missing qr_code');
         }
 
         return [
@@ -127,77 +43,56 @@ final class AlipayGateway implements PaymentGatewayInterface
 
     public function verifyNotify(array $payload): array
     {
-        $publicKeyPath = config('payment.alipay.public_key_path');
-        if (empty($publicKeyPath) || ! file_exists($publicKeyPath)) {
-            throw new RuntimeException('Alipay public key file not found: '.($publicKeyPath ?? '(null)'));
-        }
-        $publicKey = file_get_contents($publicKeyPath);
-        if ($publicKey === false) {
-            throw new RuntimeException('Failed to read Alipay public key file');
-        }
-
-        $sign = $payload['sign'] ?? '';
-        if (empty($sign)) {
+        try {
+            $collection = $this->payClient()->callback($payload);
+        } catch (Throwable) {
             return ['verified' => false, 'order_no' => '', 'amount_in_cents' => 0];
         }
 
-        $signType = $payload['sign_type'] ?? self::SIGN_TYPE;
-
-        $signParams = $payload;
-        unset($signParams['sign'], $signParams['sign_type']);
-        $signString = $this->buildSignString($signParams);
-
-        $verified = $this->rsaVerify($signString, $sign, $publicKey, $signType);
-
-        $orderNo = $payload['out_trade_no'] ?? '';
-        $totalAmount = $payload['total_amount'] ?? '0';
-
-        $amountInCents = (int) round((float) $totalAmount * 1000);
+        $orderNo = $collection->get('out_trade_no', '');
+        $totalAmount = $collection->get('total_amount', '0');
 
         return [
-            'verified' => $verified,
-            'order_no' => $orderNo,
-            'amount_in_cents' => $amountInCents,
+            'verified' => true,
+            'order_no' => is_string($orderNo) ? $orderNo : '',
+            'amount_in_cents' => (int) round(((float) (is_string($totalAmount) ? $totalAmount : '0')) * 1000),
         ];
     }
 
-    private function buildSignString(array $params): string
+    /**
+     * 构建 SDK 客户端：校验 4 个证书路径存在后注册配置。
+     *
+     * @throws RuntimeException 配置缺失或证书文件不存在
+     */
+    private function payClient(): Alipay
     {
-        $params = array_filter($params, fn ($v) => $v !== '' && $v !== null);
-        ksort($params);
-        $pairs = [];
-        foreach ($params as $key => $value) {
-            $pairs[] = $key.'='.$value;
+        $appId = config('payment.alipay.app_id');
+        if (! is_string($appId) || $appId === '') {
+            throw new RuntimeException('Alipay app_id is not configured');
         }
 
-        return implode('&', $pairs);
-    }
+        $certPaths = [
+            'app_secret_cert_path' => config('payment.alipay.app_secret_cert_path'),
+            'app_public_cert_path' => config('payment.alipay.app_public_cert_path'),
+            'alipay_public_cert_path' => config('payment.alipay.alipay_public_cert_path'),
+            'alipay_root_cert_path' => config('payment.alipay.alipay_root_cert_path'),
+        ];
 
-    private function rsaSign(string $data, string $privateKey): string|false
-    {
-        $keyResource = openssl_pkey_get_private($privateKey);
-        if ($keyResource === false) {
-            return false;
+        foreach ($certPaths as $key => $path) {
+            if (! is_string($path) || $path === '' || ! file_exists($path)) {
+                throw new RuntimeException('Alipay cert file not found: '.$key.' ('.(is_string($path) ? $path : '(null)').')');
+            }
         }
-        $signature = '';
-        $result = openssl_sign($data, $signature, $keyResource, OPENSSL_ALGO_SHA256);
 
-        return $result ? base64_encode($signature) : false;
-    }
+        Pay::config([
+            'alipay' => [
+                'default' => $certPaths + [
+                    'app_id' => $appId,
+                    'notify_url' => config('payment.alipay.notify_url'),
+                ],
+            ],
+        ]);
 
-    private function rsaVerify(string $data, string $sign, string $publicKey, string $signType): bool
-    {
-        $keyResource = openssl_pkey_get_public($publicKey);
-        if ($keyResource === false) {
-            return false;
-        }
-        $decodedSign = base64_decode($sign, true);
-        if ($decodedSign === false) {
-            return false;
-        }
-        $algo = $signType === 'RSA2' ? OPENSSL_ALGO_SHA256 : OPENSSL_ALGO_SHA1;
-        $result = openssl_verify($data, $decodedSign, $keyResource, $algo);
-
-        return $result === 1;
+        return Pay::alipay();
     }
 }

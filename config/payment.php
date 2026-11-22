@@ -13,8 +13,10 @@ return [
     ],
     'alipay' => [
         'app_id' => env('ALIPAY_APP_ID'),
-        'private_key_path' => env('ALIPAY_PRIVATE_KEY_PATH', storage_path('app/certs/alipay_private_key.pem')),
-        'public_key_path' => env('ALIPAY_PUBLIC_KEY_PATH', storage_path('app/certs/alipay_public_key.pem')),
+        'app_secret_cert_path' => env('ALIPAY_APP_SECRET_CERT_PATH', storage_path('app/certs/app_private_key.pem')),
+        'app_public_cert_path' => env('ALIPAY_APP_PUBLIC_CERT_PATH', storage_path('app/certs/app_cert.crt')),
+        'alipay_public_cert_path' => env('ALIPAY_ALIPAY_PUBLIC_CERT_PATH', storage_path('app/certs/alipay_cert.crt')),
+        'alipay_root_cert_path' => env('ALIPAY_ALIPAY_ROOT_CERT_PATH', storage_path('app/certs/alipay_root_cert.crt')),
         'notify_url' => env('ALIPAY_NOTIFY_URL'),
     ],
 ];
