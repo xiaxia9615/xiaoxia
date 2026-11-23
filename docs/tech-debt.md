@@ -105,21 +105,6 @@
       两处引用（`LedgerServiceProvider.php:10`、`CreateLedgerOnUserRegistered.php:8`）
       均指向 Contracts 接口，架构守卫全绿。
 
-### P1 · 数据层
-
-- [x] ~~34 处模块内裸表待收敛~~ — 2026-11-17 修复（c0e9e17 + 495b061）：
-      Ledger：新建 `LedgerQueryService`（12 处委托，事务/悲观锁/复式记账逻辑不变）+
-      `AdminLedgerService` 更名 `AdminLedgerQueryService` + 新建 `AiUsageDeductionService`
-      （Wallet 监听器跨模块裸表改服务调用）+ 删除死代码 Ledger `DeductBalanceOnAiUsage`
-      监听器（无注册点，Wallet 版本才是生效监听器，消除双重扣款隐患）。
-      Skill：新建 `AdminSkillQueryService`（4 处委托）。
-      Team：新建 `TeamBillingQueryService`（3 处委托，幂等/成员校验逻辑不变）。
-      System：新建 `SystemQueryService`（3 处委托）。
-      Order：`OrderService` 分账幂等检查改走 `LedgerQueryService::hasBizEntries`
-      （Order→Ledger 白名单内）。
-      验收：业务代码 `DB::table` 清零（仅封装服务内部保留）；pint 全绿；
-      测试 236 passed / 4 skipped / 796 assertions 与基线一致。
-
 ## 未修复 · 结构类
 
 - [x] ~~Ledger / User 无 `Contracts/` 目录~~ — 2026-11-13 核实：已解决。
@@ -152,11 +137,12 @@
 
 ## 未修复 · 前端类（非阻塞）
 
-- [ ] **6 个前端文件超过 100 行未纳入 ROUTE_LINE_BUDGET**（2026-11-17 核实更新）：
-      admin.tsx 已拆分（现仅 9 行布局路由，原记录过时）；实际超限：
-      admin/ai-providers.tsx(218行)、admin/orders.tsx(201行)、
-      admin/api-keys.tsx(151行)、products.tsx(143行)、
-      admin/skills.tsx(109行)、articles.tsx(102行)。
+- [ ] **15 个前端业务文件超 100 行未纳入 ROUTE_LINE_BUDGET**（2026-11-24 实测，排除 config/components/ui）：
+      product-form-modal.tsx(420)、login-page.tsx(359)、products-page.tsx(287)、
+      products_.$productId.tsx(259)、finance-page.tsx(250)、address-dialog.tsx(239)、
+      zhen-sections.tsx(221)、address-page.tsx(210)、profile-page.tsx(207)、
+      users-page.tsx(195)、assistant-page.tsx(168)、order-detail-page.tsx(166)、
+      cart-page.tsx(165)、pay-self-check-page.tsx(161)、pay-qr-dialog.tsx(154)。
 
 - [x] ~~P1-工程: 替换 @qmuse/appwrite-runtime-sdk（Proprietary，支付宝团队资产，1534 行）~~ — 2026-11-17 修复：
       @qmuse 依赖此前已移除；本次删除死代码 services/appwrite.ts（无引用方、不在 tsconfig 编译范围）、
