@@ -70,6 +70,31 @@ final class AlipayGateway implements PaymentGatewayInterface
         ];
     }
 
+    public function queryPayment(string $outTradeNo): array
+    {
+        try {
+            $result = $this->payClient()->query([
+                'out_trade_no' => $outTradeNo,
+            ]);
+        } catch (Throwable $e) {
+            Log::warning('AlipayGateway queryPayment failed', [
+                'out_trade_no' => $outTradeNo,
+                'error' => $e->getMessage(),
+            ]);
+
+            return ['paid' => false, 'trade_status' => '', 'raw' => []];
+        }
+
+        $tradeStatus = (string) $result->get('trade_status', '');
+        $paid = in_array($tradeStatus, ['TRADE_SUCCESS', 'TRADE_FINISHED'], true);
+
+        return [
+            'paid' => $paid,
+            'trade_status' => $tradeStatus,
+            'raw' => $result->all(),
+        ];
+    }
+
     public function verifyNotify(array $payload): array
     {
         try {

@@ -31,4 +31,12 @@ interface PaymentGatewayInterface
      * @return array{verified: bool, order_no: string, amount_in_cents: int}
      */
     public function verifyNotify(array $payload): array;
+
+    /**
+     * 主动查询订单支付状态（同步查单兜底）。
+     *
+     * @param  string  $outTradeNo  商户订单号
+     * @return array{paid: bool, trade_status?: string, raw?: array}
+     */
+    public function queryPayment(string $outTradeNo): array;
 }

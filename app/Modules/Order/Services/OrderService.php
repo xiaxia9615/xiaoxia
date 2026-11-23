@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
+use Throwable;
 
 final class OrderService
 {
@@ -126,13 +127,108 @@ final class OrderService
     }
 
     /**
+     * 同步订单状态（主动查单兜底）：
+     * 1. 校验订单归属；
+     * 2. 已支付订单直接返回（幂等）；
+     * 3. 缓存防抖：同一订单号 5 秒内只向支付宝发起一次真实查单；
+     * 4. 查单成功后事务内 lockForUpdate 锁定订单，再次检查状态，确保只入账一次；
+     * 5. 更新订单状态为 Paid，调用 autoDeliverVirtualOrder 和 settleCommission；
+     * 6. 发货/分账异常不阻断状态更新，记录日志后继续。
+     *
+     * @throws RuntimeException 订单不存在
+     */
+    public function syncOrderStatus(int $orderId, int $userId): Order
+    {
+        /** @var Order|null $order */
+        $order = Order::query()
+            ->where('id', $orderId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (! $order) {
+            throw new RuntimeException('订单不存在');
+        }
+
+        // 幂等：已支付订单直接返回
+        if (in_array($order->status, [OrderStatus::Paid, OrderStatus::PendingShipment, OrderStatus::Completed], true)) {
+            return $order;
+        }
+
+        // 仅待支付订单需要查单
+        if (! $order->status->canPay()) {
+            return $order;
+        }
+
+        // 缓存防抖：5 秒内同一订单号只查一次支付宝
+        $cacheKey = "payment_query:{$order->order_no}";
+        $queryResult = Cache::remember($cacheKey, 5, function () use ($order): array {
+            return $this->gateway->queryPayment($order->order_no);
+        });
+
+        if (! $queryResult['paid']) {
+            return $order;
+        }
+
+        // 事务内 lockForUpdate 确保并发安全
+        return DB::transaction(function () use ($order, $queryResult): Order {
+            /** @var Order|null $locked */
+            $locked = Order::query()
+                ->where('id', $order->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $locked) {
+                return $order;
+            }
+
+            // 双重检查：可能已被异步回调处理
+            if (in_array($locked->status, [OrderStatus::Paid, OrderStatus::PendingShipment, OrderStatus::Completed], true)) {
+                return $locked;
+            }
+
+            // 更新订单状态为已支付
+            $locked->status = OrderStatus::Paid;
+            $locked->paid_at = now();
+            $locked->save();
+
+            Log::info('order synced to paid via queryPayment', [
+                'order_no' => $locked->order_no,
+                'trade_status' => $queryResult['trade_status'] ?? '',
+            ]);
+
+            // 发货和分账：异常不阻断状态更新
+            try {
+                $product = Product::withTrashed()->find($locked->product_id);
+                if ($product !== null) {
+                    $this->autoDeliverVirtualOrder($locked, $product);
+                }
+            } catch (Throwable $e) {
+                Log::error('autoDeliverVirtualOrder failed in syncOrderStatus', [
+                    'order_no' => $locked->order_no,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            try {
+                $this->settleCommission($locked);
+            } catch (Throwable $e) {
+                Log::error('settleCommission failed in syncOrderStatus', [
+                    'order_no' => $locked->order_no,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            return $locked;
+        });
+    }
+
+    /**
      * 虚拟商品自动发货（幂等）：
      * 1. 缓存锁防并发重复触发（payOrder 行锁之外的第二道防线，兼容支付回调等多入口）；
      * 2. WalletContract::deposit 以 out_trade_no 唯一约束兜底，天然幂等，绝不重复加额度；
      * 3. 仅当绑定技能且赠送额度 > 0 时入账。
      */
     /** 支付宝异步回调更新订单状态时调用 */
-    // @phpstan-ignore method.unused
     private function autoDeliverVirtualOrder(Order $order, Product $product): void
     {
         $lock = Cache::lock("virtual_deliver:{$order->id}", 30);
@@ -199,7 +295,6 @@ final class OrderService
      * - 幂等：事务内先查 order_commission 流水，已分账订单直接跳过，防止重复分账。
      */
     /** 支付宝异步回调更新订单状态时调用 */
-    // @phpstan-ignore method.unused
     private function settleCommission(Order $order): void
     {
         // 幂等：同一订单的分账流水已存在则跳过（payOrder 已对订单行加悲观锁，此处双保险）

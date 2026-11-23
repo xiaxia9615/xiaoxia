@@ -34,6 +34,15 @@ final class MockPaymentGateway implements PaymentGatewayInterface
         ];
     }
 
+    public function queryPayment(string $outTradeNo): array
+    {
+        Log::info('MockPaymentGateway queryPayment', [
+            'out_trade_no' => $outTradeNo,
+        ]);
+
+        return ['paid' => false, 'trade_status' => 'WAIT_BUYER_PAY', 'raw' => []];
+    }
+
     public function verifyNotify(array $payload): array
     {
         Log::info('MockPaymentGateway verifyNotify', [

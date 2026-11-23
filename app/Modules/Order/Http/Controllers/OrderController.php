@@ -239,6 +239,9 @@ final class OrderController
             ]);
         }
 
+        // 主动查单兜底：同步订单状态后再返回
+        $order = $this->service->syncOrderStatus($order->id, (int) $request->user()->id);
+
         $status = match ($order->status) {
             OrderStatus::Pending => 'pending',
             OrderStatus::Paid, OrderStatus::PendingShipment, OrderStatus::Completed => 'paid',
@@ -285,6 +288,9 @@ final class OrderController
     {
         $order = Order::where('user_id', $request->user()->id)->findOrFail($id);
 
+        // 主动查单兜底：同步订单状态后再返回
+        $order = $this->service->syncOrderStatus($order->id, (int) $request->user()->id);
+
         return response()->json(['code' => 0, 'msg' => 'ok', 'data' => $this->toDetailPayload($order)]);
     }
 
@@ -327,6 +333,9 @@ final class OrderController
         if ($order === null) {
             return response()->json(['code' => 1, 'msg' => '订单不存在'], 404);
         }
+
+        // 主动查单兜底：同步订单状态后再返回
+        $order = $this->service->syncOrderStatus($order->id, (int) $request->user()->id);
 
         return response()->json(['code' => 0, 'msg' => 'ok', 'data' => $this->toDetailPayload($order)]);
     }

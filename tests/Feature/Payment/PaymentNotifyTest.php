@@ -118,6 +118,11 @@ class PaymentNotifyTest extends TestCase
                 {
                     return ['verified' => false, 'order_no' => '', 'amount_in_cents' => 0];
                 }
+
+                public function queryPayment(string $outTradeNo): array
+                {
+                    return ['paid' => false, 'trade_status' => '', 'raw' => []];
+                }
             };
         });
 

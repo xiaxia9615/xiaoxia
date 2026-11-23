@@ -72,6 +72,32 @@ final class WechatPayGateway implements PaymentGatewayInterface
         ];
     }
 
+    public function queryPayment(string $outTradeNo): array
+    {
+        try {
+            $result = $this->payClient()->query([
+                'out_trade_no' => $outTradeNo,
+                'mchid' => config('payment.wechat.mch_id'),
+            ]);
+        } catch (Throwable $e) {
+            Log::warning('WechatPayGateway queryPayment failed', [
+                'out_trade_no' => $outTradeNo,
+                'error' => $e->getMessage(),
+            ]);
+
+            return ['paid' => false, 'trade_status' => '', 'raw' => []];
+        }
+
+        $tradeState = (string) $result->get('trade_state', '');
+        $paid = in_array($tradeState, ['SUCCESS'], true);
+
+        return [
+            'paid' => $paid,
+            'trade_status' => $tradeState,
+            'raw' => $result->all(),
+        ];
+    }
+
     public function verifyNotify(array $payload): array
     {
         try {
