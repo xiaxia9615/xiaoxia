@@ -4,6 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Truck } from "lucide-react";
 import { AdminPageLayout } from "@/config/components/admin/AdminPageLayout";
 import { DataTable, type DataTableColumn } from "@/config/components/admin/DataTable";
+import { Pagination } from "@/config/components/admin/Pagination";
 import { StatusBadge } from "@/config/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,11 +19,12 @@ import {
 } from "@/features/admin/ship-order-dialog";
 
 function OrdersPage() {
+  const [page, setPage] = useState(1);
   const [shippingOrder, setShippingOrder] = useState<AdminOrderItem | null>(null);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-orders"],
-    queryFn: () => getAdminOrders(),
+    queryKey: ["admin-orders", page],
+    queryFn: () => getAdminOrders({ page }),
   });
 
   const columns: Array<DataTableColumn<AdminOrderItem>> = [
@@ -82,6 +84,14 @@ function OrdersPage() {
         data={data?.list ?? []}
         isLoading={isLoading}
         emptyText="暂无订单"
+        pagination={
+          <Pagination
+            page={data?.current_page ?? page}
+            lastPage={data?.last_page ?? 1}
+            total={data?.total ?? 0}
+            onChange={setPage}
+          />
+        }
       />
 
       <ShipOrderDialog

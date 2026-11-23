@@ -22,6 +22,9 @@ import {
 } from "@/lib/api/admin";
 import { toErrorMessage } from "@/lib/api/request";
 
+/** 禁止封禁的超级管理员 ID（与后端 AdminUserController::SUPER_ADMIN_IDS 契约一致）。 */
+const SUPER_ADMIN_IDS = [1, 2];
+
 /** 用户状态 -> 标签语义。 */
 function userStatusType(isActive: boolean): StatusBadgeType {
   return isActive ? "success" : "danger";
@@ -83,8 +86,8 @@ export function UsersPage() {
       key: "actions",
       header: "操作",
       cell: (row) =>
-        row.is_admin ? (
-          <span className="text-xs text-slate-500">管理员不可操作</span>
+        SUPER_ADMIN_IDS.includes(row.id) ? (
+          <span className="text-xs text-slate-500">超级管理员不可操作</span>
         ) : (
           <Button
             variant={row.is_active ? "destructive" : "outline"}
@@ -107,7 +110,7 @@ export function UsersPage() {
           {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
-              className="h-11 animate-pulse rounded-md border border-white/5 bg-white/5"
+              className="h-11 animate-pulse rounded-md border border-zinc-200 bg-zinc-100"
               style={{ animationDelay: `${i * 60}ms` }}
             />
           ))}
