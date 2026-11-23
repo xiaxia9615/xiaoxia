@@ -76,23 +76,40 @@ final class AlipayGateway implements PaymentGatewayInterface
             $result = $this->payClient()->query([
                 'out_trade_no' => $outTradeNo,
             ]);
-        } catch (Throwable $e) {
-            Log::warning('AlipayGateway queryPayment failed', [
+
+            $raw = $result->toArray();
+
+            // yansongda/pay v3 可能将响应嵌套在 alipay_trade_query_response 下
+            $tradeData = $raw['alipay_trade_query_response'] ?? $raw;
+
+            $tradeStatus = (string) ($tradeData['trade_status'] ?? '');
+            $paid = in_array($tradeStatus, ['TRADE_SUCCESS', 'TRADE_FINISHED'], true);
+
+            // 查单结果记录到日志，便于排查
+            Log::info('AlipayGateway queryPayment result', [
                 'out_trade_no' => $outTradeNo,
-                'error' => $e->getMessage(),
+                'trade_status' => $tradeStatus,
+                'paid' => $paid,
+                'raw_keys' => array_keys($raw),
             ]);
 
-            return ['paid' => false, 'trade_status' => '', 'raw' => []];
+            return [
+                'paid' => $paid,
+                'trade_status' => $tradeStatus,
+                'raw' => $raw,
+            ];
+        } catch (Throwable $e) {
+            Log::error('支付宝查单异常: '.$e->getMessage(), [
+                'out_trade_no' => $outTradeNo,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'paid' => false,
+                'trade_status' => 'ERROR',
+                'raw' => ['error' => $e->getMessage()],
+            ];
         }
-
-        $tradeStatus = (string) $result->get('trade_status', '');
-        $paid = in_array($tradeStatus, ['TRADE_SUCCESS', 'TRADE_FINISHED'], true);
-
-        return [
-            'paid' => $paid,
-            'trade_status' => $tradeStatus,
-            'raw' => $result->all(),
-        ];
     }
 
     public function verifyNotify(array $payload): array
