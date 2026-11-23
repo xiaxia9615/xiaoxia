@@ -47,7 +47,7 @@ export interface AdminProductListResponse {
 export function getAdminProducts(
   params?: { page?: number; status?: number; type?: number; keyword?: string },
 ): Promise<AdminProductListResponse> {
-  return request<AdminProductListResponse>("/admin/products", {
+  return request<AdminProductListResponse>("/v1/admin/products", {
     method: "GET",
     params: params as Record<string, unknown> | undefined,
     auth: true,
@@ -113,7 +113,7 @@ export interface AdminRechargeListResponse {
 export function getAdminFinanceRecharges(
   params?: { page?: number },
 ): Promise<AdminRechargeListResponse> {
-  return request<AdminRechargeListResponse>("/admin/finance/recharges", {
+  return request<AdminRechargeListResponse>("/v1/admin/finance/recharges", {
     method: "GET",
     params: params as Record<string, unknown> | undefined,
     auth: true,
@@ -143,7 +143,7 @@ export interface AdminWithdrawalListResponse {
 export function getAdminFinanceWithdrawals(
   params?: { page?: number },
 ): Promise<AdminWithdrawalListResponse> {
-  return request<AdminWithdrawalListResponse>("/admin/finance/withdrawals", {
+  return request<AdminWithdrawalListResponse>("/v1/admin/finance/withdrawals", {
     method: "GET",
     params: params as Record<string, unknown> | undefined,
     auth: true,
@@ -445,6 +445,32 @@ export function getAdminUsers(
   return request<AdminUserListResponse>("/v1/admin/users", {
     method: "GET",
     params: params as Record<string, unknown> | undefined,
+    auth: true,
+  });
+}
+
+/** Dashboard 聚合统计响应。 */
+export interface AdminDashboardStats {
+  total_users: number;
+  today_orders: number;
+  today_revenue: number;
+  total_products: number;
+  pending_shipment: number;
+  paid_orders: number;
+}
+
+/** Dashboard 聚合统计。 */
+export function getAdminDashboardStats(): Promise<AdminDashboardStats> {
+  return request<AdminDashboardStats>("/v1/admin/dashboard/stats", {
+    method: "GET",
+    auth: true,
+  });
+}
+
+/** 封禁/解封用户。 */
+export function toggleUserBan(id: number): Promise<{ id: number; is_active: boolean }> {
+  return request<{ id: number; is_active: boolean }>(`/v1/admin/users/${id}/ban`, {
+    method: "PATCH",
     auth: true,
   });
 }

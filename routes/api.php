@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminAiProviderController;
 use App\Http\Controllers\Admin\AdminApiCallController;
 use App\Http\Controllers\Admin\AdminApiKeyController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminFinanceController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminProductController;
@@ -144,7 +145,9 @@ Route::middleware('uid.auth')->prefix('v1')->group(function (): void {
     Route::middleware('admin')->group(function (): void {
         Route::get('admin/orders', [AdminOrderController::class, 'apiIndex']);
         Route::post('admin/orders/{id}/ship', [AdminOrderController::class, 'apiShip'])->whereNumber('id');
+        Route::get('admin/dashboard/stats', [AdminDashboardController::class, 'apiStats']);
         Route::get('admin/users', [AdminUserController::class, 'apiIndex']);
+        Route::patch('admin/users/{id}/ban', [AdminUserController::class, 'apiToggleBan'])->whereNumber('id');
         Route::get('admin/products', [AdminProductController::class, 'apiIndex']);
         Route::post('admin/products', [AdminProductController::class, 'apiStore']);
         Route::put('admin/products/{id}', [AdminProductController::class, 'apiUpdate'])->whereNumber('id');
