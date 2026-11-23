@@ -72,6 +72,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
   notFoundComponent: NotFoundComponent,
   beforeLoad: async ({ location }) => {
+    if (location.pathname === "/auth/callback") return;
     if (typeof window === "undefined") return;
 
     const token = localStorage.getItem(TOKEN_KEY);
