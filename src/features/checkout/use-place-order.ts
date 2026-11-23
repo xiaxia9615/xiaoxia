@@ -44,9 +44,14 @@ export function usePlaceOrder(ids: string) {
       const selected = payments.find((p) =>
         p.name.toLowerCase().includes(payment === "alipay" ? "alipay" : payment),
       );
+      // 从结算预览中提取商品 ID（goods_id），而非购物车项 ID
+      const productIds = (checkoutQuery.data?.items ?? []).map((it) => it.goods_id);
+      if (productIds.length === 0) {
+        throw new Error("没有可结算的商品");
+      }
       const order = await buyAdd({
         buyType: "cart",
-        ids: idArr,
+        ids: productIds,
         addressId: defaultAddr.address_id,
         paymentId: selected?.id,
       });
@@ -74,8 +79,11 @@ export function usePlaceOrder(ids: string) {
     payment,
     setPayment,
     placeOrder,
-    /** 提交订单（同一动作出口，供页面按钮调用） */
-    submitOrder: () => placeOrder.mutate(),
+    /** 提交订单（同一动作出口，供页面按钮调用，防重复提交） */
+    submitOrder: () => {
+      if (placeOrder.isPending) return;
+      placeOrder.mutate();
+    },
     checkout: checkoutQuery.data,
     checkoutError: checkoutQuery.error,
     isLoading: checkoutQuery.isLoading,

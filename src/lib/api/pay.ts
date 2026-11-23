@@ -82,14 +82,14 @@ export async function buyAdd(input:
   | { buyType: "goods"; goodsData: Array<{ goods_id: number; stock?: number }>; addressId: number; paymentId?: number },
 ): Promise<BuyAddData> {
   const body: Record<string, unknown> = {
-    buy_type: input.buyType,
     address_id: input.addressId,
     payment_id: input.paymentId ?? 0,
   };
   if (input.buyType === "cart") {
-    body.ids = input.ids.join(",");
+    // 后端 buyAdd 只接受 product_id（单品下单），取第一个商品
+    body.product_id = input.ids[0] ?? 0;
   } else {
-    body.goods_data = input.goodsData;
+    body.product_id = input.goodsData[0]?.goods_id ?? 0;
   }
   return request<BuyAddData>("/buy/add", {
     method: "POST",
