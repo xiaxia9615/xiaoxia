@@ -42,7 +42,9 @@ export async function fetchCheckout(input: {
   buyType: "cart";
   ids: number[];
 }): Promise<CheckoutData> {
-  const data = await request<CheckoutData>("/buy/index", {
+  const data = await request<Omit<CheckoutData, 'items'> & {
+    items?: Array<CheckoutItem & { goods_name?: string; quantity?: number }>;
+  }>("/buy/index", {
     method: "POST",
     auth: true,
     body: {
@@ -50,7 +52,21 @@ export async function fetchCheckout(input: {
       ids: input.ids.join(","),
     },
   });
-  return data;
+  // 后端返回 goods_name/quantity，前端期望 name/count，做字段映射
+  return {
+    ...data,
+    items: (data.items ?? []).map((it) => ({
+      goods_id: Number(it.goods_id ?? 0),
+      name: String(it.name ?? it.goods_name ?? ""),
+      image: String(it.image ?? ""),
+      spec_text: typeof it.spec_text === "string" ? it.spec_text : undefined,
+      price: Number(it.price ?? 0),
+      original_price: Number(it.original_price ?? it.price ?? 0),
+      count: Number(it.count ?? it.quantity ?? 1),
+      stock: Number(it.stock ?? 0),
+      nature: it.nature === "virtual" ? "virtual" : "physical",
+    })),
+  };
 }
 
 /** 下单返回（buy/add）。 */
