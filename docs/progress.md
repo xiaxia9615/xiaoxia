@@ -8,7 +8,7 @@
 |---|---|---|
 | 测试基线 | **168 passed / 635 断言** | 全绿；本仓库历史删除 16 个 Admin/Blade 测试文件（`b906a59`/`6e17c32`/`febedeb`），上一版看板记录的 236 已不适用 |
 | CI/CD | 已上线且持续转绿 | GitHub Actions（PHP 8.5 + MySQL 8.0 + Redis 7），tsc 作为唯一强类型安全网 |
-| 架构守卫 | 13 项全绿 | 模块边界 + 防裸查 + 防绕过 WalletService（`check-architecture.mjs`） |
+| 架构守卫 | 6 规则 + 12 路由预算 | 模块边界 + 防裸查 + 防绕过 WalletService + 路由体积/提交逻辑（`check-architecture.mjs`）；当前 `src/routes/admin/skills.tsx` 待迁移 |
 | 静态分析 | Larastan 0 errors + Pint 0 issues | 已接入 |
 | 前端质量 | typecheck 0 errors + build 通过 | tsc --noEmit + Vite 构建 |
 | 模块数 | **21 个目录 / 18 个注册** | app/Modules/ 下 21 个目录；config/modules.php list 注册 18 个（含 ServiceProvider）；Goods/Favor/Aftersale 仅有 Http/Controllers 目录，无 ServiceProvider，未纳入 list |
@@ -26,7 +26,7 @@
 
 ### 多方式登录认证（阶段 1-3，2026-11-16 ~ 11-17）
 - **阶段 1 依赖与表结构**：overtrue/easy-sms ^3.5 + laravel/socialite ^5.32 + socialiteproviders/weixin ^4.1 + yansongda/pay ^3.7；users 表新增 provider/provider_id + 联合索引，email/password 改 nullable
-- **阶段 2 腾讯云短信 + 手机号登录**：config/easysms.php（qcloud 通道）；SmsService（失败记 Log 抛异常）；AuthController smsSend（Redis 频控：手机号 60s 一次 + IP 每小时 5 次，超限 429）+ smsLogin（校验成功立即删 Key 防复用、用户不存在自动创建、签发 Sanctum token、禁用账号 403）
+- **阶段 2 腾讯云短信 + 手机号登录**：config/easysms.php（qcloud 通道）；SmsService（失败记 Log 抛异常）；AuthController smsSend（⚠️ 频控待补：`config/ratelimit.php` 缺 `sms_per_minute`，当前 SMS 接口无有效限流）+ smsLogin（校验成功立即删 Key 防复用、用户不存在自动创建、签发 Sanctum token、禁用账号 403）
 - **阶段 3 OAuth 三方登录**：SocialiteController（GitHub/微信，provider+provider_id 查找或创建用户）；AlipayController（官方网关手写 RSA2 签名，auth_code 换 token + 获取用户信息）；回调统一重定向 `https://xiaoxia.ren/#/auth/callback?token=***&redirect=/`
 - **认证中间件**：`UidAuth`（UID 签名认证，兼容 Sanctum Token）+ `EnsureUserIsAdmin` + `EnsureIsFinance` + `EnsureUserIsActive` + `ThrottleByUserOrIp`
 - **待用户**：.env 填入真实腾讯云短信密钥并实测发送
