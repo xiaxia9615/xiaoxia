@@ -1,6 +1,6 @@
 # 项目开发进度看板
 
-> 最后更新：2026-11-23 | 状态：支付宝真实网关已跑通 + SPA 化完成 + 21 模块全量注册，Git HEAD `e8c7b77`
+> 最后更新：2026-11-24 | 状态：支付宝真实网关已跑通 + SPA 化完成 + 21 目录 / 18 模块注册，Git HEAD `672fbb9`
 
 ## 📊 核心数据
 
@@ -17,42 +17,6 @@
 | Git HEAD | `e8c7b77` | feat(admin): 完善用户封禁与订单分页逻辑，修复金额精度展示 |
 
 ## 🟢 已完成
-
-### 支付宝真实网关接入（2026-11-17 ~ 11-22）
-- **后端**：`AlipayGateway` 使用 `yansongda/pay ^3.7` SDK 公钥证书模式；`AlipayController` 手写 RSA2 签名实现 OAuth 授权（app_cert_sn + alipay_root_cert_sn）；auth_code 换 token + 获取用户信息；兼容 open_id
-- **前端**：二维码弹窗 `pay-qr-dialog.tsx` + 状态轮询 + 主动查单页 `pay-self-check`（解决支付成功但回调失败的死单问题）
-- **多轮修复**：GBK 编码 / BOM / 根证书 SN / open_id 兼容 / 时区问题
-- **关键 commit**：`b7f3ec4`, `30d576c`, `f4f0bea`
-
-### 多方式登录认证（阶段 1-3，2026-11-16 ~ 11-17）
-- **阶段 1 依赖与表结构**：overtrue/easy-sms ^3.5 + laravel/socialite ^5.32 + socialiteproviders/weixin ^4.1 + yansongda/pay ^3.7；users 表新增 provider/provider_id + 联合索引，email/password 改 nullable
-- **阶段 2 腾讯云短信 + 手机号登录**：config/easysms.php（qcloud 通道）；SmsService（失败记 Log 抛异常）；AuthController smsSend（⚠️ 频控待补：`config/ratelimit.php` 缺 `sms_per_minute`，当前 SMS 接口无有效限流）+ smsLogin（校验成功立即删 Key 防复用、用户不存在自动创建、签发 Sanctum token、禁用账号 403）
-- **阶段 3 OAuth 三方登录**：SocialiteController（GitHub/微信，provider+provider_id 查找或创建用户）；AlipayController（官方网关手写 RSA2 签名，auth_code 换 token + 获取用户信息）；回调统一重定向 `https://xiaoxia.ren/#/auth/callback?token=***&redirect=/`
-- **认证中间件**：`UidAuth`（UID 签名认证，兼容 Sanctum Token）+ `EnsureUserIsAdmin` + `EnsureIsFinance` + `EnsureUserIsActive` + `ThrottleByUserOrIp`
-- **待用户**：.env 填入真实腾讯云短信密钥并实测发送
-
-### P1 技术债清理：34 处裸表收敛（2026-11-17）
-- **Ledger 批次（c0e9e17）**：新建 LedgerQueryService（12 处委托，事务/悲观锁/复式记账逻辑不变）；AdminLedgerService 更名 AdminLedgerQueryService；新建 AiUsageDeductionService；删除死代码 Ledger DeductBalanceOnAiUsage 监听器（消除双重扣款隐患）
-- **Skill/Team/System/Order 批次（495b061）**：AdminSkillQueryService、TeamBillingQueryService、SystemQueryService、OrderService 分账幂等检查改走 LedgerQueryService::hasBizEntries
-- **验收**：业务代码 DB::table 清零（仅封装服务内部保留）；测试 236 passed / 4 skipped / 796 assertions 与基线一致
-
-### 订单模块后端真实实现 + 前端双态展示（2026-11-17）
-- **OrderController 真实实现**：show/orderDetail/orderCancel/orderDelete 全部对接真实数据，新增 toDetailPayload（含 nature/tracking_no/receiver_*/items）与 statusToNumber
-- **前端双态展示**：order-detail-page 虚拟商品已支付显示绿色「已自动交付」，收货信息/物流信息区仅实物订单显示
-- **越权测试**：新增 3 个测试（查看他人订单 404 / 取消他人订单 400 / 删除他人订单 404）
-
-### 全栈依赖安全升级（2026-11-17）
-- **Composer**：46 包升级，composer audit 0 漏洞
-- **NPM**：minor/patch 全量 + major 升级（orval 8.x、i18next 27.x、react-i18next 18.x、jsdom 31.x、vitest 5.x、jest-dom 7.x），npm audit 0 漏洞
-- **CI 修复**：composer install 前切换官方 Packagist 源 + --prefer-source；npm install 指定官方 registry
-
-### Admin 后台彻底重构（2026-11-15 ~ 11-16）
-- **统一布局体系**：抽离 `AdminPageLayout`、`DataTable`、`Pagination`、`StatusBadge` 共享组件，14 个模块路由全部接入
-- **AdminShell 升级**：侧边栏 5 组折叠菜单（概览/交易/资产/AI/系统）+ 顶部面包屑
-- **仪表盘极客暗黑风**：纯 SVG 折线图、动态数字滚动（use-count-up）、CRT 扫描线效果
-- **核心模块真实数据对接**（零 Mock）：财务中心（充值流水/提现审批双 Tab）、用户列表、AI 供应商、技能管理、API Keys、调用流水
-- **后端 JSON API 补齐**：4 个模块 7 条新路由（ai-providers/skills/api-keys/api-calls），全部挂 `v1/admin` + `auth:***`
-- **后续完善**（`e8c7b77`）：用户封禁逻辑、订单分页、金额精度展示修复、深色模式残留样式修复
 
 ### 双态商品与自动发货闭环
 - `products` 表新增 `nature`（physical/virtual）、`quota`、`skill_id` 字段
