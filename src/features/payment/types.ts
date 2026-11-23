@@ -10,14 +10,20 @@ export interface PayContext {
   orderId: number;
 }
 
+/** 支付结果：页面跳转、二维码展示、或失败。 */
+export type PayResult =
+  | { type: "launched" }
+  | { type: "qr_code"; qrCode: string; orderId: number }
+  | { type: "fallback" };
+
 /**
  * 支付策略：一个渠道一份实现。
- * 返回 true 表示已成功唤起/跳转（页面即将离开）。
+ * 返回 PayResult 描述支付发起后的处理方式。
  */
 export interface PayStrategy {
   readonly channel: PayChannel;
   /** 展示名，用于 UI 与提示文案 */
   readonly label: string;
   /** 调用后端 pay/submit 并按环境完成唤起 */
-  pay(ctx: PayContext): Promise<boolean>;
+  pay(ctx: PayContext): Promise<PayResult>;
 }

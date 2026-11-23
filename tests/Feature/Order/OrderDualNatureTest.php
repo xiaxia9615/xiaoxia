@@ -17,9 +17,9 @@ use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 /**
- * 双态商品分流测试：
- * - 场景 A：实物商品支付成功 -> 订单进入待发货（pending_shipment）；
- * - 场景 B：虚拟商品支付成功 -> 订单完成（completed）且买家钱包额度增加 quota。
+ * 双态商品支付测试：
+ * payOrder 不再修改订单状态或扣款，只返回支付信息。
+ * 订单状态由支付宝异步回调更新。
  */
 class OrderDualNatureTest extends TestCase
 {
@@ -41,8 +41,8 @@ class OrderDualNatureTest extends TestCase
         );
     }
 
-    /** 场景 A：购买实物商品 -> 支付成功 -> 订单状态为待发货 */
-    public function test_pay_physical_order_enters_pending_shipment(): void
+    /** 场景 A：购买实物商品 -> payOrder 返回支付信息，订单状态不变 */
+    public function test_pay_physical_order_returns_payment_info(): void
     {
         Http::fake();
 
@@ -60,20 +60,23 @@ class OrderDualNatureTest extends TestCase
 
         $orderService = app(OrderService::class);
         $order = $orderService->createOrder($buyer->id, $product->id);
-        $orderService->payOrder($order->id, $buyer->id);
+        $result = $orderService->payOrder($order->id, $buyer->id);
+
+        // 返回支付信息
+        $this->assertArrayHasKey('pay_url', $result);
 
         $paid = Order::find($order->id);
-        $this->assertSame(OrderStatus::PendingShipment, $paid->status);
-        $this->assertNotNull($paid->paid_at);
-        $this->assertNull($paid->tracking_no);
+        // 订单状态不变（由异步回调更新）
+        $this->assertSame(OrderStatus::Pending, $paid->status);
+        $this->assertNull($paid->paid_at);
 
-        // 实物订单不自动发货：买家余额只被扣款，无额外额度入账
-        $this->assertSame(40000, (int) Wallet::where('user_id', $buyer->id)->value('balance'));
+        // 钱包余额不变（不再扣款）
+        $this->assertSame(50000, (int) Wallet::where('user_id', $buyer->id)->value('balance'));
         $this->assertWalletLedgerEqual($buyer->id);
     }
 
-    /** 场景 B：购买虚拟商品 -> 支付成功 -> 订单完成且钱包额度增加 */
-    public function test_pay_virtual_order_completes_and_credits_quota(): void
+    /** 场景 B：购买虚拟商品 -> payOrder 返回支付信息，订单状态不变 */
+    public function test_pay_virtual_order_returns_payment_info(): void
     {
         Http::fake();
 
@@ -93,19 +96,23 @@ class OrderDualNatureTest extends TestCase
 
         $orderService = app(OrderService::class);
         $order = $orderService->createOrder($buyer->id, $product->id);
-        $orderService->payOrder($order->id, $buyer->id);
+        $result = $orderService->payOrder($order->id, $buyer->id);
+
+        // 返回支付信息
+        $this->assertArrayHasKey('pay_url', $result);
 
         $paid = Order::find($order->id);
-        $this->assertSame(OrderStatus::Completed, $paid->status);
-        $this->assertNotNull($paid->paid_at);
+        // 订单状态不变（由异步回调更新）
+        $this->assertSame(OrderStatus::Pending, $paid->status);
+        $this->assertNull($paid->paid_at);
 
-        // 扣款 10000 + 自动发货入账 3000 = 43000
-        $this->assertSame(43000, (int) Wallet::where('user_id', $buyer->id)->value('balance'));
+        // 钱包余额不变（不再扣款、不自动发货）
+        $this->assertSame(50000, (int) Wallet::where('user_id', $buyer->id)->value('balance'));
         $this->assertWalletLedgerEqual($buyer->id);
 
-        // 幂等：重复支付不重复扣款、不重复加额度
+        // 重复调用仍返回支付信息，不报错
         $again = $orderService->payOrder($order->id, $buyer->id);
-        $this->assertSame('already_paid', $again['status']);
-        $this->assertSame(43000, (int) Wallet::where('user_id', $buyer->id)->value('balance'));
+        $this->assertArrayHasKey('pay_url', $again);
+        $this->assertSame(50000, (int) Wallet::where('user_id', $buyer->id)->value('balance'));
     }
 }

@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 import { toErrorMessage } from "@/lib/api";
 import type { BuyAddData } from "@/lib/api";
-import type { PayChannel, PayStrategy } from "./types";
+import type { PayChannel, PayResult, PayStrategy } from "./types";
 import { alipayStrategy } from "./strategies/alipay";
 import { weixinStrategy } from "./strategies/weixin";
 import { TRACK_EVENTS, track } from "@/lib/observability";
@@ -32,12 +32,12 @@ export function getPayStrategy(channel: PayChannel): PayStrategy {
 /**
  * 统一支付入口：按渠道取出策略执行。
  *
- * @returns true 表示支付流程已发起（页面即将跳转）
+ * @returns PayResult 描述支付发起后的处理方式（跳转/二维码/兜底）
  */
 export async function startPay(
   order: Pick<BuyAddData, "order_ids" | "order_sn">,
   channel: PayChannel = "alipay",
-): Promise<boolean> {
+): Promise<PayResult> {
   const orderId = order.order_ids[0];
   if (!orderId) {
     throw new Error("订单信息缺失，无法发起支付");
@@ -45,21 +45,23 @@ export async function startPay(
   const strategy = STRATEGIES[channel];
   track(TRACK_EVENTS.payStart, { orderId, channel });
 
-  let launched: boolean;
+  let result: PayResult;
   try {
-    launched = await strategy.pay({ order, orderId });
+    result = await strategy.pay({ order, orderId });
   } catch (err) {
     track(TRACK_EVENTS.payResult, { orderId, channel, ok: false });
     throw err;
   }
-  track(TRACK_EVENTS.payResult, { orderId, channel, ok: launched });
 
-  if (!launched) {
+  const ok = result.type === "launched" || result.type === "qr_code";
+  track(TRACK_EVENTS.payResult, { orderId, channel, ok });
+
+  if (result.type === "fallback") {
     toast.success("订单已创建，请前往订单页完成支付", {
       description: `订单号 ${order.order_sn}`,
     });
   }
-  return launched;
+  return result;
 }
 
 /** 支付失败时的统一提示文案。 */

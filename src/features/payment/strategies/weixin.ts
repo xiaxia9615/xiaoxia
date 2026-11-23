@@ -1,5 +1,5 @@
 import { detectPayClient, paySubmit } from "@/lib/api";
-import type { PayContext, PayStrategy } from "../types";
+import type { PayContext, PayResult, PayStrategy } from "../types";
 
 /**
  * 微信支付策略。
@@ -10,7 +10,7 @@ export const weixinStrategy: PayStrategy = {
   channel: "weixin",
   label: "微信支付",
 
-  async pay({ orderId }: PayContext): Promise<boolean> {
+  async pay({ orderId }: PayContext): Promise<PayResult> {
     const pay = await paySubmit({
       orderId,
       payment: this.channel,
@@ -18,8 +18,8 @@ export const weixinStrategy: PayStrategy = {
     });
     if (pay.pay_url) {
       window.location.href = pay.pay_url;
-      return true;
+      return { type: "launched" };
     }
-    return false;
+    return { type: "fallback" };
   },
 };

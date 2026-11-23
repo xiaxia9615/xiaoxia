@@ -34,9 +34,10 @@ class OrderCommissionTest extends TestCase
 
         $this->actingAs($buyer, 'sanctum')->postJson("/api/v1/orders/{$order->id}/pay")->assertOk();
 
+        // payOrder 不再扣款和分账，由异步回调处理
         $ledger = app(LedgerContract::class);
-        $this->assertEquals(8000, $ledger->balance('user', $seller->id, 'balance'));
-        $this->assertEquals(-48000, $ledger->balance('platform', 0, 'platform'));
+        $this->assertEquals(0, $ledger->balance('user', $seller->id, 'balance'));
+        $this->assertEquals(-50000, $ledger->balance('platform', 0, 'platform'));
     }
 
     public function test_pay_order_with_distributor()
@@ -53,9 +54,10 @@ class OrderCommissionTest extends TestCase
 
         $this->actingAs($buyer, 'sanctum')->postJson("/api/v1/orders/{$order->id}/pay")->assertOk();
 
+        // payOrder 不再扣款和分账，由异步回调处理
         $ledger = app(LedgerContract::class);
-        $this->assertEquals(8000, $ledger->balance('user', $seller->id, 'balance'));
-        $this->assertEquals(1000, $ledger->balance('user', $distributor->id, 'balance'));
-        $this->assertEquals(-49000, $ledger->balance('platform', 0, 'platform'));
+        $this->assertEquals(0, $ledger->balance('user', $seller->id, 'balance'));
+        $this->assertEquals(0, $ledger->balance('user', $distributor->id, 'balance'));
+        $this->assertEquals(-50000, $ledger->balance('platform', 0, 'platform'));
     }
 }

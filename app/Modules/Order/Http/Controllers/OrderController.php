@@ -59,8 +59,8 @@ final class OrderController
 
         return response()->json([
             'code' => 0,
-            'data' => $result['order'],
-            'message' => $result['message'] ?? '支付成功',
+            'data' => $result,
+            'message' => '支付二维码已生成',
         ]);
     }
 

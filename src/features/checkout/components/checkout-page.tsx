@@ -8,10 +8,11 @@ import { cn } from "@/lib/utils";
 import { formatPrice } from "@/data/products";
 import { AppImage } from "@/components/system/app-image";
 import { usePlaceOrder } from "../use-place-order";
+import { PayQrDialog } from "@/features/payment/components/pay-qr-dialog";
 
 /** 结算页：交易流程在 usePlaceOrder，组件只负责渲染。 */
 export function CheckoutPage({ ids }: { ids: string }) {
-  const { payment, setPayment, placeOrder, submitOrder, checkout, checkoutError, isLoading, addresses } =
+  const { payment, setPayment, placeOrder, submitOrder, checkout, checkoutError, isLoading, addresses, qrDialog, closeQrDialog, onQrPaySuccess } =
     usePlaceOrder(ids);
 
   const defaultAddr = addresses.find((a) => a.is_default) ?? addresses[0];
@@ -133,6 +134,14 @@ export function CheckoutPage({ ids }: { ids: string }) {
           </div>
         )}
       </main>
+
+      <PayQrDialog
+        open={qrDialog.open}
+        qrCode={qrDialog.qrCode}
+        orderId={qrDialog.orderId}
+        onClose={closeQrDialog}
+        onSuccess={onQrPaySuccess}
+      />
     </SiteLayout>
   );
 }

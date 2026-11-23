@@ -15,6 +15,11 @@ export function usePlaceOrder(ids: string) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [payment, setPayment] = useState<PayChannel>("alipay");
+  const [qrDialog, setQrDialog] = useState<{ open: boolean; qrCode: string; orderId: number }>({
+    open: false,
+    qrCode: "",
+    orderId: 0,
+  });
 
   const idArr = ids
     .split(",")
@@ -57,10 +62,19 @@ export function usePlaceOrder(ids: string) {
       });
       if (!order.order_ids?.length) throw new Error("下单失败，请稍后重试");
       track(TRACK_EVENTS.placeOrder, { orderId: order.order_ids[0], channel: payment });
-      await startPay(order, payment);
-      return order;
+      const result = await startPay(order, payment);
+      return { order, result };
     },
-    onSuccess: async () => {
+    onSuccess: async ({ result }) => {
+      if (result.type === "qr_code") {
+        setQrDialog({
+          open: true,
+          qrCode: result.qrCode,
+          orderId: result.orderId,
+        });
+        toast.success("订单已创建，请扫码支付");
+        return;
+      }
       toast.success("下单成功");
       await queryClient.invalidateQueries({ queryKey: ["cart"] });
       await navigate({ to: "/orders" });
@@ -79,6 +93,13 @@ export function usePlaceOrder(ids: string) {
     payment,
     setPayment,
     placeOrder,
+    qrDialog,
+    closeQrDialog: () => setQrDialog((prev) => ({ ...prev, open: false })),
+    onQrPaySuccess: async () => {
+      setQrDialog((prev) => ({ ...prev, open: false }));
+      await queryClient.invalidateQueries({ queryKey: ["cart"] });
+      await navigate({ to: "/orders" });
+    },
     /** 提交订单（同一动作出口，供页面按钮调用，防重复提交） */
     submitOrder: () => {
       if (placeOrder.isPending) return;

@@ -3,7 +3,6 @@
 namespace Tests\Feature\Order;
 
 use App\Models\User;
-use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Models\Order;
 use App\Modules\Product\Models\Product;
@@ -74,7 +73,6 @@ class OrderTest extends TestCase
         $buyer = $this->user();
         $seller = $this->user();
         $product = $this->product($seller);
-        $this->giveBalance($buyer, 50000);
 
         $order = Order::factory()->create([
             'user_id' => $buyer->id,
@@ -83,15 +81,17 @@ class OrderTest extends TestCase
             'status' => OrderStatus::Pending->value,
         ]);
 
-        $this->actingAs($buyer, 'sanctum')
-            ->postJson("/api/v1/orders/{$order->id}/pay")
-            ->assertOk();
+        $response = $this->actingAs($buyer, 'sanctum')
+            ->postJson("/api/v1/orders/{$order->id}/pay");
 
-        // 实物商品支付后进入待发货（双态分流：physical -> pending_shipment）
-        $this->assertEquals(OrderStatus::PendingShipment, $order->fresh()->status);
+        $response->assertOk();
+        $response->assertJsonStructure(['code', 'data', 'message']);
+
+        // payOrder 不再修改订单状态，由异步回调更新
+        $this->assertEquals(OrderStatus::Pending, $order->fresh()->status);
     }
 
-    public function test_pay_order_insufficient_balance(): void
+    public function test_pay_order_amount_below_minimum(): void
     {
         Http::fake();
         $buyer = $this->user();
@@ -101,7 +101,7 @@ class OrderTest extends TestCase
         $order = Order::factory()->create([
             'user_id' => $buyer->id,
             'product_id' => $product->id,
-            'amount' => 10000,
+            'amount' => 5,
             'status' => OrderStatus::Pending->value,
         ]);
 
@@ -125,11 +125,12 @@ class OrderTest extends TestCase
             'status' => OrderStatus::Pending->value,
         ]);
 
+        // 两次调用都成功返回支付信息，订单状态不变
         $this->actingAs($buyer, 'sanctum')->postJson("/api/v1/orders/{$order->id}/pay")->assertOk();
         $this->actingAs($buyer, 'sanctum')->postJson("/api/v1/orders/{$order->id}/pay")->assertOk();
 
-        $balance = app(LedgerContract::class)->balance('user', $buyer->id, 'balance');
-        $this->assertEquals(40000, $balance);
+        // 订单仍为待支付，钱包余额不变（不再扣款）
+        $this->assertEquals(OrderStatus::Pending, $order->fresh()->status);
     }
 
     public function test_cannot_view_others_order_detail(): void
@@ -148,12 +149,10 @@ class OrderTest extends TestCase
 
         $attacker = $this->user();
 
-        // 旧风格端点：order/detail
         $this->actingAs($attacker, 'sanctum')
             ->getJson('/api/v1/order/detail?id='.$order->id)
             ->assertStatus(404);
 
-        // REST 端点：orders/{id}
         $this->actingAs($attacker, 'sanctum')
             ->getJson("/api/v1/orders/{$order->id}")
             ->assertStatus(404);

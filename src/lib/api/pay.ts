@@ -111,6 +111,8 @@ export interface PaySubmitData {
   order_str?: string;
   /** 收银台跳转 URL（电脑网站支付），后端补齐后返回。 */
   pay_url?: string;
+  /** 支付宝扫码支付二维码 URL（alipay.trade.precreate），后端返回。 */
+  qr_code?: string;
   /** 电脑网站支付 HTML 表单（alipay.trade.page.pay），后端生成，前端渲染提交。 */
   pay_form?: string;
   /** 客户端类型：app / mini / pc。 */

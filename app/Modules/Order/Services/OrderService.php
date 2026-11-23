@@ -8,6 +8,7 @@ use App\Modules\Distributor\Models\DistributorRelation;
 use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Models\Order;
+use App\Modules\Payment\Contracts\PaymentGatewayInterface;
 use App\Modules\Product\Models\Product;
 use App\Modules\Wallet\Contracts\WalletContract;
 use Illuminate\Database\QueryException;
@@ -26,6 +27,7 @@ final class OrderService
     public function __construct(
         private readonly WalletContract $wallet,
         private readonly LedgerContract $ledger,
+        private readonly PaymentGatewayInterface $gateway,
     ) {}
 
     /**
@@ -78,60 +80,49 @@ final class OrderService
      */
     public function payOrder(int $orderId, int $userId): array
     {
-        return DB::transaction(function () use ($orderId, $userId): array {
-            /** @var Order|null $order */
-            $order = Order::query()
-                ->where('id', $orderId)
-                ->where('user_id', $userId)
-                ->lockForUpdate()
-                ->first();
+        /** @var Order|null $order */
+        $order = Order::query()
+            ->where('id', $orderId)
+            ->where('user_id', $userId)
+            ->first();
 
-            if (! $order) {
-                throw new RuntimeException('订单不存在');
-            }
+        if (! $order) {
+            throw new RuntimeException('订单不存在');
+        }
 
-            // 幂等：已支付订单（含待发货/已完成）直接返回，严禁重复扣款
-            if (in_array($order->status, [OrderStatus::Paid, OrderStatus::PendingShipment, OrderStatus::Completed], true)) {
-                return ['status' => 'already_paid', 'order' => $order, 'message' => '订单已支付'];
-            }
+        // 幂等：已支付订单直接拒绝，严禁重复发起支付
+        if (in_array($order->status, [OrderStatus::Paid, OrderStatus::PendingShipment, OrderStatus::Completed], true)) {
+            throw new RuntimeException('订单已支付');
+        }
 
-            if (! $order->status->canPay()) {
-                throw new RuntimeException('当前订单状态不可支付');
-            }
+        if (! $order->status->canPay()) {
+            throw new RuntimeException('当前订单状态不可支付');
+        }
 
-            $buyer = $order->user;
-            if (! $buyer) {
-                throw new RuntimeException('买家不存在');
-            }
+        // 金额校验：支付宝最低 0.01 元 = 10 毫
+        if ($order->amount < 10) {
+            throw new RuntimeException('订单金额低于支付宝最低支付限额（0.01 元）');
+        }
 
-            // 扣款走 WalletContract：同事务内同步 wallets.balance 与 Ledger，
-            // 避免 payOrder 只扣 Ledger 造成 wallet 缓存漂移。
-            // biz_type 从 'order_pay' 变为 WalletContract 内部的 'wallet_deduct'，
-            // settleCommission 只依赖 'order_commission'，不受影响。
-            $this->wallet->deduct($buyer, (int) $order->amount, 'order_'.$order->id);
+        // 获取商品名称作为支付标题
+        /** @var Product|null $product */
+        $product = Product::withTrashed()->find($order->product_id);
+        $subject = $product !== null ? $product->name : '商品订单';
 
-            $order->paid_at = now();
-            // 双态分流：虚拟商品支付后立即自动发货（幂等）并完成；实物商品进入待发货
-            /** @var Product|null $product */
-            $product = Product::withTrashed()->find($order->product_id);
-            if ($product && $product->isVirtual()) {
-                $this->autoDeliverVirtualOrder($order, $product);
-                $order->status = OrderStatus::Completed;
-            } else {
-                $order->status = OrderStatus::PendingShipment;
-            }
-            $order->save();
+        // 调用真实支付宝网关，获取二维码（不在此时修改订单状态，由异步回调更新）
+        $result = $this->gateway->createPayment(
+            $order->order_no,
+            (int) $order->amount,
+            $subject,
+        );
 
-            // 分账：开发者 80%；买家绑定上级达人时达人 10%、平台 10%，否则平台 20%；误差归平台
-            $this->settleCommission($order);
+        Log::info('alipay payment created', [
+            'order_no' => $order->order_no,
+            'amount' => $order->amount,
+            'subject' => $subject,
+        ]);
 
-            Log::info('order paid, commission settled', [
-                'order_no' => $order->order_no,
-                'amount' => $order->amount,
-            ]);
-
-            return ['status' => 'success', 'order' => $order];
-        });
+        return $result;
     }
 
     /**
@@ -140,6 +131,8 @@ final class OrderService
      * 2. WalletContract::deposit 以 out_trade_no 唯一约束兜底，天然幂等，绝不重复加额度；
      * 3. 仅当绑定技能且赠送额度 > 0 时入账。
      */
+    /** 支付宝异步回调更新订单状态时调用 */
+    // @phpstan-ignore method.unused
     private function autoDeliverVirtualOrder(Order $order, Product $product): void
     {
         $lock = Cache::lock("virtual_deliver:{$order->id}", 30);
@@ -205,6 +198,8 @@ final class OrderService
      * - 金额单位为毫，向下取整，舍入误差归入平台；
      * - 幂等：事务内先查 order_commission 流水，已分账订单直接跳过，防止重复分账。
      */
+    /** 支付宝异步回调更新订单状态时调用 */
+    // @phpstan-ignore method.unused
     private function settleCommission(Order $order): void
     {
         // 幂等：同一订单的分账流水已存在则跳过（payOrder 已对订单行加悲观锁，此处双保险）

@@ -6,12 +6,12 @@ namespace Tests\Feature\Order;
 
 use App\Models\User;
 use App\Modules\Ledger\Contracts\LedgerContract;
+use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Services\OrderService;
 use App\Modules\Product\Models\Product;
 use App\Modules\Wallet\Models\Wallet;
 use App\Modules\Wallet\Services\WalletService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class OrderPayWalletSyncTest extends TestCase
@@ -41,45 +41,43 @@ class OrderPayWalletSyncTest extends TestCase
         $product = Product::factory()->skill()->create(['status' => 1, 'price' => 5000]);
         $order = $orderService->createOrder($user->id, $product->id);
 
-        $orderService->payOrder($order->id, $user->id);
+        // payOrder 不再扣款，只返回支付信息
+        $result = $orderService->payOrder($order->id, $user->id);
+        $this->assertArrayHasKey('pay_url', $result);
 
+        // 钱包余额不变（支付前 10000，支付后仍 10000）
         $this->assertWalletLedgerEqual($user->id);
         $wallet = Wallet::where('user_id', $user->id)->first();
-        $this->assertSame(5000, (int) $wallet->balance);
-        $this->assertSame(5000, app(LedgerContract::class)->balance('user', $user->id, 'balance'));
+        $this->assertSame(10000, (int) $wallet->balance);
 
-        $this->assertDatabaseHas('ledger_entries', ['biz_type' => 'order_commission']);
+        // 订单状态不变（由异步回调更新）
+        $this->assertEquals(OrderStatus::Pending, $order->fresh()->status);
     }
 
-    public function test_insufficient_balance_rolls_back_both(): void
+    public function test_pay_order_amount_below_minimum(): void
     {
         $user = User::factory()->create();
         $walletService = app(WalletService::class);
         $orderService = app(OrderService::class);
 
-        $walletService->deposit($user, 3000, 'recharge_test_2');
-        $this->assertWalletLedgerEqual($user->id);
-
-        $product = Product::factory()->skill()->create(['status' => 1, 'price' => 5000]);
+        $walletService->deposit($user, 10000, 'recharge_test_2');
+        $product = Product::factory()->skill()->create(['status' => 1, 'price' => 5]);
         $order = $orderService->createOrder($user->id, $product->id);
 
         try {
             $orderService->payOrder($order->id, $user->id);
             $this->fail('Expected RuntimeException');
         } catch (\RuntimeException $e) {
-            // expected
+            $this->assertStringContainsString('最低支付限额', $e->getMessage());
         }
 
+        // 钱包余额不变
         $this->assertWalletLedgerEqual($user->id);
         $wallet = Wallet::where('user_id', $user->id)->first();
-        $this->assertSame(3000, (int) $wallet->balance);
-        $this->assertSame(3000, app(LedgerContract::class)->balance('user', $user->id, 'balance'));
-
-        $order->refresh();
-        $this->assertSame('pending', $order->status->value);
+        $this->assertSame(10000, (int) $wallet->balance);
     }
 
-    public function test_duplicate_pay_is_idempotent(): void
+    public function test_duplicate_pay_returns_payment_info(): void
     {
         $user = User::factory()->create();
         $walletService = app(WalletService::class);
@@ -89,22 +87,21 @@ class OrderPayWalletSyncTest extends TestCase
         $product = Product::factory()->skill()->create(['status' => 1, 'price' => 5000]);
         $order = $orderService->createOrder($user->id, $product->id);
 
+        // 两次调用都返回支付信息，不扣款
         $result1 = $orderService->payOrder($order->id, $user->id);
-        $this->assertSame('success', $result1['status']);
+        $this->assertArrayHasKey('pay_url', $result1);
         $this->assertWalletLedgerEqual($user->id);
-
-        $wallet = Wallet::where('user_id', $user->id)->first();
-        $this->assertSame(5000, (int) $wallet->balance);
 
         $result2 = $orderService->payOrder($order->id, $user->id);
-        $this->assertSame('already_paid', $result2['status']);
+        $this->assertArrayHasKey('pay_url', $result2);
 
+        // 钱包余额不变
         $this->assertWalletLedgerEqual($user->id);
         $wallet = Wallet::where('user_id', $user->id)->first();
-        $this->assertSame(5000, (int) $wallet->balance);
+        $this->assertSame(10000, (int) $wallet->balance);
     }
 
-    public function test_commission_settled_after_pay(): void
+    public function test_pay_does_not_settle_commission(): void
     {
         $user = User::factory()->create();
         $walletService = app(WalletService::class);
@@ -116,14 +113,8 @@ class OrderPayWalletSyncTest extends TestCase
 
         $orderService->payOrder($order->id, $user->id);
 
-        $this->assertDatabaseHas('ledger_entries', ['biz_type' => 'order_commission']);
-
-        $commissionTotal = (int) DB::table('ledger_entries')
-            ->where('biz_type', 'order_commission')
-            ->where('biz_id', $order->id)
-            ->where('direction', 'credit')
-            ->sum('amount');
-        $this->assertSame(5000, $commissionTotal);
+        // payOrder 不再分账，由异步回调处理
+        $this->assertDatabaseMissing('ledger_entries', ['biz_type' => 'order_commission']);
     }
 
     public function test_wallet_ledger_equal_after_multiple_operations(): void
@@ -132,29 +123,26 @@ class OrderPayWalletSyncTest extends TestCase
         $walletService = app(WalletService::class);
         $orderService = app(OrderService::class);
 
-        // 充值 10000
         $walletService->deposit($user, 10000, 'recharge_multi_1');
         $this->assertWalletLedgerEqual($user->id);
 
-        // 支付 3000
+        // 支付不扣款，只返回支付信息
         $product1 = Product::factory()->skill()->create(['status' => 1, 'price' => 3000]);
         $order1 = $orderService->createOrder($user->id, $product1->id);
         $orderService->payOrder($order1->id, $user->id);
         $this->assertWalletLedgerEqual($user->id);
 
-        // 再充值 5000
         $walletService->deposit($user, 5000, 'recharge_multi_2');
         $this->assertWalletLedgerEqual($user->id);
 
-        // 再支付 2000
         $product2 = Product::factory()->skill()->create(['status' => 1, 'price' => 2000]);
         $order2 = $orderService->createOrder($user->id, $product2->id);
         $orderService->payOrder($order2->id, $user->id);
         $this->assertWalletLedgerEqual($user->id);
 
-        // 最终余额 = 10000 - 3000 + 5000 - 2000 = 10000
+        // 最终余额 = 10000 + 5000 = 15000（支付不扣款）
         $wallet = Wallet::where('user_id', $user->id)->first();
-        $this->assertSame(10000, (int) $wallet->balance);
-        $this->assertSame(10000, app(LedgerContract::class)->balance('user', $user->id, 'balance'));
+        $this->assertSame(15000, (int) $wallet->balance);
+        $this->assertSame(15000, app(LedgerContract::class)->balance('user', $user->id, 'balance'));
     }
 }
