@@ -1,5 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
-import { createBrowserHistory, createRouter } from "@tanstack/react-router";
+import { createHashHistory, createRouter } from "@tanstack/react-router";
 import { ApiError } from "@/lib/api";
 import { routeTree } from "./routeTree.gen";
 
@@ -26,11 +26,11 @@ export const getRouter = () => {
       mutations: { retry: false },
     },
   });
-  const browserHistory = createBrowserHistory();
+  const hashHistory = createHashHistory();
 
   const router = createRouter({
     routeTree,
-    history: browserHistory,
+    history: hashHistory,
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,

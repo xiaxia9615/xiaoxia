@@ -68,10 +68,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         return null;
       });
-      // 强制跳转登录页，记录当前路径用于登录后回跳（browser 路由）
-      const current = window.location.pathname + window.location.search || "/";
-      if (current !== "/login") {
-        window.location.href = `/login?redirect=${encodeURIComponent(current)}`;
+      // hash 路由模式：从 hash 提取当前路径，跳转到 /#/login
+      const hashPath = window.location.hash.slice(1) || "/";
+      if (hashPath !== "/login") {
+        window.location.href = `/#/login?redirect=${encodeURIComponent(hashPath)}`;
       }
     };
     window.addEventListener(AUTH_EXPIRED_EVENT, onExpired);

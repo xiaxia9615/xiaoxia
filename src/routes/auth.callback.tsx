@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { TOKEN_KEY, fetchProfile } from "@/lib/api";
+import { useAuth } from "@/features/account/auth-provider";
 
 /** OAuth 回调中转页：从 URL 解析 token，存入 localStorage，拉取用户信息后跳转。 */
 function AuthCallbackPage() {
   const navigate = useNavigate();
+  const { updateUser } = useAuth();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,11 +24,13 @@ function AuthCallbackPage() {
       return;
     }
 
+    // 先写入 token，request.ts 拦截器实时从 localStorage 读取
     localStorage.setItem(TOKEN_KEY, token);
 
     fetchProfile()
       .then((user) => {
-        localStorage.setItem("xiaoxia.user", JSON.stringify(user));
+        // 同步 AuthProvider context 状态 + localStorage
+        updateUser(user);
         navigate({ to: redirect.startsWith("/") ? redirect : "/" });
       })
       .catch(() => {
@@ -35,7 +39,7 @@ function AuthCallbackPage() {
         navigate({ to: "/login" });
       })
       .finally(() => setLoading(false));
-  }, [navigate]);
+  }, [navigate, updateUser]);
 
   return (
     <div className="grid min-h-screen place-items-center">

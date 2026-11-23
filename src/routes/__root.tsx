@@ -79,10 +79,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     const isLoginRoute = location.pathname === "/login";
 
     // 无 Token 访问 /admin/* → 重定向到 /login（携带 redirect 参数）
+    // hash 路由模式：从 hash 提取当前路径
     if (!token && isAdminRoute) {
+      const currentPath = window.location.hash.slice(1) || "/";
       throw redirect({
         to: "/login",
-        search: { redirect: window.location.pathname + window.location.search },
+        search: { redirect: currentPath },
       });
     }
 
