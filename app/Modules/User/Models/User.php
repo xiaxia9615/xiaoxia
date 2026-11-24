@@ -24,6 +24,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $phone
  * @property string|null $provider
  * @property string|null $provider_id
+ * @property string|null $unionid
  * @property string|null $avatar
  * @property int $status
  * @property string $developer_status
