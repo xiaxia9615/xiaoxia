@@ -61,6 +61,7 @@ final class SocialiteController
         }
 
         $providerId = (string) $socialUser->getId();
+        $unionid = (string) ($socialUser->getRaw()['unionid'] ?? '');
         $name = $socialUser->getName() ?? $socialUser->getNickname() ?? '用户';
         $avatar = $socialUser->getAvatar();
 
@@ -75,12 +76,16 @@ final class SocialiteController
                 'password' => null,
                 'provider' => $provider,
                 'provider_id' => $providerId,
+                'unionid' => $unionid !== '' ? $unionid : null,
                 'avatar' => $avatar,
                 'status' => 1,
             ]);
         } else {
             // 更新头像和昵称
             $user->avatar = $avatar;
+            if ($unionid !== '' && $user->unionid !== $unionid) {
+                $user->unionid = $unionid;
+            }
             $user->save();
         }
 

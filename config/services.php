@@ -46,6 +46,10 @@ return [
         'client_secret' => env('WEIXIN_CLIENT_SECRET'),
         'redirect' => env('WEIXIN_REDIRECT_URI', 'https://xiaoxia.ren/api/v1/auth/callback/weixin'),
     ],
+    'weixin_mini' => [
+        'appid' => env('WEIXIN_MINI_APP_ID'),
+        'secret' => env('WEIXIN_MINI_APP_SECRET'),
+    ],
 
     'alipay' => [
         'app_id' => env('ALIPAY_APP_ID'),
