@@ -51,7 +51,7 @@ final class SocialiteController
 
         try {
             /** @var \Laravel\Socialite\Two\User $socialUser */
-        $socialUser = Socialite::driver($provider)->user();
+            $socialUser = Socialite::driver($provider)->user();
         } catch (RuntimeException $e) {
             Log::error('Socialite callback failed: '.$e->getMessage(), [
                 'provider' => $provider,
