@@ -1,6 +1,6 @@
 # 项目开发进度看板
 
-> 最后更新：2026-11-24 | 状态：支付宝真实网关已跑通 + SPA 化完成 + 21 目录 / 18 模块注册，Git HEAD `672fbb9`
+> 最后更新：2026-11-24 | 状态：支付宝真实网关已跑通 + SPA 化完成 + 微信小程序/H5 静默登录接入，21 目录 / 18 模块注册，Git HEAD `aaf3159`
 
 ## 📊 核心数据
 
@@ -12,11 +12,15 @@
 | 静态分析 | Larastan 0 errors + Pint 0 issues | 已接入 |
 | 前端质量 | typecheck 0 errors + build 通过 | tsc --noEmit + Vite 构建 |
 | 模块数 | **21 个目录 / 18 个注册** | app/Modules/ 下 21 个目录；config/modules.php list 注册 18 个（含 ServiceProvider）；Goods/Favor/Aftersale 仅有 Http/Controllers 目录，无 ServiceProvider，未纳入 list |
-| 路由总数 | 110 条（`artisan route:list --json` 口径） | 含 Admin JSON API + API + SPA 兜底 |
+| 路由总数 | 111 条（`artisan route:list --json` 口径） | 含 Admin JSON API + API + SPA 兜底 |
 | Git 远程 | origin → Gitee + GitHub 双推 | 私有化仓库 |
-| Git HEAD | `e8c7b77` | feat(admin): 完善用户封禁与订单分页逻辑，修复金额精度展示 |
+| Git HEAD | `aaf3159` | feat(wechat): 完成前端H5静默登录接入与打包配置 |
 
 ## 🟢 已完成
+
+### 微信小程序 / H5 静默登录
+- 后端 `WechatMiniController`：通过 code2Session 获取 openid/unionid 并与 H5 账号打通；users 表新增 `unionid` 字段（`34c8276`）
+- 前端 `wechat-auth.ts`：微信内置浏览器 UA 检测，URL 携带 code 时静默换取 Token，存储方式与普通登录一致（`aaf3159`）
 
 ### 双态商品与自动发货闭环
 - `products` 表新增 `nature`（physical/virtual）、`quota`、`skill_id` 字段
@@ -63,7 +67,7 @@
 | checkout | checkout-page | use-place-order | ✅ 含虚拟商品逻辑 |
 | order | orders-page, order-detail-page, aftersales-page | useOrders, useOrderDetail, useAftersales | ✅ 完整 |
 | payment | pay-qr-dialog, pay-self-check-page | usePaySelfCheck | ✅ 支付宝二维码 + 轮询 + 主动查单 |
-| account | login-page, messages-page, profile-page, reset-password-dialog, auth.callback | use-auth-forms, use-address-book, use-messages, use-profile-forms, use-require-login | ✅ 登录/回调完整，资料编辑/改密/重置密码为空实现 |
+| account | login-page, messages-page, profile-page, reset-password-dialog, auth.callback | use-auth-forms, use-address-book, use-messages, use-profile-forms, use-require-login | ✅ 登录/回调/微信静默登录完整，资料编辑/改密/重置密码为空实现 |
 | assistant | — | useChat | ✅ 本地关键词规则匹配（非 LLM） |
 | article | — | — | ✅ 完整 |
 | admin | AdminShell, AdminPageLayout, DataTable, Pagination, StatusBadge, crt-overlay | — | ✅ 14 模块真实数据 |

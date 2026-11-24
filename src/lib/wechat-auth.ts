@@ -7,8 +7,8 @@ export const initWechatAuth = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get("code");
 
-  // 如果有 code，调接口换 Token
   if (code) {
+    window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
     fetch("/api/v1/auth/wechat-mini-login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -17,19 +17,18 @@ export const initWechatAuth = () => {
     .then(res => res.json())
     .then(data => {
       if (data.code === 0 && data.data?.token) {
-        // 与普通登录保持完全一致的存储方式
         localStorage.setItem(TOKEN_KEY, data.data.token);
         if (data.data.uid && data.data.uid !== "0") {
           localStorage.setItem(UID_KEY, data.data.uid);
         }
-        
-        // 清理 URL 上的 code，刷新回首页
-        window.location.href = window.location.origin + window.location.pathname + window.location.hash;
+        window.location.reload(); 
       } else {
-        console.error("微信登录失败:", data.message);
+        alert("❌ 微信登录接口报错：\n" + JSON.stringify(data));
       }
     })
-    .catch(err => console.error("请求失败:", err));
-    return;
+    .catch(err => {
+        alert("❌ 网络请求彻底失败：\n" + err.message);
+    });
+    return; 
   }
 };
