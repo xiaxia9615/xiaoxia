@@ -72,6 +72,7 @@ final class WechatMiniController
             'code' => 0,
             'data' => [
                 'token' => $user->createToken('wechat_mini')->plainTextToken,
+                'uid' => (string) ($user->uid ?? $user->id),
             ],
         ]);
     }

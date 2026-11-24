@@ -6,6 +6,10 @@ import { getRouter } from "./router";
 import { initObservability, reportError } from "./lib/observability";
 import "./styles.css";
 import "./i18n";
+import { initWechatAuth } from "./lib/wechat-auth";
+
+// 微信静默登录拦截
+initWechatAuth();
 
 // 先装可观测层，才能捕获后续初始化阶段的异常
 initObservability();
