@@ -99,7 +99,7 @@
 - [ ] 退款分账回滚（开发者模块开放后）
 
 ### P2 · 技术债
-- [ ] 15 个前端业务文件超 100 行拆分（product-form-modal 420 / login-page 359 / products-page 287 / products_.$productId 259 / finance-page 250 / address-dialog 239 等）；原 6 个中 5 个已拆，products 143→287 反而上升
+- [ ] 前端业务文件超 100 行拆分：Top 3 已完成（product-form-modal 420→350+schema 78 / login-page 359→219+icons 30+phone-form 117 / products-page 287→245+filter-bar 69），剩余 35 个（products_.$productId 259 / finance-page 250 / address-dialog 239 / zhen-sections 221 / header 220 等）
 - [ ] 历史资金数据回填脚本（涉及资金，建议人工复核）
 
 ### P1 · C 端打磨
