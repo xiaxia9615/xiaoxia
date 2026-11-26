@@ -40,7 +40,7 @@ class AftersaleService
             throw new RuntimeException('订单不存在或不属于当前用户');
         }
 
-        if (! in_array($order->status, ['paid', 'completed'], true)) {
+        if (! in_array($order->status->value, ['paid', 'completed'], true)) {
             throw new RuntimeException('当前订单状态不支持售后申请');
         }
 
@@ -87,6 +87,7 @@ class AftersaleService
         }
 
         $aftersale->status = 'cancelled';
+
         return $aftersale->save();
     }
 }

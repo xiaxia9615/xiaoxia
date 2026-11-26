@@ -146,7 +146,7 @@ class AdminOrderController extends Controller
         $companyName = $companyMap[$companyCode] ?? $companyCode;
         $tracks = [];
         try {
-            $url = 'https://www.kuaidi100.com/query?type=' . $companyCode . '&postid=' . $order->tracking_no . '&temp=' . random_int(100000, 999999);
+            $url = 'https://www.kuaidi100.com/query?type='.$companyCode.'&postid='.$order->tracking_no.'&temp='.random_int(100000, 999999);
             $ctx = stream_context_create(['http' => ['timeout' => 5]]);
             $resp = @file_get_contents($url, false, $ctx);
             if ($resp) {
@@ -163,6 +163,7 @@ class AdminOrderController extends Controller
         } catch (\Throwable $e) {
             // 查询失败不阻断，返回空轨迹
         }
+
         return response()->json([
             'code' => 0,
             'msg' => 'ok',

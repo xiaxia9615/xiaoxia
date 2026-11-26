@@ -35,7 +35,7 @@ final class AuthService
     {
         $user = User::where('email', $email)->first();
 
-        if (! $user || ! Hash::check($password, $user->password)) { // @phpstan-ignore-line
+        if (! $user || ! Hash::check($password, $user->password)) {
             throw new RuntimeException('invalid credentials');
         }
 

@@ -29,7 +29,7 @@ final class SmsService
     /**
      * 发送短信验证码到指定手机号。
      *
-     * @param string $scene 场景：register / login / bind_phone / change_phone
+     * @param  string  $scene  场景：register / login / bind_phone / change_phone
      *
      * @throws RuntimeException
      */

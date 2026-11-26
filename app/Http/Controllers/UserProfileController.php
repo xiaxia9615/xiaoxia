@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Modules\Wallet\Models\Wallet;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -27,14 +29,14 @@ final class UserProfileController extends Controller
                 'email' => $u->email,
                 'phone' => $u->phone,
                 'avatar' => $u->avatar,
+                'sex' => (int) $u->sex,
+                'birthday' => $u->birthday?->toDateString(),
                 'provider' => $u->provider,
                 'is_admin' => (bool) $u->is_admin,
                 'is_finance' => (bool) $u->is_finance,
                 'is_active' => (bool) $u->is_active,
                 'is_developer' => (bool) $u->is_developer,
-                'developer_status' => $u->developer_status instanceof \BackedEnum
-                    ? $u->developer_status->value
-                    : (string) $u->developer_status,
+                'developer_status' => $u->developer_status?->value,
                 'created_at' => $u->created_at?->toDateTimeString(),
             ],
         ]);
@@ -49,6 +51,8 @@ final class UserProfileController extends Controller
             'name' => 'sometimes|string|max:50',
             'phone' => 'sometimes|nullable|string|max:20',
             'avatar' => 'sometimes|nullable|string|max:500',
+            'sex' => 'sometimes|integer|in:0,1,2',
+            'birthday' => 'sometimes|nullable|date',
         ]);
 
         $u = $request->user();
@@ -62,6 +66,12 @@ final class UserProfileController extends Controller
         if (array_key_exists('avatar', $data)) {
             $u->avatar = $data['avatar'];
         }
+        if (array_key_exists('sex', $data)) {
+            $u->sex = (int) $data['sex'];
+        }
+        if (array_key_exists('birthday', $data)) {
+            $u->birthday = $data['birthday'];
+        }
         $u->save();
 
         return response()->json([
@@ -72,6 +82,8 @@ final class UserProfileController extends Controller
                 'name' => $u->name,
                 'phone' => $u->phone,
                 'avatar' => $u->avatar,
+                'sex' => (int) $u->sex,
+                'birthday' => $u->birthday?->toDateString(),
             ],
         ]);
     }
@@ -115,7 +127,7 @@ final class UserProfileController extends Controller
         $u = $request->user();
 
         // 从 Wallet 模块获取余额（如果存在）
-        $wallet = \App\Modules\Wallet\Models\Wallet::where('user_id', $u->id)->first();
+        $wallet = Wallet::where('user_id', $u->id)->first();
 
         return response()->json([
             'code' => 0,
@@ -152,7 +164,7 @@ final class UserProfileController extends Controller
             ], 422);
         }
 
-        $user = \App\Models\User::where('email', $data['email'])->first();
+        $user = User::where('email', $data['email'])->first();
         if ($user === null) {
             return response()->json([
                 'code' => 1,

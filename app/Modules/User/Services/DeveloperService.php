@@ -25,7 +25,7 @@ class DeveloperService
             throw new RuntimeException('当前状态不允许提交开发者申请');
         }
 
-        $user->developer_status = DeveloperStatus::Pending->value;
+        $user->developer_status = DeveloperStatus::Pending;
         $user->save();
 
         return [
@@ -55,7 +55,7 @@ class DeveloperService
         }
 
         $user->is_developer = $approve;
-        $user->developer_status = $approve ? DeveloperStatus::Approved->value : DeveloperStatus::Rejected->value;
+        $user->developer_status = $approve ? DeveloperStatus::Approved : DeveloperStatus::Rejected;
         $user->save();
 
         return [

@@ -162,6 +162,8 @@ export async function fetchUserProfile(): Promise<User> {
 
 /** 修改用户资料（name/phone/avatar）。调用 POST /api/v1/user/update。 */
 export async function updateUserProfile(payload: {
+  sex?: number;
+  birthday?: string | null;
   name?: string;
   phone?: string | null;
   avatar?: string | null;

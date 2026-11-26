@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Skill\Enums\SkillStatus;
 use App\Modules\Skill\Services\AdminSkillService;
 use App\Modules\System\Services\AuditService;
 use Illuminate\Http\JsonResponse;
@@ -62,7 +63,7 @@ final class AdminSkillController extends Controller
             'endpoint' => $s->endpoint,
             'method' => $s->method,
             'pricing_type' => (int) $s->pricing_type,
-            'status' => $s->status instanceof \App\Modules\Skill\Enums\SkillStatus
+            'status' => $s->status instanceof SkillStatus
                 ? $s->status->value
                 : (string) $s->status,
             'system_prompt' => $s->system_prompt,

@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Modules\Wallet\Models\Wallet;
 use App\Modules\Wallet\Models\WalletTransaction;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -25,7 +24,7 @@ final class AdminWalletController extends Controller
 
         $wallets = $query->paginate($perPage);
 
-        $list = collect($wallets->items())->map(fn ($w): array => [
+        $list = collect($wallets->items())->map(fn (Wallet $w): array => [
             'id' => $w->id,
             'user_id' => $w->user_id,
             'user_email' => $w->user?->email,
@@ -64,7 +63,7 @@ final class AdminWalletController extends Controller
             ->orderByDesc('id')
             ->paginate($perPage);
 
-        $list = collect($txs->items())->map(fn ($t): array => [
+        $list = collect($txs->items())->map(fn (WalletTransaction $t): array => [
             'id' => $t->id,
             'wallet_id' => $t->wallet_id,
             'type' => $t->type,

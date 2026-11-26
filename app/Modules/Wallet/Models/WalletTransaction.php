@@ -14,6 +14,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $out_trade_no
  * @property int $amount
  * @property string $type
+ * @property string|null $description
  * @property Carbon|null $created_at
  * @property Wallet|null $wallet
  */

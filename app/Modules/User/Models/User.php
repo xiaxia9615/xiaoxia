@@ -26,8 +26,13 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $provider_id
  * @property string|null $unionid
  * @property string|null $avatar
+ * @property int $sex
+ * @property Carbon|null $birthday
  * @property int $status
- * @property string $developer_status
+ * @property DeveloperStatus|null $developer_status
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property string $password
  */
 class User extends Authenticatable
 {
@@ -56,6 +61,7 @@ class User extends Authenticatable
             'is_super_admin' => 'boolean',
             'is_active' => 'boolean',
             'is_developer' => 'boolean',
+            'birthday' => 'date',
             'developer_status' => DeveloperStatus::class,
         ];
     }
