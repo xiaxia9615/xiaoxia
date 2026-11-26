@@ -14,7 +14,7 @@ Route::middleware('api')->prefix('api/v1/auth')->group(function (): void {
     Route::post('/register', [AuthController::class, 'register'])->middleware('throttle.user_or_ip:register_per_minute');
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle.user_or_ip:login_per_minute');
     Route::post('/sms/send', [AuthController::class, 'smsSend'])->middleware('throttle.user_or_ip:sms_per_minute');
-    Route::post('/sms/login', [AuthController::class, 'smsLogin'])->middleware('throttle.user_or_ip:sms_per_minute');
+    Route::post('/sms/login', [AuthController::class, 'smsLogin'])->middleware('throttle.user_or_ip:login_per_minute');
 
     // 第三方 OAuth 登录
     Route::post('/wechat-mini-login', [WechatMiniController::class, 'login'])->middleware('throttle.user_or_ip:login_per_minute');
