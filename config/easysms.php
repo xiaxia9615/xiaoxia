@@ -20,6 +20,7 @@ return [
             'secret_id' => env('QCLOUD_SMS_SECRET_ID', ''),
             'secret_key' => env('QCLOUD_SMS_SECRET_KEY', ''),
             'sign_name' => env('QCLOUD_SMS_SIGN_NAME', ''),
+            'template_id' => env('QCLOUD_SMS_TEMPLATE_ID', ''),
         ],
     ],
 ];

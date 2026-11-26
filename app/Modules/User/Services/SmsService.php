@@ -30,7 +30,7 @@ final class SmsService
         try {
             $this->easySms->send($phone, [
                 'template' => $templateId,
-                'data' => [$code],
+                'data' => [$code, '5'],
             ]);
         } catch (EasySmsException $e) {
             Log::error('SMS send failed: '.$e->getMessage(), [
