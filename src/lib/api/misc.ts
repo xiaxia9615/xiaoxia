@@ -211,7 +211,4 @@ export function toIntegral(dto: IntegralDto): IntegralItem {
   };
 }
 
-export async function fetchIntegral(): Promise<IntegralItem[]> {
-  // 后端 /user/integral 为空壳桩，暂返回本地空数据；后端实现后恢复 request 调用
-  return [];
-}
+// fetchIntegral 已迁移至 user.ts（对接后端 GET /api/v1/user/integral）

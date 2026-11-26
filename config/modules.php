@@ -24,6 +24,7 @@ return [
         'System',
         'Favor',
         'Aftersale',
+        'Goods',
     ],
 
     'provider_pattern' => 'App\\Modules\\%s\\Providers\\%sServiceProvider',

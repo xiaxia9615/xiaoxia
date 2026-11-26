@@ -154,4 +154,68 @@ export async function smsLogin(phone: string, code: string): Promise<{
     },
   };
 }
-export const AUTH_FEATURES = { profileEdit: false, changePassword: false, resetPassword: false } as const;
+/** 获取用户详细资料（含 phone/avatar/开发者状态）。调用 GET /api/v1/user/profile。 */
+export async function fetchUserProfile(): Promise<User> {
+  const data = await request<Record<string, unknown>>("/v1/user/profile", { auth: true });
+  return mapUser(data);
+}
+
+/** 修改用户资料（name/phone/avatar）。调用 POST /api/v1/user/update。 */
+export async function updateUserProfile(payload: {
+  name?: string;
+  phone?: string | null;
+  avatar?: string | null;
+}): Promise<{ id: number; name: string; phone: string | null; avatar: string | null }> {
+  const data = await request<Record<string, unknown>>("/v1/user/update", {
+    method: "POST",
+    body: payload,
+    auth: true,
+  });
+  return {
+    id: Number(data.id ?? 0),
+    name: String(data.name ?? ""),
+    phone: typeof data.phone === "string" ? data.phone : null,
+    avatar: typeof data.avatar === "string" ? data.avatar : null,
+  };
+}
+
+/** 修改密码（需验证旧密码）。调用 POST /api/v1/user/password。 */
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string,
+): Promise<void> {
+  await request<Record<string, unknown>>("/v1/user/password", {
+    method: "POST",
+    body: { current_password: currentPassword, new_password: newPassword },
+    auth: true,
+  });
+}
+
+/** 重置密码（邮箱+验证码）。调用 POST /api/v1/user/reset-password。 */
+export async function resetPassword(
+  email: string,
+  code: string,
+  newPassword: string,
+): Promise<void> {
+  await request<Record<string, unknown>>("/v1/user/reset-password", {
+    method: "POST",
+    body: { email, code, new_password: newPassword },
+    auth: false,
+  });
+}
+
+/** 用户积分/余额概览。调用 GET /api/v1/user/integral。 */
+export async function fetchIntegral(): Promise<{
+  balance: number;
+  frozen_balance: number;
+  points: number;
+}> {
+  const data = await request<Record<string, unknown>>("/v1/user/integral", { auth: true });
+  return {
+    balance: typeof data.balance === "number" ? data.balance : 0,
+    frozen_balance: typeof data.frozen_balance === "number" ? data.frozen_balance : 0,
+    points: typeof data.points === "number" ? data.points : 0,
+  };
+}
+
+export const AUTH_FEATURES = { profileEdit: true, changePassword: true, resetPassword: true } as const;
