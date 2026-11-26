@@ -17,10 +17,12 @@ import {
   orderStatusType,
   orderStatusLabel,
 } from "@/features/admin/ship-order-dialog";
+import { TrackingDialog } from "@/features/admin/tracking-dialog";
 
 function OrdersPage() {
   const [page, setPage] = useState(1);
   const [shippingOrder, setShippingOrder] = useState<AdminOrderItem | null>(null);
+  const [trackingOrder, setTrackingOrder] = useState<AdminOrderItem | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-orders", page],
@@ -67,9 +69,10 @@ function OrdersPage() {
         }
         if (row.tracking_no) {
           return (
-            <span className="text-xs text-slate-500" title={row.tracking_no}>
-              {row.tracking_no}
-            </span>
+            <Button variant="outline" size="sm" onClick={() => setTrackingOrder(row)}>
+              <Truck className="mr-1 h-3 w-3" />
+              查看物流
+            </Button>
           );
         }
         return <span className="text-xs text-slate-600">-</span>;
@@ -99,6 +102,14 @@ function OrdersPage() {
         open={shippingOrder !== null}
         onOpenChange={(open) => {
           if (!open) setShippingOrder(null);
+        }}
+      />
+
+      <TrackingDialog
+        order={trackingOrder}
+        open={trackingOrder !== null}
+        onOpenChange={(open) => {
+          if (!open) setTrackingOrder(null);
         }}
       />
     </AdminPageLayout>

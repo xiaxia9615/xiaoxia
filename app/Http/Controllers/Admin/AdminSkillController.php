@@ -50,6 +50,40 @@ final class AdminSkillController extends Controller
     }
 
     /**
+     * API 待审核技能列表（JSON）.
+     */
+    public function apiPendingIndex(): JsonResponse
+    {
+        $skills = $this->service->paginatePendingSkills(20);
+        $list = collect($skills->items())->map(fn ($s): array => [
+            'id' => $s->id,
+            'product_id' => $s->product_id,
+            'product_name' => $s->product?->name,
+            'endpoint' => $s->endpoint,
+            'method' => $s->method,
+            'pricing_type' => (int) $s->pricing_type,
+            'status' => $s->status instanceof \App\Modules\Skill\Enums\SkillStatus
+                ? $s->status->value
+                : (string) $s->status,
+            'system_prompt' => $s->system_prompt,
+            'free_quota' => $s->free_quota,
+            'created_at' => $s->created_at?->toDateTimeString(),
+        ])->all();
+
+        return response()->json([
+            'code' => 0,
+            'msg' => 'ok',
+            'data' => [
+                'list' => $list,
+                'total' => $skills->total(),
+                'current_page' => $skills->currentPage(),
+                'last_page' => $skills->lastPage(),
+                'per_page' => $skills->perPage(),
+            ],
+        ]);
+    }
+
+    /**
      * API 切换技能上下架状态（JSON）.
      */
     public function apiToggleStatus(Request $request, AuditService $auditService, int $id): JsonResponse

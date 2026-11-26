@@ -279,6 +279,53 @@ export function toggleAdminSkillStatus(id: number): Promise<SkillToggleResult> {
   });
 }
 
+/** 待审核技能条目。 */
+export interface PendingSkillItem {
+  id: number;
+  product_id: number;
+  product_name: string | null;
+  endpoint: string | null;
+  method: string | null;
+  pricing_type: number;
+  status: string;
+  system_prompt: string | null;
+  free_quota: number | null;
+  created_at: string | null;
+}
+
+/** 待审核技能列表响应。 */
+export interface PendingSkillListResponse {
+  list: PendingSkillItem[];
+  total: number;
+  current_page: number;
+  last_page: number;
+  per_page: number;
+}
+
+/** 待审核技能列表。 */
+export function getAdminPendingSkills(
+  params?: { page?: number },
+): Promise<PendingSkillListResponse> {
+  return request<PendingSkillListResponse>("/v1/admin/skills/pending", {
+    method: "GET",
+    params: params as Record<string, unknown> | undefined,
+    auth: true,
+  });
+}
+
+/** 审核技能（通过/驳回）。 */
+export function auditSkill(
+  id: number,
+  approve: boolean,
+  note?: string,
+): Promise<unknown> {
+  return request<unknown>(`/v1/admin/skills/${id}/audit`, {
+    method: "POST",
+    body: { approve, note },
+    auth: true,
+  });
+}
+
 // ===== Admin API Keys =====
 
 /** API Key 条目（key 脱敏输出：仅 key_prefix + ****）。 */
@@ -366,8 +413,11 @@ export function getAdminApiCalls(
 
 // ── Admin Orders ──────────────────────────────────────────────
 
-/** Schema 请求体类型（ship 端点无 200 响应定义，响应类型暂保留手写，见待汇报清单） */
-type ShipOrderReq = paths["/api/v1/admin/orders/{id}/ship"]["post"]["requestBody"]["content"]["application/json"];
+/** 发货请求体类型（schema 仅有 tracking_no，实际已扩展 express_company）。 */
+type ShipOrderReq = {
+  tracking_no: string;
+  express_company: string;
+};
 
 /** 后台订单条目（schema 无 200 响应定义，按 UI 使用字段声明）。 */
 export interface AdminOrderItem {
@@ -377,6 +427,7 @@ export interface AdminOrderItem {
   user_name?: string;
   status?: string;
   tracking_no?: string;
+  express_company?: string;
   total_amount?: number;
   amount?: number;
   product_name?: string;
@@ -408,12 +459,263 @@ export function getAdminOrders(
 export function shipAdminOrder(
   orderId: number,
   trackingNo: string,
+  expressCompany: string,
 ): Promise<unknown> {
-  const body: ShipOrderReq = { tracking_no: trackingNo };
+  const body: ShipOrderReq = { tracking_no: trackingNo, express_company: expressCompany };
   return request<unknown>(`/v1/admin/orders/${orderId}/ship`, {
     method: "POST",
     auth: true,
     body,
+  });
+}
+
+/** 物流轨迹条目。 */
+export interface TrackingItem {
+  time: string;
+  context: string;
+}
+
+/** 物流轨迹查询响应。 */
+export interface TrackingInfo {
+  order_no: string;
+  tracking_no: string;
+  express_company: string;
+  express_company_name: string;
+  shipped_at: string | null;
+  tracks: TrackingItem[];
+}
+
+/** 查询订单物流轨迹。 */
+export function getOrderTracking(orderId: number): Promise<TrackingInfo> {
+  return request<TrackingInfo>(`/v1/admin/orders/${orderId}/tracking`, {
+    method: "GET",
+    auth: true,
+  });
+}
+
+/** 钱包条目。 */
+export interface AdminWalletItem {
+  id: number;
+  user_id: number;
+  user_email: string | null;
+  balance: number;
+  frozen_balance: number;
+  created_at: string | null;
+}
+
+/** 钱包列表响应。 */
+export interface AdminWalletListResponse {
+  list: AdminWalletItem[];
+  total: number;
+  current_page: number;
+  last_page: number;
+  per_page: number;
+}
+
+/** 钱包交易记录条目。 */
+export interface WalletTxItem {
+  id: number;
+  wallet_id: number;
+  type: string;
+  amount: number;
+  description: string | null;
+  out_trade_no: string | null;
+  created_at: string | null;
+}
+
+/** 钱包交易记录响应。 */
+export interface WalletTxListResponse {
+  wallet: {
+    id: number;
+    user_id: number;
+    balance: number;
+    frozen_balance: number;
+  };
+  list: WalletTxItem[];
+  total: number;
+  current_page: number;
+  last_page: number;
+  per_page: number;
+}
+
+/** 钱包列表。 */
+export function getAdminWallets(
+  params?: { page?: number },
+): Promise<AdminWalletListResponse> {
+  return request<AdminWalletListResponse>("/v1/admin/wallets", {
+    method: "GET",
+    params: params as Record<string, unknown> | undefined,
+    auth: true,
+  });
+}
+
+/** 钱包交易记录。 */
+export function getWalletTransactions(
+  walletId: number,
+  params?: { page?: number },
+): Promise<WalletTxListResponse> {
+  return request<WalletTxListResponse>(
+    `/v1/admin/wallets/${walletId}/transactions`,
+    {
+      method: "GET",
+      params: params as Record<string, unknown> | undefined,
+      auth: true,
+    },
+  );
+}
+
+/** 账本账户条目。 */
+export interface LedgerAccountItem {
+  id: number;
+  owner_type: string;
+  owner_id: number;
+  account_type: string;
+  currency: string;
+  balance: number;
+  entries_count: number;
+  created_at: string | null;
+}
+
+/** 账本账户列表响应。 */
+export interface LedgerAccountListResponse {
+  list: LedgerAccountItem[];
+  total: number;
+  current_page: number;
+  last_page: number;
+  per_page: number;
+}
+
+/** 账本流水条目。 */
+export interface LedgerEntryItem {
+  id: number;
+  transaction_id: string;
+  account_id: number;
+  direction: string;
+  amount: number;
+  biz_type: string;
+  biz_id: number;
+  created_at: string | null;
+}
+
+/** 账本流水列表响应。 */
+export interface LedgerEntryListResponse {
+  list: LedgerEntryItem[];
+  total: number;
+  current_page: number;
+  last_page: number;
+  per_page: number;
+}
+
+/** 账本统计。 */
+export interface LedgerStats {
+  accounts: number;
+  entries: number;
+  total_balance: number;
+}
+
+/** 账本账户列表。 */
+export function getAdminLedgerAccounts(
+  params?: { page?: number },
+): Promise<LedgerAccountListResponse> {
+  return request<LedgerAccountListResponse>("/v1/admin/ledger/accounts", {
+    method: "GET",
+    params: params as Record<string, unknown> | undefined,
+    auth: true,
+  });
+}
+
+/** 账本流水分页。 */
+export function getAdminLedgerEntries(
+  accountId: number,
+  params?: { page?: number },
+): Promise<LedgerEntryListResponse> {
+  return request<LedgerEntryListResponse>(
+    `/v1/admin/ledger/accounts/${accountId}/entries`,
+    {
+      method: "GET",
+      params: params as Record<string, unknown> | undefined,
+      auth: true,
+    },
+  );
+}
+
+/** 账本统计。 */
+export function getAdminLedgerStats(): Promise<LedgerStats> {
+  return request<LedgerStats>("/v1/admin/ledger/stats", {
+    method: "GET",
+    auth: true,
+  });
+}
+
+/** 系统健康状态。 */
+export interface SystemHealth {
+  db: boolean;
+  cache: boolean;
+  nginx: boolean;
+  'php-fpm': boolean;
+  worker: string;
+}
+
+/** 失败任务条目。 */
+export interface FailedJobItem {
+  id: number;
+  uuid: string;
+  queue: string;
+  exception: string;
+  failed_at: string;
+}
+
+/** 队列统计。 */
+export interface QueueStats {
+  pending: number;
+  failed: FailedJobItem[];
+}
+
+/** 备份文件。 */
+export interface BackupFile {
+  name: string;
+  size: number;
+  mtime: string;
+}
+
+/** 系统健康检查。 */
+export function getSystemHealth(): Promise<SystemHealth> {
+  return request<SystemHealth>("/v1/admin/system/health", {
+    method: "GET",
+    auth: true,
+  });
+}
+
+/** 队列统计。 */
+export function getQueueStats(): Promise<QueueStats> {
+  return request<QueueStats>("/v1/admin/system/queue", {
+    method: "GET",
+    auth: true,
+  });
+}
+
+/** 重试失败任务。 */
+export function retryFailedJob(uuid: string): Promise<unknown> {
+  return request<unknown>("/v1/admin/system/queue/retry", {
+    method: "POST",
+    body: { uuid },
+    auth: true,
+  });
+}
+
+/** 备份列表。 */
+export function getSystemBackups(): Promise<BackupFile[]> {
+  return request<BackupFile[]>("/v1/admin/system/backups", {
+    method: "GET",
+    auth: true,
+  });
+}
+
+/** 最近日志。 */
+export function getSystemLogs(): Promise<string[]> {
+  return request<string[]>("/v1/admin/system/logs", {
+    method: "GET",
+    auth: true,
   });
 }
 

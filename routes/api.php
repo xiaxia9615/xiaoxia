@@ -7,9 +7,13 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminFinanceController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\AdminLedgerController;
 use App\Http\Controllers\Admin\AdminSkillController;
+use App\Http\Controllers\Admin\AdminSystemController;
+use App\Http\Controllers\Admin\AdminWalletController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Api\PaymentNotifyController;
+use App\Http\Controllers\UserProfileController;
 use App\Modules\Address\Http\Controllers\AddressController;
 use App\Modules\Aftersale\Http\Controllers\AftersaleController;
 use App\Modules\Article\Http\Controllers\ArticleController;
@@ -118,22 +122,12 @@ Route::middleware('uid.auth')->prefix('v1')->group(function (): void {
     Route::post('order/cancel', [OrderController::class, 'orderCancel']);
     Route::post('order/delete', [OrderController::class, 'orderDelete']);
 
-    // User（用户：额外接口）
-    Route::get('user/profile', function () {
-        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => []]);
-    });
-    Route::post('user/update', function () {
-        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => []]);
-    });
-    Route::post('user/password', function () {
-        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => []]);
-    });
-    Route::get('user/integral', function () {
-        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => ['list' => [], 'total' => 0]]);
-    });
-    Route::post('user/reset-password', function () {
-        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => []]);
-    });
+    // User（用户：资料 / 密码 / 积分）
+    Route::get('user/profile', [UserProfileController::class, 'profile']);
+    Route::post('user/update', [UserProfileController::class, 'update']);
+    Route::post('user/password', [UserProfileController::class, 'password']);
+    Route::get('user/integral', [UserProfileController::class, 'integral']);
+    Route::post('user/reset-password', [UserProfileController::class, 'resetPassword']);
 
     // 原有路由（保留）
     Route::get('orders', [OrderController::class, 'index']);
@@ -145,6 +139,7 @@ Route::middleware('uid.auth')->prefix('v1')->group(function (): void {
     Route::middleware('admin')->group(function (): void {
         Route::get('admin/orders', [AdminOrderController::class, 'apiIndex']);
         Route::post('admin/orders/{id}/ship', [AdminOrderController::class, 'apiShip'])->whereNumber('id');
+        Route::get('admin/orders/{id}/tracking', [AdminOrderController::class, 'apiTracking'])->whereNumber('id');
         Route::get('admin/dashboard/stats', [AdminDashboardController::class, 'apiStats']);
         Route::get('admin/users', [AdminUserController::class, 'apiIndex']);
         Route::patch('admin/users/{id}/ban', [AdminUserController::class, 'apiToggleBan'])->whereNumber('id');
@@ -162,9 +157,19 @@ Route::middleware('uid.auth')->prefix('v1')->group(function (): void {
         Route::get('admin/ai-providers', [AdminAiProviderController::class, 'apiIndex']);
         Route::patch('admin/ai-providers/{id}', [AdminAiProviderController::class, 'apiUpdate'])->whereNumber('id');
 
-        // 技能（列表 / 上下架切换）
+        // 技能（列表 / 待审核列表 / 上下架切换）
         Route::get('admin/skills', [AdminSkillController::class, 'apiIndex']);
+        Route::get('admin/skills/pending', [AdminSkillController::class, 'apiPendingIndex']);
         Route::patch('admin/skills/{id}/status', [AdminSkillController::class, 'apiToggleStatus'])->whereNumber('id');
+
+        // 账本（账户列表 / 流水 / 统计）
+        Route::get('admin/ledger/accounts', [AdminLedgerController::class, 'apiIndex']);
+        Route::get('admin/ledger/accounts/{id}/entries', [AdminLedgerController::class, 'apiEntries'])->whereNumber('id');
+        Route::get('admin/ledger/stats', [AdminLedgerController::class, 'apiStats']);
+
+        // 钱包（列表 / 交易记录）
+        Route::get('admin/wallets', [AdminWalletController::class, 'apiIndex']);
+        Route::get('admin/wallets/{id}/transactions', [AdminWalletController::class, 'apiTransactions'])->whereNumber('id');
 
         // API Keys（key 脱敏输出 / 吊销）
         Route::get('admin/api-keys', [AdminApiKeyController::class, 'apiIndex']);
@@ -172,6 +177,12 @@ Route::middleware('uid.auth')->prefix('v1')->group(function (): void {
 
         // 调用流水
         Route::get('admin/api-calls', [AdminApiCallController::class, 'apiIndex']);
+        // 系统（健康 / 队列 / 重试 / 备份 / 日志）
+        Route::get('admin/system/health', [AdminSystemController::class, 'apiHealth']);
+        Route::get('admin/system/queue', [AdminSystemController::class, 'apiQueueStats']);
+        Route::post('admin/system/queue/retry', [AdminSystemController::class, 'apiRetryJob']);
+        Route::get('admin/system/backups', [AdminSystemController::class, 'apiBackups']);
+        Route::get('admin/system/logs', [AdminSystemController::class, 'apiLogs']);
     });
 });
 

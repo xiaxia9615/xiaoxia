@@ -22,6 +22,8 @@ return [
         'Comment',
         'Message',
         'System',
+        'Favor',
+        'Aftersale',
     ],
 
     'provider_pattern' => 'App\\Modules\\%s\\Providers\\%sServiceProvider',
@@ -46,5 +48,7 @@ return [
         'Browse' => ['User', 'Product'],
         'Comment' => ['User', 'Product'],
         'Message' => ['User'],
+        'Favor' => ['User', 'Product'],
+        'Aftersale' => ['User', 'Order'],
     ],
 ];

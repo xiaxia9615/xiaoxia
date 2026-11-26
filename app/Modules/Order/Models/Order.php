@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
  * @property array|null $product_snapshot
  * @property Carbon|null $paid_at
  * @property string|null $tracking_no
+ * @property string|null $express_company
  * @property Carbon|null $shipped_at
  * @property string $order_no
  * @property int $user_id
@@ -40,6 +41,7 @@ class Order extends Model
         'status',
         'paid_at',
         'tracking_no',
+        'express_company',
         'shipped_at',
     ];
 

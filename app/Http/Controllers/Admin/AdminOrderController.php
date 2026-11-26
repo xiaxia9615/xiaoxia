@@ -36,6 +36,7 @@ class AdminOrderController extends Controller
             'status' => $order->status->value,
             'nature' => $order->product?->nature,
             'tracking_no' => $order->tracking_no,
+            'express_company' => $order->express_company,
             'product_name' => $order->product?->name,
             'user_name' => $order->user?->name,
             'user_email' => $order->user?->email,
@@ -66,6 +67,7 @@ class AdminOrderController extends Controller
     {
         $data = $request->validate([
             'tracking_no' => 'required|string|max:64',
+            'express_company' => 'required|string|max:32',
         ]);
 
         $order = DB::transaction(function () use ($data, $id, $auditService, $request): Order {
@@ -89,6 +91,7 @@ class AdminOrderController extends Controller
             }
 
             $order->tracking_no = $data['tracking_no'];
+            $order->express_company = $data['express_company'];
             $order->shipped_at = now();
             $order->status = OrderStatus::Completed;
             $order->save();
@@ -98,7 +101,7 @@ class AdminOrderController extends Controller
                 'admin.order.ship',
                 'order',
                 $order->id,
-                ['order_no' => $order->order_no, 'tracking_no' => $order->tracking_no],
+                ['order_no' => $order->order_no, 'tracking_no' => $order->tracking_no, 'express_company' => $order->express_company],
             );
 
             return $order;
@@ -111,8 +114,65 @@ class AdminOrderController extends Controller
                 'id' => $order->id,
                 'order_no' => $order->order_no,
                 'tracking_no' => $order->tracking_no,
+                'express_company' => $order->express_company,
                 'shipped_at' => $order->shipped_at?->toDateTimeString(),
                 'status' => $order->status->value,
+            ],
+        ]);
+    }
+
+    /**
+     * 查询物流轨迹（JSON API）。
+     *
+     * 返回订单的物流单号、快递公司及轨迹信息。
+     * 轨迹通过快递100免费接口查询（jsonp 格式，无需授权）。
+     */
+    public function apiTracking(int $id)
+    {
+        $order = Order::query()->find($id);
+        if (! $order) {
+            return response()->json(['code' => 1, 'msg' => '订单不存在'], 404);
+        }
+        if (! $order->tracking_no) {
+            return response()->json(['code' => 1, 'msg' => '该订单尚未发货'], 400);
+        }
+        $companyMap = [
+            'SF' => '顺丰速运', 'YTO' => '圆通速递', 'ZTO' => '中通快递',
+            'YD' => '韵达快递', 'STO' => '申通快递', 'JD' => '京东物流',
+            'EMS' => 'EMS', 'TT' => '天天快递', 'DBL' => '德邦快递',
+            'HTKY' => '百世快递', 'JTSD' => '极兔速递',
+        ];
+        $companyCode = $order->express_company ?? 'SF';
+        $companyName = $companyMap[$companyCode] ?? $companyCode;
+        $tracks = [];
+        try {
+            $url = 'https://www.kuaidi100.com/query?type=' . $companyCode . '&postid=' . $order->tracking_no . '&temp=' . random_int(100000, 999999);
+            $ctx = stream_context_create(['http' => ['timeout' => 5]]);
+            $resp = @file_get_contents($url, false, $ctx);
+            if ($resp) {
+                $data = json_decode($resp, true);
+                if (isset($data['data']) && is_array($data['data'])) {
+                    foreach ($data['data'] as $item) {
+                        $tracks[] = [
+                            'time' => $item['time'] ?? '',
+                            'context' => $item['context'] ?? '',
+                        ];
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // 查询失败不阻断，返回空轨迹
+        }
+        return response()->json([
+            'code' => 0,
+            'msg' => 'ok',
+            'data' => [
+                'order_no' => $order->order_no,
+                'tracking_no' => $order->tracking_no,
+                'express_company' => $companyCode,
+                'express_company_name' => $companyName,
+                'shipped_at' => $order->shipped_at?->toDateTimeString(),
+                'tracks' => $tracks,
             ],
         ]);
     }
