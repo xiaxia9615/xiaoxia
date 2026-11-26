@@ -6,4 +6,5 @@ return [
     'gateway_per_minute' => (int) env('RATELIMIT_GATEWAY_PER_MINUTE', 60),
     'login_per_minute' => (int) env('RATELIMIT_LOGIN_PER_MINUTE', 10),
     'register_per_minute' => (int) env('RATELIMIT_REGISTER_PER_MINUTE', 10),
+    'sms_per_minute' => (int) env('RATELIMIT_SMS_PER_MINUTE', 1),
 ];
