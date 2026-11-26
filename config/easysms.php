@@ -21,6 +21,12 @@ return [
             'secret_key' => env('QCLOUD_SMS_SECRET_KEY', ''),
             'sign_name' => env('QCLOUD_SMS_SIGN_NAME', ''),
             'template_id' => env('QCLOUD_SMS_TEMPLATE_ID', ''),
+            'templates' => [
+                'register' => env('QCLOUD_SMS_TEMPLATE_REGISTER', '2643723'),
+                'login' => env('QCLOUD_SMS_TEMPLATE_LOGIN', '2630737'),
+                'bind_phone' => env('QCLOUD_SMS_TEMPLATE_BIND_PHONE', '2658567'),
+                'change_phone' => env('QCLOUD_SMS_TEMPLATE_CHANGE_PHONE', '2641259'),
+            ],
         ],
     ],
 ];

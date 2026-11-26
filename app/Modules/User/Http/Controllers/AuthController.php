@@ -80,6 +80,7 @@ final class AuthController
     {
         $data = $request->validate([
             'phone' => 'required|string|regex:/^1[3-9]\d{9}$/',
+            'scene' => 'sometimes|string|in:register,login,bind_phone,change_phone',
         ]);
 
         $phone = $data['phone'];
@@ -104,7 +105,7 @@ final class AuthController
         $code = str_pad((string) mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
         try {
-            $this->sms->sendCode($phone, $code);
+            $this->sms->sendCode($phone, $code, $data['scene'] ?? 'register');
         } catch (\RuntimeException $e) {
             return response()->json(['code' => 1, 'message' => $e->getMessage()], 500);
         }
