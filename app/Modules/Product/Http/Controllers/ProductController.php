@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Product\Http\Controllers;
 
 use App\Modules\Product\Models\Product;
+use App\Modules\Product\Services\CategoryService;
 use Illuminate\Http\JsonResponse;
 
 final class ProductController
@@ -33,6 +34,6 @@ final class ProductController
      */
     public function categories(): JsonResponse
     {
-        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => []]);
+        return response()->json(['code' => 0, 'msg' => 'ok', 'data' => app(CategoryService::class)->activeCategories()]);
     }
 }

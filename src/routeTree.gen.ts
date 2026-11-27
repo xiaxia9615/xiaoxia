@@ -31,6 +31,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminAiProvidersRouteImport } from './routes/admin/ai-providers'
 import { Route as AdminApiCallsRouteImport } from './routes/admin/api-calls'
 import { Route as AdminApiKeysRouteImport } from './routes/admin/api-keys'
+import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
 import { Route as AdminFinanceRouteImport } from './routes/admin/finance'
 import { Route as AdminLedgerRouteImport } from './routes/admin/ledger'
 import { Route as AdminOrdersRouteImport } from './routes/admin/orders'
@@ -156,6 +157,11 @@ const AdminApiKeysRoute = AdminApiKeysRouteImport.update({
   path: '/api-keys',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminFinanceRoute = AdminFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
@@ -249,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/admin/ai-providers': typeof AdminAiProvidersRoute
   '/admin/api-calls': typeof AdminApiCallsRoute
   '/admin/api-keys': typeof AdminApiKeysRoute
+  '/admin/categories': typeof AdminCategoriesRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/ledger': typeof AdminLedgerRoute
   '/admin/orders': typeof AdminOrdersRoute
@@ -286,6 +293,7 @@ export interface FileRoutesByTo {
   '/admin/ai-providers': typeof AdminAiProvidersRoute
   '/admin/api-calls': typeof AdminApiCallsRoute
   '/admin/api-keys': typeof AdminApiKeysRoute
+  '/admin/categories': typeof AdminCategoriesRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/ledger': typeof AdminLedgerRoute
   '/admin/orders': typeof AdminOrdersRoute
@@ -325,6 +333,7 @@ export interface FileRoutesById {
   '/admin/ai-providers': typeof AdminAiProvidersRoute
   '/admin/api-calls': typeof AdminApiCallsRoute
   '/admin/api-keys': typeof AdminApiKeysRoute
+  '/admin/categories': typeof AdminCategoriesRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/ledger': typeof AdminLedgerRoute
   '/admin/orders': typeof AdminOrdersRoute
@@ -365,6 +374,7 @@ export interface FileRouteTypes {
     | '/admin/ai-providers'
     | '/admin/api-calls'
     | '/admin/api-keys'
+    | '/admin/categories'
     | '/admin/finance'
     | '/admin/ledger'
     | '/admin/orders'
@@ -402,6 +412,7 @@ export interface FileRouteTypes {
     | '/admin/ai-providers'
     | '/admin/api-calls'
     | '/admin/api-keys'
+    | '/admin/categories'
     | '/admin/finance'
     | '/admin/ledger'
     | '/admin/orders'
@@ -440,6 +451,7 @@ export interface FileRouteTypes {
     | '/admin/ai-providers'
     | '/admin/api-calls'
     | '/admin/api-keys'
+    | '/admin/categories'
     | '/admin/finance'
     | '/admin/ledger'
     | '/admin/orders'
@@ -638,6 +650,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminApiKeysRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/categories': {
+      id: '/admin/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/finance': {
       id: '/admin/finance'
       path: '/finance'
@@ -743,6 +762,7 @@ interface AdminRouteChildren {
   AdminAiProvidersRoute: typeof AdminAiProvidersRoute
   AdminApiCallsRoute: typeof AdminApiCallsRoute
   AdminApiKeysRoute: typeof AdminApiKeysRoute
+  AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminFinanceRoute: typeof AdminFinanceRoute
   AdminLedgerRoute: typeof AdminLedgerRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
@@ -760,6 +780,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAiProvidersRoute: AdminAiProvidersRoute,
   AdminApiCallsRoute: AdminApiCallsRoute,
   AdminApiKeysRoute: AdminApiKeysRoute,
+  AdminCategoriesRoute: AdminCategoriesRoute,
   AdminFinanceRoute: AdminFinanceRoute,
   AdminLedgerRoute: AdminLedgerRoute,
   AdminOrdersRoute: AdminOrdersRoute,

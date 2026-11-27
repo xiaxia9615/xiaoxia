@@ -46,6 +46,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -93,10 +95,6 @@ jobs:
       - name: Run Pint (formatting check)
         run: vendor/bin/pint --test
 
-      # --- Tests (blocking) ---
-      - name: Run tests (incl. architecture guards)
-        run: php artisan test
-
       # --- Deploy Gate (blocking) ---
       - name: Check pending migrations
         run: |
@@ -108,16 +106,31 @@ jobs:
           fi
           echo "OK: No pending migrations"
 
-      # --- Frontend (non-blocking) ---
+      # --- Frontend (blocking) ---
       - name: Install npm dependencies
-        run: npm install --ignore-scripts --registry=https://registry.npmjs.org
+        run: npm ci --ignore-scripts --registry=https://registry.npmjs.org
 
       - name: TypeScript type check
-        run: npx tsc --noEmit
+        run: npm run typecheck
+
+      - name: ESLint (changed files only)
+        run: |
+          FILES=$(git diff --name-only origin/main...HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' 2>/dev/null)
+          if [ -n "$FILES" ]; then
+            echo "$FILES" | xargs npx eslint
+          else
+            echo "No changed TS/JS files to lint"
+          fi
+      - name: Frontend architecture check
+        run: npm run arch:check
+
+      - name: Vitest (frontend coverage)
+        run: npm run test:coverage
 
       - name: Build frontend assets
         run: npm run build
 
+      # --- Backend coverage (blocking) ---
       - name: Run tests with coverage
         run: php artisan test --coverage --coverage-html=coverage-report --min=40
 

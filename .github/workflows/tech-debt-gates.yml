@@ -1,5 +1,5 @@
 # 技术债治理门禁（密钥扫描）
-# 覆盖率门禁已统一由 laravel.yml 负责（--min=55），此处不重复，避免配置漂移
+# 覆盖率门禁已统一由 laravel.yml 负责（--min=40），此处不重复，避免配置漂移
 # 原型位于 /home/ubuntu/.github/workflows/tech-debt-gates.yml（占位版），
 # 本文件为填充实际命令后的生效版本。
 name: tech-debt-gates

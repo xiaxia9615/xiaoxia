@@ -42,6 +42,7 @@ const ADMIN_MENU_GROUPS: AdminMenuGroup[] = [
     items: [
       { to: "/admin/orders", label: "订单" },
       { to: "/admin/products", label: "商品" },
+      { to: "/admin/categories", label: "分类" },
       { to: "/admin/finance", label: "财务中心" },
     ],
   },

@@ -24,6 +24,7 @@ use App\Modules\Favor\Http\Controllers\FavorController;
 use App\Modules\Goods\Http\Controllers\GoodsController;
 use App\Modules\Message\Http\Controllers\MessageController;
 use App\Modules\Order\Http\Controllers\OrderController;
+use App\Modules\Product\Http\Controllers\CategoryController;
 use App\Modules\Product\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -68,6 +69,8 @@ Route::prefix('v1')->group(function (): void {
     Route::get('goods/index', [GoodsController::class, 'index']);
     Route::get('goods/category', [GoodsController::class, 'category']);
     Route::get('goods/detail', [GoodsController::class, 'detail']);
+    Route::get('products/categories', [ProductController::class, 'categories']);
+    Route::get('products/categories/tree', [CategoryController::class, 'tree']);
 
     // Security
     Route::get('security/publickey', function () {
@@ -133,7 +136,6 @@ Route::middleware('uid.auth')->prefix('v1')->group(function (): void {
     Route::get('orders', [OrderController::class, 'index']);
     Route::get('orders/{id}', [OrderController::class, 'show'])->whereNumber('id');
     Route::get('orders/{id}/status', [OrderController::class, 'status'])->whereNumber('id');
-    Route::get('products/categories', [ProductController::class, 'categories']);
 
     // Admin（管理员接口，仅管理员可用：admin 中间件校验 is_admin）
     Route::middleware('admin')->group(function (): void {
@@ -144,6 +146,10 @@ Route::middleware('uid.auth')->prefix('v1')->group(function (): void {
         Route::get('admin/users', [AdminUserController::class, 'apiIndex']);
         Route::patch('admin/users/{id}/ban', [AdminUserController::class, 'apiToggleBan'])->whereNumber('id');
         Route::get('admin/products', [AdminProductController::class, 'apiIndex']);
+        Route::get('admin/categories', [CategoryController::class, 'index']);
+        Route::post('admin/categories', [CategoryController::class, 'store']);
+        Route::put('admin/categories/{id}', [CategoryController::class, 'update'])->whereNumber('id');
+        Route::delete('admin/categories/{id}', [CategoryController::class, 'destroy'])->whereNumber('id');
         Route::post('admin/products', [AdminProductController::class, 'apiStore']);
         Route::put('admin/products/{id}', [AdminProductController::class, 'apiUpdate'])->whereNumber('id');
         Route::patch('admin/products/{id}/status', [AdminProductController::class, 'apiToggleStatus'])->whereNumber('id');

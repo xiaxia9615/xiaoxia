@@ -3,7 +3,6 @@
  * 后端为 Laravel Blade 服务端路由，字段以控制器返回结构为准声明契约。
  */
 import { request } from "./request";
-import type { paths } from "./schema";
 
 // ===== Admin Products =====
 
@@ -773,6 +772,70 @@ export function getAdminDashboardStats(): Promise<AdminDashboardStats> {
 export function toggleUserBan(id: number): Promise<{ id: number; is_active: boolean }> {
   return request<{ id: number; is_active: boolean }>(`/v1/admin/users/${id}/ban`, {
     method: "PATCH",
+    auth: true,
+  });
+}
+
+/** 分类树节点。 */
+export interface CategoryTreeNode {
+  id: number;
+  name: string;
+  slug: string;
+  parent_id: number;
+  sort: number;
+  status: number;
+  created_at: string | null;
+  children: CategoryTreeNode[];
+}
+
+/** 分类列表项。 */
+export interface CategoryItem {
+  id: number;
+  name: string;
+  slug: string;
+  parent_id: number;
+  sort: number;
+  status: number;
+  created_at: string | null;
+}
+
+/** 获取分类树。 */
+export function getCategoryTree(): Promise<CategoryTreeNode[]> {
+  return request<CategoryTreeNode[]>(`/v1/products/categories/tree`, {
+    method: `GET`,
+  });
+}
+
+/** 获取分类列表（Admin）。 */
+export function getAdminCategories(page = 1): Promise<{ list: CategoryItem[]; total: number; current_page: number; last_page: number; per_page: number }> {
+  return request<{ list: CategoryItem[]; total: number; current_page: number; last_page: number; per_page: number }>(`/v1/admin/categories?page=${page}`, {
+    method: `GET`,
+    auth: true,
+  });
+}
+
+/** 创建分类。 */
+export function createCategory(payload: { name: string; slug: string; parent_id?: number; sort?: number; status?: number }): Promise<CategoryItem> {
+  return request<CategoryItem>(`/v1/admin/categories`, {
+    method: `POST`,
+    body: payload,
+    auth: true,
+  });
+}
+
+/** 更新分类。 */
+export function updateCategory(id: number, payload: Partial<{ name: string; slug: string; parent_id: number; sort: number; status: number }>): Promise<CategoryItem> {
+  return request<CategoryItem>(`/v1/admin/categories/${id}`, {
+    method: `PUT`,
+    body: payload,
+    auth: true,
+  });
+}
+
+/** 删除分类。 */
+export function deleteCategory(id: number): Promise<void> {
+  return request<void>(`/v1/admin/categories/${id}`, {
+    method: `DELETE`,
     auth: true,
   });
 }

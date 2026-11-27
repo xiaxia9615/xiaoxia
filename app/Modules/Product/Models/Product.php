@@ -14,6 +14,7 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $type
+ * @property int $category_id
  * @property int $price
  * @property int $status
  * @property int $sales_count
@@ -76,6 +77,11 @@ class Product extends Model
     public function scopeSkills($query)
     {
         return $query->where('type', 1);
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function scopeGoods($query)
