@@ -43,7 +43,7 @@ export function UsersPage() {
 
   const banMutation = useMutation({
     mutationFn: (id: number) => toggleUserBan(id),
-    onSuccess: (_result, _id) => {
+    onSuccess: () => {
       toast.success("操作成功", {
         description: confirming?.is_active
           ? `用户 ${confirming.name} 已封禁`

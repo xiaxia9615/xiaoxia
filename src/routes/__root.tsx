@@ -91,7 +91,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
     // 有 Token 访问 /login → 根据角色跳转（防死循环：目标路由非 /login）
     if (token && isLoginRoute) {
-      let user: { is_admin?: boolean; is_finance?: boolean } | null = null;
+      let user: { is_admin?: boolean; is_finance?: boolean } | null;
       try {
         const rawUser = localStorage.getItem("xiaoxia.user");
         user = rawUser ? JSON.parse(rawUser) : null;

@@ -52,6 +52,7 @@ export function PayQrDialog({
   useEffect(() => {
     if (!open || !polling) return;
     // 立即查一次，然后每 3 秒轮询
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 首次轮询需立即触发，checkOrderStatus 内部 setState 是预期行为
     checkOrderStatus();
     timerRef.current = setInterval(checkOrderStatus, 3000);
     return () => {
@@ -64,6 +65,7 @@ export function PayQrDialog({
 
   useEffect(() => {
     if (!open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- 关闭弹窗时重置支付状态，逻辑正确但规则误报
       setPaid(false);
       setPolling(true);
     }

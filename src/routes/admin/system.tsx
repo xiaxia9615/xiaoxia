@@ -12,7 +12,6 @@ import {
   retryFailedJob,
   getSystemBackups,
   getSystemLogs,
-  type SystemHealth,
   type FailedJobItem,
 } from "@/lib/api/admin";
 import { toErrorMessage } from "@/lib/api/request";
