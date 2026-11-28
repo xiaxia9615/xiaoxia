@@ -29,7 +29,7 @@ export type ProfileFormValues = z.infer<typeof profileSchema>;
 export type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 export function useProfileForms() {
-  const { user } = useAuth();
+  const { user, updateUser, logout } = useAuth();
   const [tab, setTab] = useState("info");
 
   const initialSex: 0 | 1 | 2 =
@@ -57,9 +57,16 @@ export function useProfileForms() {
         name: values.nickname,
         sex: values.sex,
         birthday: values.birthday || null,
-        phone: null,
-        avatar: null,
       });
+      if (user) {
+        updateUser({
+          ...user,
+          name: values.nickname,
+          nickname: values.nickname,
+          sex: values.sex,
+          birthday: values.birthday || undefined,
+        });
+      }
       toast.success("资料保存成功");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "保存失败");
@@ -72,6 +79,7 @@ export function useProfileForms() {
       await changePassword(values.oldPassword, values.newPassword);
       toast.success("密码修改成功，请重新登录");
       passwordForm.reset();
+      logout();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "修改失败");
     }
