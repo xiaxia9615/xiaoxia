@@ -151,5 +151,5 @@ export function getProduct(id: string): Product | undefined {
 }
 
 export function formatPrice(value: number): string {
-  return `¥${(value / 1000).toFixed(2)}`;
+  return `¥${(value / 100).toFixed(2)}`;
 }
