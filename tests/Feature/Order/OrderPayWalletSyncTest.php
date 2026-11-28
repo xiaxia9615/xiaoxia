@@ -65,7 +65,7 @@ class OrderPayWalletSyncTest extends TestCase
         $product = Product::factory()->skill()->create(['status' => 1, 'price' => 5]);
         // 直接创建毫单位小金额订单（绕过 createOrder 的分→毫 ×10），测试 payOrder 限额本身
         $order = Order::create([
-            'order_no' => 'TEST' . date('YmdHis') . random_int(1000, 9999),
+            'order_no' => 'TEST'.date('YmdHis').random_int(1000, 9999),
             'user_id' => $user->id,
             'product_id' => $product->id,
             'amount' => 5,
