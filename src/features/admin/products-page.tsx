@@ -85,6 +85,20 @@ export function ProductsPage() {
 
   const columns: Array<DataTableColumn<AdminProductItem>> = [
     { key: "id", header: "ID", cell: (row) => row.id },
+    {
+      key: "cover",
+      header: "封面",
+      cell: (row) =>
+        row.cover ? (
+          <img
+            src={row.cover.startsWith("http") ? row.cover : `https://xiaoxia.ren${row.cover}`}
+            alt="封面"
+            className="h-10 w-10 rounded object-cover border"
+          />
+        ) : (
+          <span className="text-xs text-muted-foreground">无</span>
+        ),
+    },
     { key: "name", header: "商品名", cell: (row) => row.name },
     { key: "type", header: "分类", cell: (row) => typeLabel(row.type) },
     {

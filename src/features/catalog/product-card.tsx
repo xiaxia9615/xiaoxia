@@ -24,7 +24,7 @@ export function ProductCard({ product }: { product: Product }) {
         className="relative block overflow-hidden bg-surface"
       >
         <AppImage
-          src={product.image}
+          src={product.cover ? (product.cover.startsWith("http") ? product.cover : `https://xiaoxia.ren${product.cover}`) : product.image}
           alt={product.name}
           className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />

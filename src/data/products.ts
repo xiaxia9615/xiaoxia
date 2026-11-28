@@ -17,6 +17,7 @@ export interface Product {
   detail: string;
   tags: string[];
   image: string;
+  cover?: string;
   images?: string[];
   featured?: boolean;
 }
