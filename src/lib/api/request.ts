@@ -131,7 +131,8 @@ export async function request<T>(
     });
   }
 
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const isFormData = init.body instanceof FormData;
+  const headers: Record<string, string> = isFormData ? {} : { "Content-Type": "application/json" };
   if (init.auth) {
     const token = localStorage.getItem(TOKEN_KEY);
     if (token) {
@@ -157,7 +158,9 @@ export async function request<T>(
     res = await fetch(url.toString(), {
       method: init.method ?? "GET",
       headers,
-      body: init.body !== undefined ? JSON.stringify(init.body) : undefined,
+      body: init.body !== undefined
+      ? (init.body instanceof FormData ? init.body : JSON.stringify(init.body))
+      : undefined,
     });
   } catch {
     // 网络层失败（连接失败/CORS 拦截/DNS 等）

@@ -34,6 +34,7 @@ import {
 import {
   createAdminProduct,
   updateAdminProduct,
+  uploadProductCover,
   type AdminProductItem,
   type ProductPayload,
 } from "@/lib/api/admin";
@@ -285,13 +286,49 @@ export function ProductFormModal({
               name="cover"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-slate-300">封面图 URL</FormLabel>
+                  <FormLabel className="text-slate-300">封面图</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="https://example.com/cover.png（暂用文本占位）"
-                      className={fieldClass}
-                      {...field}
-                    />
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="粘贴 URL 或点击右侧上传"
+                          className={fieldClass}
+                          value={field.value ?? ""}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          ref={field.ref}
+                        />
+                        <label className="inline-flex cursor-pointer items-center rounded-md border border-input bg-background px-3 text-sm hover:bg-accent">
+                          上传
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,image/gif"
+                            className="hidden"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              e.target.value = "";
+                              if (!file) return;
+                              try {
+                                const { url } = await uploadProductCover(file);
+                                field.onChange(url);
+                                toast.success("封面图上传成功");
+                              } catch (err) {
+                                toast.error(err instanceof Error ? err.message : "上传失败");
+                              }
+                            }}
+                          />
+                        </label>
+                      </div>
+                      {field.value && (
+                        <img
+                          src={field.value}
+                          alt="封面预览"
+                          className="h-20 w-20 rounded border object-cover"
+                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                        />
+                      )}
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

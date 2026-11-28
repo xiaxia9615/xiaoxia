@@ -839,3 +839,21 @@ export function deleteCategory(id: number): Promise<void> {
     auth: true,
   });
 }
+
+// ===== 商品封面图上传 =====
+
+export interface CoverUploadResult {
+  url: string;
+  path: string;
+}
+
+/** 上传商品封面图，返回 /storage/products/xxx.jpg */
+export async function uploadProductCover(file: File): Promise<CoverUploadResult> {
+  const form = new FormData();
+  form.append("file", file);
+  const res = await request<{ code: number; msg: string; data: CoverUploadResult }>(
+    "/v1/admin/products/upload-cover",
+    { method: "POST", body: form, auth: true },
+  );
+  return res.data;
+}

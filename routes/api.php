@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AdminFinanceController;
 use App\Http\Controllers\Admin\AdminLedgerController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\AdminProductCoverController;
 use App\Http\Controllers\Admin\AdminSkillController;
 use App\Http\Controllers\Admin\AdminSystemController;
 use App\Http\Controllers\Admin\AdminUserController;
@@ -154,6 +155,7 @@ Route::middleware('uid.auth')->prefix('v1')->group(function (): void {
         Route::put('admin/products/{id}', [AdminProductController::class, 'apiUpdate'])->whereNumber('id');
         Route::patch('admin/products/{id}/status', [AdminProductController::class, 'apiToggleStatus'])->whereNumber('id');
         Route::post('admin/products/{id}/force-archive', [AdminProductController::class, 'apiForceArchive'])->whereNumber('id');
+        Route::post('admin/products/upload-cover', [AdminProductCoverController::class, 'store']);
         Route::get('admin/finance/recharges', [AdminFinanceController::class, 'apiRecharges']);
         Route::get('admin/finance/withdrawals', [AdminFinanceController::class, 'apiWithdrawals']);
         Route::post('admin/finance/withdrawals/{id}/approve', [AdminFinanceController::class, 'apiApprove'])->whereNumber('id');
