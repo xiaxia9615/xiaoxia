@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatMilliAmount } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
@@ -76,14 +77,14 @@ function WalletsPage() {
       key: "balance",
       header: "余额",
       cell: (row) => (
-        <span className="font-mono text-emerald-400">¥{row.balance.toFixed(2)}</span>
+        <span className="font-mono text-emerald-400">{formatMilliAmount(row.balance)}</span>
       ),
     },
     {
       key: "frozen_balance",
       header: "冻结",
       cell: (row) => (
-        <span className="font-mono text-amber-400">¥{row.frozen_balance.toFixed(2)}</span>
+        <span className="font-mono text-amber-400">{formatMilliAmount(row.frozen_balance)}</span>
       ),
     },
     {
@@ -123,7 +124,7 @@ function WalletsPage() {
           }`}
         >
           {row.type === "recharge" || row.type === "refund" ? "+" : "-"}¥
-          {row.amount.toFixed(2)}
+          {formatMilliAmount(row.amount).replace("¥", "")}
         </span>
       ),
     },
@@ -175,8 +176,8 @@ function WalletsPage() {
             <DialogDescription className="text-slate-500">
               {txData && (
                 <span>
-                  钱包 #{txData.wallet.id} — 余额 ¥{txData.wallet.balance.toFixed(2)}
-                  / 冻结 ¥{txData.wallet.frozen_balance.toFixed(2)}
+                  钱包 #{txData.wallet.id} — 余额 {formatMilliAmount(txData.wallet.balance)}
+                  / 冻结 {formatMilliAmount(txData.wallet.frozen_balance)}
                 </span>
               )}
             </DialogDescription>

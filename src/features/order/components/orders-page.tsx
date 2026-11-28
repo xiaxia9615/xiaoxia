@@ -9,8 +9,9 @@ import { useOrders } from "../use-orders";
 
 function formatAmount(value: number | string | undefined): string {
   const n = Number(value);
-  if (!Number.isFinite(n)) return "¥0";
-  return `¥${n.toFixed(n % 1 === 0 ? 0 : 2)}`;
+  if (!Number.isFinite(n)) return "¥0.00";
+  // orders.amount 单位是「毫」，1 元 = 1000 毫
+  return `¥${(n / 1000).toFixed(2)}`;
 }
 
 /** 我的订单页：业务逻辑在 useOrders，组件只负责渲染。 */

@@ -63,7 +63,7 @@ class OrderTest extends TestCase
             'user_id' => $buyer->id,
             'product_id' => $product->id,
             'status' => OrderStatus::Pending->value,
-            'amount' => $product->price,
+            'amount' => $product->price * 10,
         ]);
     }
 
@@ -77,7 +77,7 @@ class OrderTest extends TestCase
         $order = Order::factory()->create([
             'user_id' => $buyer->id,
             'product_id' => $product->id,
-            'amount' => 10000,
+            'amount' => 100000,
             'status' => OrderStatus::Pending->value,
         ]);
 
@@ -121,7 +121,7 @@ class OrderTest extends TestCase
         $order = Order::factory()->create([
             'user_id' => $buyer->id,
             'product_id' => $product->id,
-            'amount' => 10000,
+            'amount' => 100000,
             'status' => OrderStatus::Pending->value,
         ]);
 
@@ -143,7 +143,7 @@ class OrderTest extends TestCase
         $order = Order::factory()->create([
             'user_id' => $buyer->id,
             'product_id' => $product->id,
-            'amount' => 10000,
+            'amount' => 100000,
             'status' => OrderStatus::Pending->value,
         ]);
 
@@ -168,7 +168,7 @@ class OrderTest extends TestCase
         $order = Order::factory()->create([
             'user_id' => $buyer->id,
             'product_id' => $product->id,
-            'amount' => 10000,
+            'amount' => 100000,
             'status' => OrderStatus::Pending->value,
         ]);
 
@@ -191,7 +191,7 @@ class OrderTest extends TestCase
         $order = Order::factory()->create([
             'user_id' => $buyer->id,
             'product_id' => $product->id,
-            'amount' => 10000,
+            'amount' => 100000,
             'status' => OrderStatus::Cancelled->value,
         ]);
 

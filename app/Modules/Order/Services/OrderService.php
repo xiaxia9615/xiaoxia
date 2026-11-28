@@ -49,7 +49,8 @@ final class OrderService
                 'order_no' => $this->generateOrderNo(),
                 'user_id' => $userId,
                 'product_id' => $product->id,
-                'amount' => (int) $product->price,
+                // products.price 单位是「分」，orders.amount 单位是「毫」，需 ×10 转换
+                'amount' => (int) $product->price * 10,
                 'product_name' => $product->name,
                 'product_snapshot' => [
                     'id' => $product->id,

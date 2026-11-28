@@ -7,6 +7,7 @@ namespace Tests\Feature\Order;
 use App\Models\User;
 use App\Modules\Ledger\Contracts\LedgerContract;
 use App\Modules\Order\Enums\OrderStatus;
+use App\Modules\Order\Models\Order;
 use App\Modules\Order\Services\OrderService;
 use App\Modules\Product\Models\Product;
 use App\Modules\Wallet\Models\Wallet;
@@ -62,7 +63,16 @@ class OrderPayWalletSyncTest extends TestCase
 
         $walletService->deposit($user, 10000, 'recharge_test_2');
         $product = Product::factory()->skill()->create(['status' => 1, 'price' => 5]);
-        $order = $orderService->createOrder($user->id, $product->id);
+        // 直接创建毫单位小金额订单（绕过 createOrder 的分→毫 ×10），测试 payOrder 限额本身
+        $order = Order::create([
+            'order_no' => 'TEST' . date('YmdHis') . random_int(1000, 9999),
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'amount' => 5,
+            'product_name' => $product->name,
+            'product_snapshot' => ['id' => $product->id],
+            'status' => 'pending',
+        ]);
 
         try {
             $orderService->payOrder($order->id, $user->id);

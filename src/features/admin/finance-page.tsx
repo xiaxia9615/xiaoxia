@@ -26,11 +26,7 @@ import {
   type AdminWithdrawalItem,
 } from "@/lib/api/admin";
 import { toErrorMessage } from "@/lib/api/request";
-
-/** 财务接口金额单位为毫（1 元 = 1000 毫），展示时 /1000 转元。 */
-function formatMilliAmount(value: number): string {
-  return `¥${(value / 1000).toFixed(2)}`;
-}
+import { formatMilliAmount } from "@/lib/utils";
 
 /** 提现状态 -> 标签语义。 */
 function withdrawalStatusType(status: string): StatusBadgeType {

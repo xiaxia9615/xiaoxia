@@ -24,12 +24,13 @@ final class WechatPayGateway implements PaymentGatewayInterface
             'out_batch_no' => 'transfer_'.time().'_'.random_int(1000, 9999),
             'batch_name' => '提现转账',
             'batch_remark' => '用户提现',
-            'total_amount' => $amountInCents,
+            // 微信转账要「分」，内部是「毫」，故 ÷10
+            'total_amount' => intdiv($amountInCents, 10),
             'total_num' => 1,
             'transfer_detail_list' => [
                 [
                     'out_detail_no' => 'detail_'.time().'_'.random_int(1000, 9999),
-                    'transfer_amount' => $amountInCents,
+                    'transfer_amount' => intdiv($amountInCents, 10),
                     'transfer_remark' => '提现',
                     'openid' => $account,
                 ],
@@ -56,7 +57,8 @@ final class WechatPayGateway implements PaymentGatewayInterface
             'out_trade_no' => $orderNo,
             'description' => $subject,
             'amount' => [
-                'total' => $amountInCents,
+                // $amountInCents 实际单位是「毫」，微信要「分」，故 ÷10
+                'total' => intdiv($amountInCents, 10),
                 'currency' => 'CNY',
             ],
         ]);
@@ -113,7 +115,8 @@ final class WechatPayGateway implements PaymentGatewayInterface
         return [
             'verified' => true,
             'order_no' => is_string($orderNo) ? $orderNo : '',
-            'amount_in_cents' => $amountInCents,
+            // 微信 V3 回调 amount.total 单位是「分」，内部统一用「毫」，故 ×10
+            'amount_in_cents' => $amountInCents * 10,
         ];
     }
 

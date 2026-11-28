@@ -55,6 +55,7 @@ final class AlipayGateway implements PaymentGatewayInterface
     {
         $result = $this->payClient()->scan([
             'out_trade_no' => $orderNo,
+            // $amountInCents 实际单位是「毫」，支付宝要「元」，故 ÷1000
             'total_amount' => number_format($amountInCents / 1000, 2, '.', ''),
             'subject' => $subject,
         ]);
@@ -126,6 +127,7 @@ final class AlipayGateway implements PaymentGatewayInterface
         return [
             'verified' => true,
             'order_no' => is_string($orderNo) ? $orderNo : '',
+            // 支付宝返回「元」，内部统一用「毫」，故 ×1000
             'amount_in_cents' => (int) round(((float) (is_string($totalAmount) ? $totalAmount : '0')) * 1000),
         ];
     }

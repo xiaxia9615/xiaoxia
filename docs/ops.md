@@ -45,3 +45,29 @@ unset MYSQL_PWD
 - npm 11 已修复，`npm install` 全新解析正常（20s 通过）
 - `npm ci` 仍是日常重建依赖首选（快、确定性）
 - 当前环境：Node v22.23.5 / npm 11.21.2
+
+## 金额单位约定
+
+**数据库注释是唯一权威来源。**
+
+| 表.字段 | 单位 | 数据库注释 |
+| --- | --- | --- |
+| `products.price` | 分 | 「单价，单位分」 |
+| `orders.amount` | 毫 | 「价格快照（毫）」 |
+| `wallets.balance` / `frozen_balance` | 毫 | 代码约定 |
+| `ledger_entries.amount` | 毫 | 代码约定 |
+| `withdrawals.amount` | 毫 | 「提现金额（毫）」 |
+| `payment_orders.amount_in_cents` | 毫 | **字段名误导，实际是毫** |
+
+### 转换点
+
+- `OrderService::create`：`products.price（分） × 10 = orders.amount（毫）`
+- `AlipayGateway`：`毫 / 1000 = 元`（支付宝要元）
+- `WechatPayGateway`：`毫 / 10 = 分`（微信要分）
+- 前端 `formatPrice`：`分 / 100 = 元`
+- 前端 `formatAmount`：`毫 / 1000 = 元`
+
+### 历史踩坑
+
+- 2026-11-28：订单创建时直接复制 `products.price`（分），但 `orders.amount` 应该是毫，导致全链路少 10 倍。已修复。
+- `payment_orders.amount_in_cents` 字段名误导（名字是分，实际存毫），不改名以免连锁。

@@ -10,7 +10,7 @@ interface PaymentGatewayInterface
      * 向指定账户转账。
      *
      * @param  string  $account  收款账户
-     * @param  int  $amountInCents  金额（单位：分，整数）
+     * @param  int  $amountInCents  金额（单位：毫，整数；1 元 = 1000 毫）
      */
     public function transfer(string $account, int $amountInCents): bool;
 
@@ -18,7 +18,7 @@ interface PaymentGatewayInterface
      * 创建支付订单，返回支付参数。
      *
      * @param  string  $orderNo  商户订单号
-     * @param  int  $amountInCents  金额（单位：分）
+     * @param  int  $amountInCents  金额（单位：毫；1 元 = 1000 毫）
      * @param  string  $subject  订单标题
      * @return array 各网关格式不同，键名不做约束
      */
