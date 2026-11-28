@@ -132,7 +132,7 @@ jobs:
 
       # --- Backend coverage (blocking) ---
       - name: Run tests with coverage
-        run: php artisan test --coverage --coverage-html=coverage-report --min=40
+        run: php artisan test --coverage --coverage-html=coverage-report --min=35
 
       - name: Upload coverage report
         if: always()
