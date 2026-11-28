@@ -321,12 +321,14 @@ export function ProductFormModal({
                         </label>
                       </div>
                       {field.value && (
-                        <img
-                          src={field.value}
-                          alt="封面预览"
-                          className="h-20 w-20 rounded border object-cover"
-                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                        />
+                        <div className="mt-2">
+                          <p className="text-xs text-red-500 font-bold mb-1">预览URL: {field.value}</p>
+                          <img
+                            src={field.value.startsWith('http') ? field.value : `https://xiaoxia.ren${field.value}`}
+                            alt="封面预览"
+                            className="h-20 w-20 rounded border object-cover bg-gray-100"
+                          />
+                        </div>
                       )}
                     </div>
                   </FormControl>

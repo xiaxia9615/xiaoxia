@@ -851,9 +851,10 @@ export interface CoverUploadResult {
 export async function uploadProductCover(file: File): Promise<CoverUploadResult> {
   const form = new FormData();
   form.append("file", file);
-  const res = await request<{ code: number; msg: string; data: CoverUploadResult }>(
-    "/v1/admin/products/upload-cover",
-    { method: "POST", body: form, auth: true },
-  );
-  return res.data;
+  // request.ts 会自动解包 {code, msg, data}，直接返回 data
+  return request<CoverUploadResult>("/v1/admin/products/upload-cover", {
+    method: "POST",
+    body: form,
+    auth: true,
+  });
 }

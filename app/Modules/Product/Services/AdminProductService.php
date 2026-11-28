@@ -19,6 +19,7 @@ final class AdminProductService
                 'name' => $data['name'],
                 'slug' => Str::slug($data['name']).'-'.uniqid(),
                 'description' => $data['description'] ?? null,
+                'cover' => $data['cover'] ?? null,
                 'price' => (int) $data['price'],
                 'status' => (int) $data['status'],
                 'nature' => $data['nature'] ?? Product::NATURE_PHYSICAL,
@@ -35,6 +36,7 @@ final class AdminProductService
             $product->update([
                 'name' => $data['name'],
                 'description' => $data['description'] ?? null,
+                'cover' => $data['cover'] ?? null,
                 'price' => (int) $data['price'],
                 'type' => (int) $data['type'],
                 'nature' => $data['nature'] ?? $product->nature,
