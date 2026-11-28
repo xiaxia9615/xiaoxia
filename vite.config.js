@@ -15,6 +15,20 @@ export default defineConfig({
         react(),
         tailwindcss(),
     ],
+    server: {
+        watch: {
+            ignored: [
+                '**/vendor/**',
+                '**/node_modules/**',
+                '**/storage/**',
+                '**/.git/**',
+                '**/coverage/**',
+                '**/test-results/**',
+                '**/playwright-report/**',
+                '**/public/build/**',
+            ],
+        },
+    },
     resolve: {
         alias: {
             '@/components': path.resolve(__dirname, './src/config/components'),
